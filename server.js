@@ -69,6 +69,185 @@ const server = http.createServer(async (req, res) => {
             return;
         }
 
+        // Rota: Cadastro de Novo Salão (Onboarding SaaS / Trial 7 Dias)
+        if (req.url === '/api/auth/register-salon' && req.method === 'POST') {
+            try {
+                const data = await parseJsonBody(req);
+                const { email, password, name, businessType, planId } = data;
+
+                if (!email || !password || !name) {
+                    res.writeHead(400);
+                    res.end(JSON.stringify({ ok: false, error: 'Preencha todos os campos obrigatórios (nome, e-mail e senha).' }));
+                    return;
+                }
+
+                if (password.length < 6) {
+                    res.writeHead(400);
+                    res.end(JSON.stringify({ ok: false, error: 'A senha deve conter no mínimo 6 caracteres.' }));
+                    return;
+                }
+
+                // 1. Cria usuário no Supabase Auth via Admin API
+                let userId = null;
+                const adminUserRes = await fetch(`${SUPABASE_URL}/auth/v1/admin/users`, {
+                    method: 'POST',
+                    headers: {
+                        'apikey': SUPABASE_KEY,
+                        'Authorization': `Bearer ${SUPABASE_KEY}`,
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        email: email.trim().toLowerCase(),
+                        password: password,
+                        email_confirm: true,
+                        user_metadata: {
+                            name: name.trim(),
+                            business_type: businessType || 'barbearia',
+                            plan_id: planId || 'individual'
+                        }
+                    })
+                });
+
+                const adminUserData = await adminUserRes.json();
+                if (adminUserRes.ok && adminUserData && adminUserData.id) {
+                    userId = adminUserData.id;
+                } else if (adminUserData && adminUserData.msg && adminUserData.msg.includes('already registered')) {
+                    res.writeHead(400);
+                    res.end(JSON.stringify({ ok: false, error: 'Este e-mail já está cadastrado. Faça login diretamente.' }));
+                    return;
+                } else {
+                    // Fallback para signup público se admin API não estiver acessível
+                    const signupRes = await fetch(`${SUPABASE_URL}/auth/v1/signup`, {
+                        method: 'POST',
+                        headers: {
+                            'apikey': SUPABASE_KEY,
+                            'Content-Type': 'application/json'
+                        },
+                        body: JSON.stringify({
+                            email: email.trim().toLowerCase(),
+                            password: password,
+                            data: { name: name.trim(), business_type: businessType || 'barbearia' }
+                        })
+                    });
+                    const signupData = await signupRes.json();
+                    if (!signupRes.ok) {
+                        throw new Error(signupData.msg || signupData.error_description || 'Erro ao criar conta de usuário.');
+                    }
+                    userId = signupData.id || (signupData.user && signupData.user.id);
+                }
+
+                if (!userId) {
+                    throw new Error('Falha ao obter identificador do usuário.');
+                }
+
+                // 2. Gera slug único a partir do nome
+                const baseSlug = name.trim().toLowerCase()
+                    .normalize('NFD').replace(/[\u0300-\u036f]/g, '')
+                    .replace(/[^a-z0-9]+/g, '-')
+                    .replace(/^-+|-+$/g, '') || 'salao';
+                const randomHash = Math.random().toString(36).substring(2, 6);
+                const slug = `${baseSlug}-${randomHash}`;
+
+                const typeColors = {
+                    barbearia: { primary: '#d4af37', service: 'Corte Tradicional & Barba', price: 45.00 },
+                    salao:     { primary: '#c89547', service: 'Corte & Escova Modelada', price: 85.00 },
+                    estetica:  { primary: '#e0a96d', service: 'Limpeza de Pele Profunda', price: 120.00 }
+                };
+                const config = typeColors[businessType] || typeColors.barbearia;
+
+                // 3. Insere business_info
+                const trialEnds = new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toISOString();
+                await fetch(`${SUPABASE_URL}/rest/v1/business_info`, {
+                    method: 'POST',
+                    headers: {
+                        'apikey': SUPABASE_KEY,
+                        'Authorization': `Bearer ${SUPABASE_KEY}`,
+                        'Content-Type': 'application/json',
+                        'Prefer': 'resolution=merge-duplicates'
+                    },
+                    body: JSON.stringify({
+                        user_id: userId,
+                        name: name.trim(),
+                        slug: slug,
+                        business_type: businessType || 'barbearia',
+                        primary_color: config.primary,
+                        secondary_color: '#141419',
+                        plan_id: planId || 'individual',
+                        status: 'trial',
+                        trial_ends_at: trialEnds
+                    })
+                });
+
+                // 4. Insere salon_members como owner
+                await fetch(`${SUPABASE_URL}/rest/v1/salon_members`, {
+                    method: 'POST',
+                    headers: {
+                        'apikey': SUPABASE_KEY,
+                        'Authorization': `Bearer ${SUPABASE_KEY}`,
+                        'Content-Type': 'application/json',
+                        'Prefer': 'resolution=merge-duplicates'
+                    },
+                    body: JSON.stringify({
+                        user_id: userId,
+                        salon_id: userId,
+                        role: 'owner'
+                    })
+                });
+
+                // 5. Cria profissional inicial e serviço inicial
+                const profId = 'prof_' + Math.random().toString(36).substring(2, 9);
+                await fetch(`${SUPABASE_URL}/rest/v1/professionals`, {
+                    method: 'POST',
+                    headers: {
+                        'apikey': SUPABASE_KEY,
+                        'Authorization': `Bearer ${SUPABASE_KEY}`,
+                        'Content-Type': 'application/json',
+                        'Prefer': 'resolution=merge-duplicates'
+                    },
+                    body: JSON.stringify({
+                        id: profId,
+                        user_id: userId,
+                        name: 'Profissional Principal',
+                        commission: 50.00,
+                        active: true
+                    })
+                });
+
+                const servId = 'serv_' + Math.random().toString(36).substring(2, 9);
+                await fetch(`${SUPABASE_URL}/rest/v1/services`, {
+                    method: 'POST',
+                    headers: {
+                        'apikey': SUPABASE_KEY,
+                        'Authorization': `Bearer ${SUPABASE_KEY}`,
+                        'Content-Type': 'application/json',
+                        'Prefer': 'resolution=merge-duplicates'
+                    },
+                    body: JSON.stringify({
+                        id: servId,
+                        user_id: userId,
+                        name: config.service,
+                        price: config.price,
+                        duration: 45,
+                        active: true
+                    })
+                });
+
+                res.writeHead(200);
+                res.end(JSON.stringify({
+                    ok: true,
+                    userId: userId,
+                    email: email,
+                    slug: slug,
+                    message: 'Salão cadastrado com sucesso! Período de 7 dias grátis iniciado.'
+                }));
+            } catch (err) {
+                console.error('[Register Salon] Erro:', err);
+                res.writeHead(500);
+                res.end(JSON.stringify({ ok: false, error: err.message || 'Erro ao criar salão.' }));
+            }
+            return;
+        }
+
         // Rota: Criar Assinatura no Asaas (Checkout)
         if (req.url === '/api/asaas/create-subscription' && req.method === 'POST') {
             try {

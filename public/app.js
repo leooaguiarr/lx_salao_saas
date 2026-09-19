@@ -5414,7 +5414,29 @@ window.addEventListener('DOMContentLoaded', async () => {
         return;
     }
 
-    // 2. Se o Supabase está configurado mas não logado, mostra tela de login
+    // 2. Se o Supabase está configurado mas não logado, verifica se há credenciais de auto-login
+    if (DataService.isSupabaseConfigured() && !DataService.isAuthenticated()) {
+        try {
+            const autoLogin = JSON.parse(localStorage.getItem('lexion_auto_login') || 'null');
+            if (autoLogin && autoLogin.email && autoLogin.password) {
+                localStorage.removeItem('lexion_auto_login');
+                await DataService.login(autoLogin.email, autoLogin.password);
+                if (typeof showToast === 'function') {
+                    showToast(`Bem-vindo ao ${autoLogin.salonName || 'seu novo Salão'}! Período de 7 dias grátis ativo.`, 'success');
+                }
+            }
+        } catch (autoErr) {
+            console.warn('[Auto-Login] Falha ao efetuar login automático:', autoErr);
+        }
+    }
+
+    // Se ainda não estiver logado, preenche o email se veio por URL
+    const urlParams = new URLSearchParams(window.location.search);
+    const emailParam = urlParams.get('email');
+    if (emailParam && document.getElementById('auth-email')) {
+        document.getElementById('auth-email').value = emailParam;
+    }
+
     const authOverlay = document.getElementById('auth-overlay');
     const appContainer = document.getElementById('app-container');
     // Quem chega pelo link de "esqueci a senha" vem COM sessão válida. Sem esta
@@ -5422,7 +5444,6 @@ window.addEventListener('DOMContentLoaded', async () => {
     if (DataService.estaEmRecuperacaoDeSenha()) {
         if (authOverlay) authOverlay.style.display = 'flex';
         if (appContainer) appContainer.style.display = 'none';
-        // A tela de login não espera dado nenhum: sai da espera agora.
         esconderCarregamentoInicial();
     } else if (DataService.isSupabaseConfigured() && !DataService.isAuthenticated()) {
         if (authOverlay) authOverlay.style.display = 'flex';

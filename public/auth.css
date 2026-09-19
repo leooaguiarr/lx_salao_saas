@@ -1,0 +1,364 @@
+@import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap');
+
+/* ===== AUTH OVERLAY (tela inteira) ===== */
+.auth-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    /* Altura real da área visível em navegadores mobile
+       (100vh inclui a área atrás da barra do navegador) */
+    height: 100dvh;
+    background-color: #07100B;
+    z-index: 99999;
+    display: flex;
+    padding: 0;
+    font-family: 'Plus Jakarta Sans', sans-serif,
+                 "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji";
+    margin: 0;
+    box-sizing: border-box;
+    /* Se o conteúdo não couber, permite rolar até o botão */
+    overflow-y: auto;
+}
+
+.auth-overlay * {
+    box-sizing: border-box;
+}
+
+/* ===== SPLIT LAYOUT ===== */
+.auth-split-layout {
+    display: flex;
+    width: 100%;
+    min-height: 100%;
+}
+
+/* ===== LADO ESQUERDO (imagem de barbearia) ===== */
+.auth-cover {
+    flex: 1;
+    background-image: url('assets/login-bg-alabama.jpg');
+    background-size: cover;
+    background-position: center;
+    background-color: #EDEDED; /* mesma tonalidade do tecido, evita faixa escura ao recortar */
+    background-repeat: no-repeat;
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    padding: 40px 50px;
+    overflow: hidden;
+    /* Transição suave com o lado direito */
+    border-right: none;
+}
+
+/* A capa agora é a logo aplicada em tecido claro. O escurecimento fica
+   restrito à faixa de baixo (onde entra a chamada em branco) e à borda
+   direita, que costura a imagem com o lado escuro do formulário.
+   O miolo permanece limpo para não sujar a logo. */
+.auth-cover::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0; bottom: 0;
+    background:
+        linear-gradient(to right, transparent 72%, #07100B 100%),
+        linear-gradient(to top, rgba(7, 16, 11, 0.92) 0%, rgba(7, 16, 11, 0.6) 16%, transparent 34%);
+    z-index: 1;
+}
+
+/* Logo no topo esquerdo da imagem */
+.auth-cover-logo {
+    position: relative;
+    z-index: 2;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-size: 1.4rem;
+    font-weight: 700;
+    color: #ffffff;
+}
+
+/* Na capa do login a logo aparece sozinha e grande: ela já traz o nome
+   "Alabama Barbearia" desenhado, então repetir o texto ao lado seria redundante. */
+.auth-cover-logo .logo-mark-lg {
+    width: 132px;
+    height: 132px;
+    object-fit: contain;
+    filter: drop-shadow(0 4px 16px rgba(0, 0, 0, 0.55));
+}
+
+.auth-cover-logo .logo-icon {
+    width: 38px;
+    height: 38px;
+    background: linear-gradient(135deg, #C5A059, #8F7238);
+    border-radius: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 800;
+    font-size: 18px;
+    color: #050B08;
+}
+
+/* Texto sobre a imagem (embaixo) */
+.auth-cover-content {
+    position: relative;
+    z-index: 2;
+}
+
+.auth-cover-content h1 {
+    font-size: 44px;
+    font-weight: 800;
+    color: #ffffff;
+    line-height: 1.15;
+    text-transform: uppercase;
+    margin: 0 0 12px 0;
+    letter-spacing: -0.5px;
+}
+
+.auth-cover-content h1 span {
+    color: #A48956;
+}
+
+.auth-cover-content p {
+    color: rgba(255, 255, 255, 0.7);
+    font-size: 16px;
+    margin: 0;
+    font-weight: 400;
+}
+
+/* ===== LADO DIREITO (formulário) ===== */
+.auth-form-side {
+    flex: 0 0 480px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background-color: #07100B;
+    padding: 40px 50px;
+}
+
+.auth-form-container {
+    width: 100%;
+    max-width: 380px;
+}
+
+.auth-title {
+    font-size: 36px;
+    font-weight: 800;
+    color: #F8FAFC;
+    margin: 0 0 8px 0;
+}
+
+.auth-subtitle {
+    font-size: 15px;
+    color: #94A3B8;
+    margin: 0 0 36px 0;
+    font-weight: 400;
+}
+
+/* ===== FORMULÁRIO ===== */
+.auth-form {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
+
+.auth-form .form-group {
+    margin: 0;
+    padding: 0;
+}
+
+.auth-form label {
+    display: block;
+    font-size: 13px;
+    font-weight: 600;
+    color: #F1F5F9;
+    margin-bottom: 8px;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+/* Inputs */
+.auth-input {
+    background-color: #13241D !important;
+    border: 1px solid rgba(255, 255, 255, 0.08) !important;
+    color: #F1F5F9 !important;
+    height: 52px !important;
+    border-radius: 12px !important;
+    font-size: 15px !important;
+    padding: 0 20px 0 48px !important;
+    width: 100% !important;
+    outline: none !important;
+    transition: border-color 0.3s, box-shadow 0.3s;
+}
+
+.auth-input::placeholder {
+    color: #7A857E;
+}
+
+.auth-input:focus {
+    border-color: #C5A059 !important;
+    box-shadow: 0 0 0 3px rgba(197, 160, 89, 0.2) !important;
+}
+
+.input-icon-wrapper {
+    position: relative;
+    display: flex;
+    align-items: center;
+    width: 100%;
+}
+
+.input-icon-wrapper i {
+    position: absolute;
+    left: 18px;
+    color: #8A968F;
+    font-size: 16px;
+    pointer-events: none;
+    z-index: 10;
+}
+
+/* ===== BOTÃO ENTRAR ===== */
+.auth-submit-btn {
+    width: 100%;
+    height: 52px;
+    border-radius: 12px;
+    background: linear-gradient(135deg, #D4AF67 0%, #A88642 100%);
+    color: #050B08 !important;
+    font-weight: 700;
+    font-size: 15px;
+    border: none;
+    margin-top: 8px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 8px;
+    box-shadow: 0 4px 20px rgba(197, 160, 89, 0.3);
+}
+
+.auth-submit-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 25px rgba(197, 160, 89, 0.45);
+}
+
+/* ===== LINKS "ESQUECEU A SENHA" / "VOLTAR" ===== */
+.auth-link-esqueci {
+    display: block;
+    width: 100%;
+    margin-top: 18px;
+    padding: 8px 0;
+    border: 0;
+    background: transparent;
+    color: #C5A059;
+    font: inherit;
+    font-size: 14px;
+    font-weight: 600;
+    text-align: center;
+    cursor: pointer;
+}
+
+.auth-link-esqueci:hover {
+    color: #D4AF67;
+    text-decoration: underline;
+}
+
+/* ===== SUCESSO ===== */
+.auth-sucesso {
+    margin-top: 20px;
+    background-color: rgba(46, 204, 113, 0.08);
+    border: 1px solid rgba(46, 204, 113, 0.25);
+    color: #2ecc71;
+    padding: 12px 16px;
+    border-radius: 12px;
+    font-size: 14px;
+    display: flex;
+    align-items: flex-start;
+    gap: 10px;
+    line-height: 1.45;
+}
+
+/* ===== ERRO ===== */
+.auth-error {
+    margin-top: 20px;
+    background-color: rgba(244, 63, 94, 0.08);
+    border: 1px solid rgba(244, 63, 94, 0.2);
+    color: #f43f5e;
+    padding: 12px 16px;
+    border-radius: 12px;
+    font-size: 14px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.auth-footer {
+    margin-top: 28px;
+    padding-top: 18px;
+    border-top: 1px solid rgba(255, 255, 255, 0.08);
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    color: #94A3B8;
+    font-size: 12px;
+}
+
+/* Versão do sistema: presente para quem procura, invisível para quem não
+   procura. É informação de manutenção, não algo que o dono da barbearia
+   precise ler ao entrar. */
+.auth-versao {
+    opacity: .45;
+    font-size: 11px;
+    letter-spacing: .02em;
+}
+
+/* Serve tanto para o <button> da política quanto para o <a> do site da Lexion:
+   os dois têm que sair iguais no rodapé. */
+.auth-footer-link {
+    width: fit-content;
+    padding: 0;
+    border: 0;
+    background: transparent;
+    color: #C5A059;
+    font: inherit;
+    font-weight: 700;
+    text-decoration: none;
+    cursor: pointer;
+}
+
+.auth-footer-link:hover {
+    color: #D4AF67;
+    text-decoration: underline;
+}
+
+/* ===== RESPONSIVIDADE ===== */
+@media (max-width: 992px) {
+    .auth-split-layout {
+        flex-direction: column;
+    }
+    /* Numa faixa baixa e larga, a imagem quadrada não serve: "cover" recorta o
+       miolo da logo e "contain" deixa sobra de cor lisa nas laterais. Aqui entra
+       a variante larga, com o tecido estendido, que preenche a faixa inteira
+       com a marca intacta no centro. */
+    .auth-cover {
+        flex: 0 0 210px;
+        padding: 0;
+        background-image: url('assets/login-bg-alabama-wide.jpg');
+    }
+    /* Costura só os últimos pixels da faixa com o formulário. Passar disso
+       come o "DESDE-2021" na base da logo. */
+    .auth-cover::before {
+        background: linear-gradient(to bottom, transparent 90%, #07100B 100%);
+    }
+    /* Sem espaço para a chamada sobre a marca: o formulário é a prioridade. */
+    .auth-cover-content {
+        display: none;
+    }
+    .auth-form-side {
+        flex: 1;
+        padding: 24px 24px 80px; /* respiro extra para o botão acima da barra do navegador */
+        align-items: flex-start;
+    }
+    .auth-title {
+        font-size: 28px;
+    }
+}

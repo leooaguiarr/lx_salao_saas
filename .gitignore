@@ -1,0 +1,43 @@
+# Logs
+logs
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Runtime data
+pids
+*.pid
+*.seed
+*.pid.lock
+
+# Dependency directories
+node_modules/
+jspm_packages/
+
+# Optional npm cache directory
+.npm
+
+# Output directories
+dist/
+build/
+
+# Operating System files
+.DS_Store
+Thumbs.db
+
+# Agent brain or metadata (optional)
+.gemini/
+.agents/
+.vscode/
+
+# Vercel CLI local
+.vercel/
+
+.vercel
+.env*
+
+# Supabase CLI local
+supabase/.temp/
+
+link.txt

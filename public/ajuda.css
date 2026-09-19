@@ -1,0 +1,339 @@
+/* ==========================================================================
+   GUIA RÁPIDO (AJUDA)
+
+   O modal que abre pelo crédito da Lexion no rodapé da barra lateral.
+
+   Carregado DEPOIS de index.css em index.html: a cascata depende dessa ordem,
+   e a paleta dourada do :root fica lá — nada aqui redefine cor de marca.
+   ========================================================================== */
+
+/* Mais largo que os modais de formulário: aqui se lê, não se preenche, e
+   linha curta demais cansa em texto corrido. */
+.modal-ajuda-dialog {
+    max-width: 720px;
+}
+
+/* O crédito do rodapé virou botão. Continua parecendo o texto discreto que
+   sempre foi — a única promessa nova é o "?" e o sublinhado ao passar. */
+.profile-role-ajuda {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    padding: 0;
+    border: none;
+    background: none;
+    font: inherit;
+    font-size: 12px;
+    color: var(--text-muted);
+    text-align: left;
+    cursor: pointer;
+    transition: var(--transition);
+}
+
+.profile-role-ajuda:hover {
+    color: var(--primary);
+    text-decoration: underline;
+}
+
+.profile-role-ajuda i {
+    flex-shrink: 0;
+}
+
+/* O corte, se acontecer, tem que cair no texto — nunca no ícone, que é a
+   única pista de que ali se clica. */
+.profile-role-ajuda span {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+/* --- Busca --------------------------------------------------------------- */
+
+.ajuda-busca-caixa {
+    position: relative;
+}
+
+.ajuda-busca-caixa i {
+    position: absolute;
+    left: 12px;
+    top: 50%;
+    transform: translateY(-50%);
+    color: var(--text-muted);
+    font-size: 13px;
+    pointer-events: none;
+}
+
+.ajuda-busca-caixa input {
+    padding-left: 34px;
+}
+
+/* --- Seções -------------------------------------------------------------- */
+
+.ajuda-secao-titulo {
+    margin: 0 0 4px;
+    font-size: 12px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.6px;
+    color: var(--text-muted);
+}
+
+.ajuda-secao-descricao {
+    margin: 0 0 14px;
+    font-size: 12px;
+    line-height: 1.5;
+    color: var(--text-muted);
+}
+
+/* --- Primeiros passos ---------------------------------------------------- */
+
+.ajuda-passo {
+    display: flex;
+    gap: 12px;
+    padding: 12px 0;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+.ajuda-passo:last-child {
+    border-bottom: none;
+}
+
+.ajuda-passo-num {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 24px;
+    height: 24px;
+    flex-shrink: 0;
+    border-radius: 50%;
+    background: var(--primary-light);
+    color: var(--primary);
+    font-size: 12px;
+    font-weight: 800;
+}
+
+.ajuda-passo-titulo {
+    display: block;
+    font-size: 14px;
+    line-height: 1.3;
+}
+
+/* O caminho na tela, em destaque próprio: é o que a pessoa vai procurar no
+   menu depois de fechar o guia. */
+.ajuda-passo-onde {
+    display: inline-block;
+    margin: 4px 0 6px;
+    padding: 2px 8px;
+    border-radius: 10px;
+    background: rgba(255, 255, 255, 0.05);
+    font-size: 11px;
+    color: var(--text-muted);
+}
+
+.ajuda-passo-texto {
+    margin: 0;
+    font-size: 13px;
+    line-height: 1.6;
+    color: var(--text-muted);
+}
+
+/* --- Dúvidas ------------------------------------------------------------- */
+
+.ajuda-grupo {
+    margin-bottom: 18px;
+}
+
+.ajuda-grupo:last-child {
+    margin-bottom: 0;
+}
+
+.ajuda-grupo-titulo {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin: 0 0 8px;
+    font-size: 13px;
+    font-weight: 700;
+    color: var(--text-main);
+}
+
+.ajuda-grupo-titulo i {
+    color: var(--primary);
+    font-size: 12px;
+}
+
+/* Fechado por padrão: a lista inteira aberta vira uma parede de texto, e
+   quem chega aqui está procurando UMA resposta. */
+.ajuda-item {
+    border: 1px solid var(--border-color);
+    border-radius: var(--radius-sm);
+    margin-bottom: 6px;
+    background: var(--bg-tertiary);
+    overflow: hidden;
+}
+
+.ajuda-item > summary {
+    padding: 10px 12px;
+    font-size: 13px;
+    font-weight: 600;
+    cursor: pointer;
+    list-style: none;
+    position: relative;
+    padding-right: 34px;
+}
+
+.ajuda-item > summary::-webkit-details-marker {
+    display: none;
+}
+
+.ajuda-item > summary::after {
+    content: '\f078';                    /* chevron-down do Font Awesome */
+    font-family: 'Font Awesome 6 Free';
+    font-weight: 900;
+    position: absolute;
+    right: 12px;
+    top: 50%;
+    transform: translateY(-50%);
+    font-size: 10px;
+    color: var(--text-muted);
+    transition: var(--transition);
+}
+
+.ajuda-item[open] > summary::after {
+    transform: translateY(-50%) rotate(180deg);
+}
+
+.ajuda-item > summary:hover {
+    color: var(--primary);
+}
+
+.ajuda-resposta {
+    padding: 0 12px 12px;
+    font-size: 13px;
+    line-height: 1.65;
+    color: var(--text-muted);
+}
+
+.ajuda-resposta strong {
+    color: var(--text-main);
+}
+
+.ajuda-vazio {
+    padding: 20px;
+    text-align: center;
+    font-size: 13px;
+    line-height: 1.6;
+    color: var(--text-muted);
+}
+
+/* --- Rodapé -------------------------------------------------------------- */
+
+.ajuda-rodape {
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 10px;
+}
+
+.ajuda-rodape-credito {
+    display: flex;
+    flex-direction: column;
+    gap: 3px;
+    font-size: 11px;
+    color: var(--text-muted);
+}
+
+/* O contato vem antes do credito e com mais peso: no rodape, quem procura
+   ajuda esta atras do telefone, nao de quem fez o sistema. */
+.ajuda-rodape-suporte {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 12px;
+    font-weight: 600;
+    color: var(--success);
+    text-decoration: none;
+}
+
+.ajuda-rodape-suporte:hover {
+    text-decoration: underline;
+}
+
+.ajuda-rodape-linha {
+    display: block;
+}
+
+.ajuda-rodape-credito a {
+    color: var(--primary);
+    text-decoration: none;
+}
+
+.ajuda-rodape-credito a:hover {
+    text-decoration: underline;
+}
+
+@media (max-width: 600px) {
+    .ajuda-rodape {
+        justify-content: center;
+        text-align: center;
+    }
+
+    .ajuda-rodape .btn {
+        width: 100%;
+        justify-content: center;
+    }
+}
+
+/* --- Suporte -------------------------------------------------------------- */
+
+/* Fecha o guia: quem rolou ate aqui e nao achou a resposta precisa de gente,
+   nao de mais texto. */
+.ajuda-suporte {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    flex-wrap: wrap;
+    margin-top: 20px;
+    padding: 14px 16px;
+    border-radius: var(--radius-md);
+    background: rgba(16, 185, 129, 0.07);
+    border: 1px solid rgba(16, 185, 129, 0.22);
+}
+
+.ajuda-suporte > i {
+    font-size: 22px;
+    color: var(--success);
+    flex-shrink: 0;
+}
+
+.ajuda-suporte-texto {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    flex: 1;
+    min-width: 180px;
+}
+
+.ajuda-suporte-texto strong {
+    font-size: 13px;
+}
+
+.ajuda-suporte-texto span {
+    font-size: 12px;
+    line-height: 1.5;
+    color: var(--text-muted);
+}
+
+/* O numero fica no proprio botao: e o que a pessoa quer copiar quando o
+   WhatsApp nao e a via dela. */
+.ajuda-suporte-botao {
+    flex-shrink: 0;
+    white-space: nowrap;
+}
+
+@media (max-width: 600px) {
+    .ajuda-suporte-botao {
+        width: 100%;
+        justify-content: center;
+    }
+}

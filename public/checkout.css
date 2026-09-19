@@ -1,0 +1,359 @@
+/**
+ * ==========================================================================
+ * CHECKOUT — FASE B
+ * A tela onde a venda fecha. Duas colunas no computador, uma no balcao e no
+ * celular — a ordem de cima para baixo e a ordem em que a conta acontece.
+ * ==========================================================================
+ */
+
+.checkout-dialog { max-width: 980px; }
+
+.checkout-body { gap: 18px; }
+
+/* Colunas quase iguais. A da esquerda leva o que se vende (cliente, itens e o
+   desconto sobre eles); a da direita, o dinheiro (pagamentos, prazo e o
+   total). Antes o desconto ficava à direita, e as duas colunas terminavam em
+   alturas tão diferentes que o TOTAL — o número mais importante da tela —
+   nascia fora da área visível. */
+.checkout-grid {
+    display: grid;
+    grid-template-columns: 1.05fr 1fr;
+    gap: 18px;
+    align-items: start;
+}
+
+.checkout-column {
+    display: grid;
+    gap: 14px;
+    min-width: 0;
+}
+
+.checkout-block {
+    display: grid;
+    gap: 10px;
+    padding: 14px;
+    border: 1px solid var(--border-color);
+    border-radius: var(--radius-md);
+    background: var(--bg-tertiary);
+}
+
+.checkout-block > label {
+    color: var(--text-muted);
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: .35px;
+    text-transform: uppercase;
+}
+
+/* `center`, e não `baseline`: desde que o "Cadastrar cliente" virou botão, o
+   cabeçalho passou a alinhar um título com um controle de altura própria — na
+   linha de base o botão fica pendurado abaixo do texto. */
+.checkout-block-head {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 10px;
+    min-height: 30px;
+}
+
+.checkout-block-head h5 {
+    margin: 0;
+    font-size: 13px;
+    font-weight: 700;
+}
+
+.checkout-hint {
+    color: var(--text-muted);
+    font-size: 11px;
+    text-align: right;
+}
+
+.checkout-quick-client {
+    display: grid;
+    grid-template-columns: 1.4fr 1fr auto;
+    gap: 8px;
+}
+
+.checkout-quick-client[hidden] { display: none; }
+
+/* Campo com rótulo em cima. Todo controle da tela usa este par, para os campos
+   ficarem alinhados pela BASE mesmo tendo rótulos de tamanhos diferentes — e
+   para nenhum deles depender do placeholder para se identificar, que é a pista
+   que some justamente quando a pessoa termina de preencher. */
+.checkout-field {
+    display: grid;
+    align-content: end;
+    gap: 5px;
+    min-width: 0;
+}
+
+.checkout-field > label {
+    color: var(--text-muted);
+    font-size: 11px;
+    font-weight: 600;
+    line-height: 1.2;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.checkout-field > .form-control { min-width: 0; }
+
+/* O botão de somar acompanha a BASE da linha, não o topo: acima dele há um
+   rótulo, e alinhar pelo topo o deixaria um degrau mais alto que os campos. */
+.checkout-add-btn {
+    align-self: end;
+    justify-content: center;
+    white-space: nowrap;
+}
+
+/* Tres linhas, e nao uma fileira de seis campos: a coluna da esquerda tem
+   ~450px, e nome de servico ou de profissional nao cabe num campo de 90px.
+
+     [ tipo ][      o que esta vendendo       ]
+     [    profissional    ][ qtd ][ preço un. ]
+     [            + Adicionar                 ]
+
+   O botao ganha a linha inteira de proposito: e a acao que fecha o
+   preenchimento do item, o alvo mais clicado desta tela, e espremido no canto
+   ele roubava a largura justamente do seletor de profissional. */
+.checkout-item-form {
+    display: grid;
+    grid-template-columns: 116px minmax(0, 1fr) 72px 96px;
+    align-items: end;
+    gap: 10px 8px;
+}
+
+.checkout-field-item { grid-column: 2 / -1; }
+.checkout-field-prof { grid-column: 1 / 3; }
+.checkout-item-form .checkout-add-btn { grid-column: 1 / -1; }
+
+.checkout-item {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) 62px auto auto;
+    align-items: center;
+    gap: 10px;
+    padding: 9px 10px;
+    border: 1px solid var(--border-color);
+    border-radius: var(--radius-sm);
+    background: var(--bg-secondary);
+}
+
+.checkout-item + .checkout-item { margin-top: 8px; }
+
+.checkout-item-main {
+    display: grid;
+    gap: 2px;
+    min-width: 0;
+}
+
+.checkout-item-main strong {
+    overflow: hidden;
+    font-size: 13px;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.checkout-item-main span {
+    color: var(--text-muted);
+    font-size: 11px;
+}
+
+.checkout-item-qty { padding: 6px 8px; text-align: center; }
+
+.checkout-item-total {
+    font-size: 13px;
+    font-weight: 700;
+    white-space: nowrap;
+}
+
+.checkout-empty {
+    margin: 0;
+    padding: 14px 4px;
+    color: var(--text-muted);
+    font-size: 12px;
+    text-align: center;
+}
+
+.checkout-adjust {
+    display: grid;
+    grid-template-columns: 88px minmax(0, 1fr);
+    align-items: end;
+    gap: 8px;
+}
+
+.checkout-payment-form {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr) auto;
+    align-items: end;
+    gap: 8px;
+}
+
+.checkout-payment {
+    display: grid;
+    grid-template-columns: 88px auto minmax(0, 1fr) auto;
+    align-items: center;
+    gap: 10px;
+    padding: 8px 10px;
+    border: 1px solid var(--border-color);
+    border-radius: var(--radius-sm);
+    background: var(--bg-secondary);
+}
+
+.checkout-payment + .checkout-payment { margin-top: 8px; }
+
+.checkout-payment-method {
+    font-size: 12px;
+    font-weight: 700;
+}
+
+.checkout-payment-amount {
+    font-size: 13px;
+    font-weight: 700;
+    white-space: nowrap;
+}
+
+.checkout-payment-change {
+    color: var(--text-muted);
+    font-size: 11px;
+    text-align: right;
+}
+
+.checkout-credit-note {
+    display: flex;
+    align-items: flex-start;
+    gap: 7px;
+    margin: 0;
+}
+
+.checkout-summary {
+    display: grid;
+    gap: 7px;
+    padding: 14px;
+    border: 1px solid var(--border-color-active);
+    border-radius: var(--radius-md);
+    background: var(--primary-light);
+}
+
+.checkout-summary-line {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: 12px;
+    color: var(--text-muted);
+    font-size: 12px;
+}
+
+.checkout-summary-line strong {
+    color: var(--text-main);
+    font-size: 13px;
+}
+
+.checkout-summary-total {
+    margin-top: 4px;
+    padding-top: 9px;
+    border-top: 1px solid var(--border-color);
+}
+
+.checkout-summary-total span,
+.checkout-summary-total strong {
+    color: var(--text-main);
+    font-size: 17px;
+    font-weight: 800;
+}
+
+.checkout-summary-line.checkout-ok strong { color: var(--success); }
+.checkout-summary-line.checkout-pending strong { color: var(--warning); }
+
+.checkout-errors {
+    display: grid;
+    gap: 6px;
+    padding: 12px 14px;
+    border: 1px solid rgba(244, 63, 94, .35);
+    border-left: 4px solid var(--danger);
+    border-radius: var(--radius-md);
+    background: var(--danger-light);
+    color: var(--danger);
+    font-size: 12px;
+}
+
+.checkout-errors[hidden] { display: none; }
+
+.checkout-footer { align-items: center; }
+
+.checkout-total-chip {
+    margin-right: auto;
+    padding: 8px 12px;
+    border: 1px solid var(--border-color);
+    border-radius: var(--radius-full);
+    background: var(--bg-tertiary);
+    font-size: 15px;
+    font-weight: 800;
+}
+
+#btn-checkout-finish:disabled {
+    cursor: not-allowed;
+    opacity: .5;
+}
+
+/* Botão da forma antiga de confirmar pagamento. Ele continua existindo até a
+   Fase C fechar as portas concorrentes, mas não disputa a atenção com o
+   "Concluir e receber". */
+.crm-alert-actions {
+    display: grid;
+    justify-items: center;
+    gap: 2px;
+    flex: 0 0 auto;
+}
+
+.crm-alert-fallback {
+    display: block;
+    margin-top: 4px;
+    padding: 0;
+    border: none;
+    background: none;
+    color: var(--text-muted);
+    font-size: 10px;
+    text-decoration: underline;
+    cursor: pointer;
+}
+
+.crm-alert-fallback:hover { color: var(--text-main); }
+
+@media (max-width: 900px) {
+    .checkout-grid { grid-template-columns: 1fr; }
+}
+
+@media (max-width: 600px) {
+    /* No celular a linha do meio vira [profissional] sozinha e a de baixo
+       [qtd][preço][Adicionar]: três campos numa faixa de 390px ficariam
+       estreitos demais para o polegar. */
+    /* 104px na primeira coluna porque "Produto" com a setinha do select nao
+       cabe em menos — cortado, ele vira "Produ" e ninguem entende o campo. */
+    .checkout-item-form { grid-template-columns: 104px 78px minmax(0, 1fr); }
+    .checkout-field-item { grid-column: 2 / -1; }
+    .checkout-field-prof { grid-column: 1 / -1; }
+    .checkout-field-qtd  { grid-column: 1 / 2; }
+    .checkout-field-preco { grid-column: 2 / -1; }
+    .checkout-quick-client { grid-template-columns: 1fr; }
+    .checkout-payment-form { grid-template-columns: 1fr 1fr; }
+    .checkout-payment-form .checkout-add-btn { grid-column: 1 / -1; }
+    .checkout-adjust { grid-template-columns: 76px minmax(0, 1fr); }
+    /* A linha do item continua numa faixa só: nome, quantidade, valor e o X.
+       Quebrar em três linhas transformava um carrinho de quatro itens numa
+       rolagem inteira de tela. */
+    .checkout-item { grid-template-columns: minmax(0, 1fr) 52px auto auto; gap: 8px; }
+    .checkout-payment { grid-template-columns: minmax(0, 1fr) auto auto; }
+    .checkout-payment-change { grid-column: 1 / -1; text-align: left; }
+
+    .checkout-footer { flex-wrap: wrap; }
+    .checkout-total-chip { order: -1; width: 100%; margin-right: 0; text-align: center; }
+    .checkout-footer .btn { flex: 1; justify-content: center; }
+}
+
+/* No celular o card de pendência empilha e o botão ocupa a linha inteira
+   (11-mobile-operacoes.css). O grupo de ações precisa acompanhar, senão o
+   "Concluir e receber" fica espremido num canto. */
+@media (max-width: 768px) {
+    .crm-alert-actions { width: 100%; justify-items: stretch; }
+}

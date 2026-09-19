@@ -1,0 +1,96 @@
+-- ============================================================
+-- REMOVE A ASSINATURA ANTIGA DE create_public_booking
+-- Cole e execute no SQL Editor do Supabase.
+-- Pode rodar mais de uma vez sem problema.
+-- ============================================================
+--
+-- O QUE ESTÁ ABERTO
+--
+-- Existem DUAS funções `create_public_booking` no banco, as duas com GRANT
+-- para `anon`:
+--
+--   create_public_booking(text × 7)  -- do script 02, antiga
+--   create_public_booking(text × 8)  -- do script 10, vigente (tem p_birth)
+--
+-- O Postgres permite sobrecarga: `CREATE OR REPLACE` no script 10 acrescentou
+-- um argumento, então criou uma função NOVA em vez de substituir a de 02. A
+-- antiga nunca saiu do banco.
+--
+-- O front sempre manda `p_birth` (`public/api.js`, em `createPublicBooking`),
+-- mesmo quando é `null`, então a tela legítima cai sempre na de 8. Mas quem
+-- chama o PostgREST direto escolhe: **omitir `p_birth` no corpo do POST resolve
+-- para a de 7 argumentos** — e ela não valida nada do que o script 10
+-- acrescentou:
+--
+--   | Validação                          | 7 args | 8 args |
+--   | ---------------------------------- | ------ | ------ |
+--   | Dia em que o salão abre            | não    | sim    |
+--   | Horário dentro do expediente       | não    | sim    |
+--   | Folga/bloqueio do profissional     | não    | sim    |
+--   | Sobreposição pela duração          | não    | sim    |
+--   | Data passada, serviço, colisão exata | sim  | sim    |
+--
+-- Ou seja: pela porta antiga dá para marcar às 03:00 da madrugada, em domingo
+-- fechado, em cima da folga do profissional, ou por cima de um atendimento que
+-- já está em andamento — coisas que a agenda mostra como ocupadas e que o
+-- profissional só descobre quando o cliente aparece.
+--
+-- POR QUE APAGAR EM VEZ DE CORRIGIR
+--
+-- A de 7 argumentos não tem nenhum chamador. Apagá-la é a mudança mínima:
+-- **este script não recria a função vigente**, que é justamente o que os
+-- scripts 10, 12, 13 e 17 alertam já ter derrubado o link público uma vez.
+-- Nada é escrito, nada é redefinido — só some a porta que ninguém usa.
+
+-- ------------------------------------------------------------
+-- 1. Apaga só a assinatura de 7 argumentos
+-- ------------------------------------------------------------
+-- A assinatura vai inteira de propósito. `DROP FUNCTION create_public_booking`
+-- sem os tipos falha com "function name is not unique" — o que é bom: se um dia
+-- a de 8 for a única, este script erra em vez de apagar a boa.
+DROP FUNCTION IF EXISTS public.create_public_booking(text, text, text, text, text, text, text);
+
+-- ------------------------------------------------------------
+-- 2. Recarrega o cache de schema do PostgREST
+-- ------------------------------------------------------------
+NOTIFY pgrst, 'reload schema';
+
+-- ============================================================
+-- CONFERÊNCIA
+-- ============================================================
+--
+-- 1. Sobrou UMA função, com 8 argumentos:
+--
+--      SELECT oid::regprocedure AS assinatura, pronargs
+--      FROM pg_proc p JOIN pg_namespace n ON n.oid = p.pronamespace
+--      WHERE n.nspname = 'public' AND proname = 'create_public_booking';
+--
+--    Esperado: uma linha só, `pronargs = 8`.
+--
+-- 2. A que sobrou é a do script 10 — tem as validações que a antiga não tinha:
+--
+--      SELECT pg_get_functiondef(oid) LIKE '%A barbearia não abre neste dia%'
+--        AND pg_get_functiondef(oid) LIKE '%professional_blocks%' AS eh_a_do_10
+--      FROM pg_proc p JOIN pg_namespace n ON n.oid = p.pronamespace
+--      WHERE n.nspname = 'public' AND proname = 'create_public_booking';
+--
+--    Tem que ser `true`.
+--
+-- 3. **Teste na tela, não só no SQL.** Abra o link público e conclua um
+--    agendamento de verdade. É a conferência que importa: o que quebra quando
+--    se mexe nesta função é o link público, e o SQL não mostra isso.
+--
+-- ============================================================
+-- PENDÊNCIA QUE CONTINUA
+-- ============================================================
+--
+-- `create_public_booking` segue SEM limite por IP — a pendência anotada no fim
+-- do script 17. Este script não a resolve: pôr `checar_limite` lá dentro exige
+-- recriar a função inteira, que é exatamente o risco que ele evita.
+--
+-- Quando for feito, no topo da função vigente:
+--
+--     PERFORM public.checar_limite('agendou', 10, interval '1 hour');
+--
+-- copiando a versão vigente por inteiro, conferindo `pronargs = 8` e testando
+-- um agendamento de verdade antes de entregar.

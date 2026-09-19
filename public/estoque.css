@@ -1,0 +1,639 @@
+/* ==========================================================================
+   ENCAIXE, PRODUTOS E ESTOQUE
+
+   Três blocos, nesta ordem:
+
+     1. ENCAIXE   — botão "Chegou agora" e o modal do cliente sem hora marcada.
+     2. PRODUTOS  — cadastro, alerta de mínimo e a vitrine do link público.
+     3. ESTOQUE   — a tela do menu lateral: resumo e extrato de movimentação.
+
+   Carregado DEPOIS de index.css em index.html. A ordem importa: a cascata
+   depende dela, e a paleta dourada do :root fica no index.css — nada aqui
+   redefine cor de marca.
+   ========================================================================== */
+
+/* ==========================================================================
+   1. ENCAIXE
+   ========================================================================== */
+
+/* Botão "Chegou agora": ação de encaixe rápido no balcão.
+   Estilo secundário elegante (outline translúcido suave em tom dourado nobre),
+   seguindo o modelo da Lexion adaptado para a identidade da Alabama Barbearia,
+   sem competir com o botão principal sólido de "Novo Agendamento". */
+.btn-encaixe {
+    background-color: rgba(197, 160, 89, 0.12);
+    color: #D4AF67;
+    border: 1px solid rgba(197, 160, 89, 0.35);
+    box-shadow: none;
+    font-weight: 600;
+}
+
+.btn-encaixe:hover {
+    background-color: rgba(197, 160, 89, 0.22);
+    border-color: rgba(197, 160, 89, 0.6);
+    color: #DFBE7A;
+    transform: translateY(-1px);
+    box-shadow: 0 4px 14px rgba(197, 160, 89, 0.2);
+}
+
+.btn-encaixe:active {
+    transform: translateY(0);
+}
+
+/* A vaga encontrada. É a primeira coisa que a pessoa no balcão lê, antes
+   mesmo de perguntar o nome do cliente. */
+.encaixe-vaga {
+    display: flex;
+    align-items: baseline;
+    flex-wrap: wrap;
+    gap: 8px;
+    padding: 14px 16px;
+    border-radius: var(--radius-md);
+    background: rgba(16, 185, 129, 0.08);
+    border: 1px solid rgba(16, 185, 129, 0.25);
+}
+
+.encaixe-vaga-rotulo {
+    font-size: 12px;
+    color: var(--text-muted);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.encaixe-vaga-hora {
+    font-size: 26px;
+    font-weight: 800;
+    color: var(--success);
+    line-height: 1;
+}
+
+.encaixe-vaga-prof {
+    font-size: 13px;
+    color: var(--text-main);
+}
+
+.encaixe-vaga.encaixe-vaga-sugerida {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 8px;
+    background: rgba(230, 126, 34, 0.08);
+    border: 1px solid rgba(230, 126, 34, 0.3);
+}
+
+.encaixe-aviso-indisponivel {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 13px;
+    color: var(--warning);
+    font-weight: 500;
+}
+
+.encaixe-aviso-indisponivel i {
+    font-size: 14px;
+}
+
+.encaixe-vaga-detalhe {
+    display: flex;
+    align-items: baseline;
+    flex-wrap: wrap;
+    gap: 8px;
+    padding-top: 6px;
+    border-top: 1px dashed rgba(255, 255, 255, 0.1);
+    width: 100%;
+}
+
+.encaixe-sem-vaga {
+    display: flex;
+    align-items: flex-start;
+    gap: 8px;
+    padding: 14px 16px;
+    border-radius: var(--radius-md);
+    background: rgba(230, 126, 34, 0.08);
+    border: 1px solid rgba(230, 126, 34, 0.25);
+    color: var(--warning);
+    font-size: 13px;
+    line-height: 1.45;
+}
+
+/* Sugestão de cliente já cadastrado, para não criar duplicata no balcão. */
+.encaixe-sugestoes {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    margin-top: 6px;
+}
+
+.encaixe-sugestao {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    width: 100%;
+    padding: 8px 10px;
+    border: 1px solid var(--border-color);
+    border-radius: var(--radius-sm);
+    background: var(--bg-tertiary);
+    color: var(--text-main);
+    font: inherit;
+    font-size: 13px;
+    text-align: left;
+    cursor: pointer;
+}
+
+.encaixe-sugestao:hover {
+    border-color: var(--primary);
+    background: var(--primary-light);
+}
+
+.encaixe-sugestao span {
+    margin-left: auto;
+    color: var(--text-muted);
+    font-size: 12px;
+}
+
+/* Texto de apoio embaixo de um campo. Não existia no index.css e é usado por
+   vários formulários daqui. */
+.form-hint {
+    font-size: 11px;
+    color: var(--text-muted);
+    margin-top: 6px;
+    line-height: 1.4;
+}
+
+/* Painel de confirmação, que substitui o formulário depois de encaixar. */
+.encaixe-feito {
+    text-align: center;
+    padding: 20px 10px 10px;
+}
+
+.encaixe-feito i {
+    font-size: 44px;
+    color: var(--success);
+    margin-bottom: 12px;
+}
+
+.encaixe-feito-titulo {
+    font-size: 18px;
+    font-weight: 700;
+    margin: 0 0 6px;
+}
+
+.encaixe-feito-detalhe {
+    font-size: 14px;
+    color: var(--text-muted);
+    margin: 0;
+}
+
+.encaixe-feito-detalhe strong {
+    color: var(--success);
+    font-size: 18px;
+}
+
+/* O cabeçalho passou a ter DOIS botões. Sem display:flex aqui os botões
+   fluíam como inline, quebravam em duas linhas e o bloco crescia para cima do
+   título da página. `flex-shrink: 0` no conjunto impede que o texto dos botões
+   seja espremido antes da data, que é o que pode sumir. */
+.quick-actions {
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    gap: 10px;
+    flex-shrink: 0;
+}
+
+.quick-actions .btn {
+    white-space: nowrap;
+}
+
+.agenda-actions {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+/* Numa faixa intermediária a data do cabeçalho é o que sobra: ela repete o que
+   a agenda já mostra, e os botões é que precisam continuar alcançáveis. */
+@media (max-width: 1100px) {
+    .header-right .header-date {
+        display: none;
+    }
+}
+
+/* No celular os dois botões da Agenda dividem a linha inteira. Os do cabeçalho
+   já são escondidos pelo index.css nesta faixa. */
+@media (max-width: 768px) {
+    .agenda-actions .btn,
+    .quick-actions .btn {
+        flex: 1;
+        min-width: 0;
+        justify-content: center;
+    }
+}
+
+/* ==========================================================================
+   2. PRODUTOS — cadastro e vitrine
+   ========================================================================== */
+
+.produto-categoria {
+    grid-column: 1 / -1;
+    margin: 18px 0 2px;
+    font-size: 12px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.6px;
+    color: var(--text-muted);
+}
+
+.produto-card {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 12px 14px;
+    border: 1px solid var(--border-color);
+    border-radius: var(--radius-md);
+    background: var(--bg-tertiary);
+    cursor: pointer;
+    transition: var(--transition);
+}
+
+.produto-card:hover {
+    border-color: var(--primary);
+    transform: translateY(-1px);
+}
+
+.produto-card.inativo {
+    opacity: 0.55;
+}
+
+.produto-foto {
+    width: 44px;
+    height: 44px;
+    border-radius: 8px;
+    object-fit: cover;
+    flex-shrink: 0;
+}
+
+.produto-foto-vazia {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: rgba(255, 255, 255, 0.04);
+    color: var(--text-muted);
+}
+
+.produto-info {
+    display: flex;
+    flex-direction: column;
+    min-width: 0;
+    flex: 1;
+}
+
+.produto-nome {
+    font-weight: 600;
+    font-size: 14px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.produto-preco {
+    font-size: 13px;
+    color: var(--success);
+}
+
+.produto-estoque {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    gap: 2px;
+    flex-shrink: 0;
+}
+
+.produto-qtd {
+    font-size: 20px;
+    font-weight: 800;
+    line-height: 1;
+}
+
+/* O número é o que a pessoa procura ao bater o olho — a cor faz o trabalho
+   antes de ela ler o selo. */
+.produto-qtd.baixo { color: var(--warning); }
+.produto-qtd.zero { color: var(--danger); }
+
+.produto-qtd-rotulo {
+    font-size: 10px;
+    color: var(--text-muted);
+    text-transform: uppercase;
+    letter-spacing: 0.4px;
+}
+
+.produto-selo {
+    margin-top: 2px;
+    padding: 2px 8px;
+    border-radius: 10px;
+    font-size: 10px;
+    font-weight: 700;
+    white-space: nowrap;
+}
+
+.produto-selo.baixo {
+    background: rgba(230, 126, 34, 0.15);
+    color: var(--warning);
+}
+
+.produto-selo.esgotado {
+    background: rgba(244, 63, 94, 0.15);
+    color: var(--danger);
+}
+
+.estoque-alerta {
+    display: flex;
+    align-items: flex-start;
+    gap: 10px;
+    margin-bottom: 16px;
+    padding: 12px 14px;
+    border-radius: var(--radius-md);
+    background: rgba(230, 126, 34, 0.08);
+    border: 1px solid rgba(230, 126, 34, 0.25);
+    color: var(--warning);
+    font-size: 13px;
+    line-height: 1.5;
+}
+
+.lista-vazia {
+    grid-column: 1 / -1;
+    padding: 24px;
+    text-align: center;
+    color: var(--text-muted);
+    font-size: 13px;
+}
+
+/* Usada no resumo do estoque; o index.css já traz .text-green e .text-danger,
+   mas não esta. */
+.text-warning { color: var(--warning); }
+
+/* --- Vitrine (link público) ---------------------------------------------- */
+
+.vitrine {
+    margin-top: 22px;
+    padding-top: 18px;
+    border-top: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.vitrine-titulo {
+    margin: 0 0 12px;
+    font-size: 13px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.6px;
+    color: var(--text-main);
+}
+
+.vitrine-grupo {
+    margin-bottom: 14px;
+}
+
+.vitrine-categoria {
+    display: block;
+    margin-bottom: 6px;
+    font-size: 11px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    color: var(--text-muted);
+}
+
+.vitrine-item {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 8px 10px;
+    border-radius: var(--radius-sm);
+    background: rgba(255, 255, 255, 0.03);
+    margin-bottom: 4px;
+}
+
+.vitrine-foto {
+    width: 34px;
+    height: 34px;
+    border-radius: 6px;
+    object-fit: cover;
+    flex-shrink: 0;
+}
+
+.vitrine-nome {
+    flex: 1;
+    min-width: 0;
+    font-size: 13px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.vitrine-preco {
+    font-size: 13px;
+    font-weight: 700;
+    color: var(--success);
+    white-space: nowrap;
+}
+
+.vitrine-aviso {
+    margin: 8px 0 0;
+    font-size: 11px;
+    color: var(--text-muted);
+    text-align: center;
+}
+
+/* ==========================================================================
+   3. ESTOQUE — a tela do menu lateral
+   ========================================================================== */
+
+.estoque-resumo {
+    margin-bottom: 20px;
+}
+
+/* Três botões no cabeçalho. `flex-shrink: 0` impede que eles quebrem para uma
+   segunda linha quando a descrição ao lado cresce — um botão fora de lugar não
+   é lido como botão. */
+.estoque-acoes {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    flex-shrink: 0;
+}
+
+.estoque-acoes .btn {
+    white-space: nowrap;
+}
+
+/* .panel-header é flex com space-between, o que deixaria título e descrição
+   lado a lado. O <div> interno os empilha, como no cabeçalho com ação. */
+.estoque-painel-cabecalho {
+    display: block;
+}
+
+/* No celular os três botões não cabem ao lado do título: o último sairia para
+   fora do painel, cortado. Aqui o cabeçalho empilha e eles dividem a linha. */
+@media (max-width: 768px) {
+    #page-estoque .panel-header-with-action {
+        flex-direction: column;
+        align-items: stretch;
+        gap: 14px;
+    }
+
+    .estoque-acoes .btn {
+        flex: 1;
+        min-width: 0;
+        justify-content: center;
+    }
+}
+
+/* --- Ações no card do produto -------------------------------------------- */
+
+/* Entrada e saída são o que se faz o dia inteiro; editar cadastro é raro.
+   Por isso os dois botões ficam no card, e o clique no resto abre a edição. */
+.produto-acoes {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    flex-shrink: 0;
+    margin-left: 4px;
+    padding-left: 10px;
+    border-left: 1px solid var(--border-color);
+}
+
+/* Na tela de Estoque o nome quebra em vez de cortar. "Pomada modela…" e
+   "Pomada modeladora efeito matte" são o mesmo começo para produtos
+   diferentes, e quem confere prateleira precisa do nome inteiro. */
+#estoque-produtos-grid .produto-nome {
+    white-space: normal;
+    overflow: visible;
+    line-height: 1.3;
+}
+
+/* --- Extrato de movimentações -------------------------------------------- */
+
+.movimento-linha {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 9px 0;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+.movimento-linha:last-child {
+    border-bottom: none;
+}
+
+.movimento-icone {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 28px;
+    height: 28px;
+    border-radius: 50%;
+    font-size: 11px;
+    flex-shrink: 0;
+}
+
+.movimento-icone.entrada {
+    background: rgba(16, 185, 129, 0.12);
+    color: var(--success);
+}
+
+.movimento-icone.saida {
+    background: rgba(244, 63, 94, 0.12);
+    color: var(--danger);
+}
+
+.movimento-texto {
+    display: flex;
+    flex-direction: column;
+    min-width: 0;
+    flex: 1;
+}
+
+.movimento-texto strong {
+    font-size: 13px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.movimento-detalhe {
+    font-size: 11px;
+    color: var(--text-muted);
+}
+
+.movimento-qtd {
+    font-size: 15px;
+    font-weight: 800;
+    flex-shrink: 0;
+}
+
+.movimento-qtd.entrada { color: var(--success); }
+.movimento-qtd.saida { color: var(--danger); }
+
+.movimento-valor {
+    min-width: 72px;
+    text-align: right;
+    font-size: 12px;
+    color: var(--text-muted);
+    flex-shrink: 0;
+}
+
+/* --- Produto dentro do pagamento do atendimento -------------------------- */
+
+.appt-produto-linha {
+    display: flex;
+    gap: 8px;
+    align-items: center;
+}
+
+.appt-produto-linha select {
+    flex: 1;
+    min-width: 0;
+}
+
+.appt-produto-linha input {
+    max-width: 80px;
+}
+
+.appt-produto-item {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 7px 10px;
+    margin-top: 6px;
+    border-radius: var(--radius-sm);
+    background: rgba(255, 255, 255, 0.04);
+    font-size: 13px;
+}
+
+.appt-produto-nome {
+    flex: 1;
+    min-width: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.appt-produto-valor {
+    font-weight: 600;
+    color: var(--success);
+    white-space: nowrap;
+}
+
+.appt-produto-total {
+    margin-top: 8px;
+    padding-top: 8px;
+    border-top: 1px dashed rgba(255, 255, 255, 0.12);
+    font-size: 12px;
+    color: var(--text-muted);
+    text-align: right;
+}
+
+.appt-produto-total strong {
+    font-size: 15px;
+    color: var(--text-main);
+}

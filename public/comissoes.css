@@ -1,0 +1,73 @@
+/* ==========================================================================
+   COMISSÕES (Fase D)
+
+   A tabela reaproveita `.sales-table` e os cards reaproveitam
+   `.sales-metrics-grid`, de propósito: é a mesma família de tela (dinheiro,
+   histórico, filtros) e duas gramáticas visuais para o mesmo tipo de conteúdo
+   só fariam o usuário reaprender a ler.
+   ========================================================================== */
+
+.com-col-check {
+    width: 36px;
+    text-align: center;
+}
+
+.com-col-check input {
+    width: 16px;
+    height: 16px;
+    cursor: pointer;
+    accent-color: var(--primary);
+}
+
+/* Linha já paga fica recuada, não escondida: o dono precisa conferir o que
+   pagou, e sumir com a linha faria o histórico parecer incompleto. */
+.comissao-paga td {
+    opacity: 0.62;
+}
+
+/* O aviso dos atendimentos anteriores ao checkout. Âmbar porque é uma
+   ressalva de leitura — o número existe, só não é apurado. */
+.comissao-aviso-legado {
+    display: flex;
+    gap: 12px;
+    align-items: flex-start;
+    background: rgba(243, 156, 18, 0.08);
+    border: 1px solid rgba(243, 156, 18, 0.3);
+    border-radius: 12px;
+    padding: 14px 16px;
+    margin-bottom: 20px;
+}
+
+/* `display: flex` acima ganha do atributo `hidden`, que só vale enquanto nada
+   define display. Sem esta linha o aviso vira uma faixa âmbar VAZIA no meio da
+   tela — que foi o que aconteceu. Mesma regra que `.sales-schema-warning` já
+   tem em 19-vendas.css. */
+.comissao-aviso-legado[hidden] { display: none; }
+
+.comissao-aviso-legado > i {
+    color: var(--warning);
+    font-size: 1.1rem;
+    margin-top: 2px;
+}
+
+.comissao-aviso-legado strong {
+    display: block;
+    color: var(--text-primary);
+    font-size: 13px;
+    margin-bottom: 3px;
+}
+
+.comissao-aviso-legado span {
+    color: var(--text-muted);
+    font-size: 12px;
+    line-height: 1.5;
+}
+
+@media (max-width: 768px) {
+    /* Na tabela empilhada do celular, a coluna de marcar perde o cabeçalho e
+       precisa do próprio rótulo para não virar um quadradinho solto. */
+    .sales-table .com-col-check::before {
+        content: 'Selecionar';
+    }
+    .comissao-aviso-legado { flex-direction: column; gap: 6px; }
+}

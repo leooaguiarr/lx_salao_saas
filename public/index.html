@@ -1,0 +1,2958 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="icon" href="/assets/favicon_alabama.png" type="image/png">
+    <title>Alabama Barbearia</title>
+    <!-- Google Fonts: Plus Jakarta Sans -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <!-- Font Awesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- CSS Customizado -->
+    <link rel="stylesheet" href="/index.css?v=55">
+    <link rel="stylesheet" href="/estoque.css?v=55">
+    <link rel="stylesheet" href="/ajuda.css?v=55">
+    <link rel="stylesheet" href="/auth.css?v=55">
+    <!-- Evolução de Vendas. Depois dos anteriores de propósito: estes só
+         acrescentam as telas novas e não redefinem nada do index.css. -->
+    <link rel="stylesheet" href="/vendas.css?v=55">
+    <link rel="stylesheet" href="/checkout.css?v=55">
+    <link rel="stylesheet" href="/comissoes.css?v=55">
+    <link rel="stylesheet" href="/crediario.css?v=55">
+    <link rel="stylesheet" href="/fidelidade.css?v=55">
+</head>
+<body class="dark-theme">
+    <!--
+      TELA DE CARREGAMENTO
+      Fica visível desde o primeiro instante, sem depender de JavaScript, e sai
+      quando o app termina de montar. Sem ela, o F5 mostrava por alguns segundos
+      os números de exemplo que ficam neste HTML — um faturamento que nunca
+      existiu — até o app substituí-los pelos reais.
+    -->
+    <div id="boot-overlay">
+        <div class="boot-card">
+            <img src="/assets/logo_alabama.png" alt="" class="boot-logo" onerror="this.style.display='none'">
+            <div class="boot-spinner" role="status" aria-label="Carregando"></div>
+            <span class="boot-texto">Carregando o salão...</span>
+        </div>
+    </div>
+
+    <!-- TELA DE LOGIN -->
+    <div id="auth-overlay" class="auth-overlay" style="display: none;">
+        <div class="auth-split-layout">
+            <!-- Left Side (Cover Image) -->
+            <div class="auth-cover">
+                <!-- A imagem de fundo já traz a logo aplicada no tecido,
+                     por isso não há logomarca sobreposta aqui. -->
+                <div class="auth-cover-logo"></div>
+                <div class="auth-cover-content">
+                    <h1>SEU ESTILO,<br><span>NOSSA ARTE.</span></h1>
+                    <p>Gerencie sua barbearia com elegância e precisão.</p>
+                </div>
+            </div>
+            
+            <!-- Right Side (Form) -->
+            <div class="auth-form-side">
+                <div class="auth-form-container">
+                    <!-- PAINEL 1: entrar -->
+                    <div id="auth-panel-login">
+                        <h2 class="auth-title">Entrar</h2>
+                        <p class="auth-subtitle">Acesse com seu e-mail e senha</p>
+
+                        <form id="form-login" class="auth-form">
+                            <div class="form-group">
+                                <label for="auth-email">E-mail</label>
+                                <div class="input-icon-wrapper">
+                                    <i class="fa-regular fa-envelope"></i>
+                                    <input type="email" id="auth-email" class="form-control auth-input" placeholder="seu@email.com" required>
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label for="auth-password">Senha</label>
+                                <div class="input-icon-wrapper">
+                                    <i class="fa-solid fa-lock"></i>
+                                    <input type="password" id="auth-password" class="form-control auth-input" placeholder="••••••••" required>
+                                </div>
+                            </div>
+
+                            <button type="submit" class="btn auth-submit-btn" id="btn-login-submit">
+                                <i class="fa-solid fa-arrow-right-to-bracket"></i> Entrar no Sistema
+                            </button>
+                        </form>
+
+                        <button type="button" class="auth-link-esqueci" id="btn-esqueci-senha">Esqueceu a senha?</button>
+                    </div>
+
+                    <!-- PAINEL 2: pedir o link por e-mail -->
+                    <div id="auth-panel-recover" style="display: none;">
+                        <h2 class="auth-title">Recuperar senha</h2>
+                        <p class="auth-subtitle">Informe seu e-mail e enviaremos um link para criar uma senha nova.</p>
+
+                        <form id="form-recover" class="auth-form">
+                            <div class="form-group">
+                                <label for="auth-recover-email">E-mail</label>
+                                <div class="input-icon-wrapper">
+                                    <i class="fa-regular fa-envelope"></i>
+                                    <input type="email" id="auth-recover-email" class="form-control auth-input" placeholder="seu@email.com" required>
+                                </div>
+                            </div>
+
+                            <button type="submit" class="btn auth-submit-btn" id="btn-recover-submit">
+                                <i class="fa-regular fa-paper-plane"></i> Enviar link de recuperação
+                            </button>
+                        </form>
+
+                        <button type="button" class="auth-link-esqueci" id="btn-voltar-login">Voltar para o login</button>
+                    </div>
+
+                    <!-- PAINEL 3: definir a senha nova (volta do link do e-mail) -->
+                    <div id="auth-panel-nova-senha" style="display: none;">
+                        <h2 class="auth-title">Nova senha</h2>
+                        <p class="auth-subtitle">Crie uma senha de pelo menos 6 caracteres.</p>
+
+                        <form id="form-nova-senha" class="auth-form">
+                            <div class="form-group">
+                                <label for="auth-nova-senha">Nova senha</label>
+                                <div class="input-icon-wrapper">
+                                    <i class="fa-solid fa-lock"></i>
+                                    <input type="password" id="auth-nova-senha" class="form-control auth-input" placeholder="••••••••" minlength="6" required>
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label for="auth-nova-senha-confirma">Repita a nova senha</label>
+                                <div class="input-icon-wrapper">
+                                    <i class="fa-solid fa-lock"></i>
+                                    <input type="password" id="auth-nova-senha-confirma" class="form-control auth-input" placeholder="••••••••" minlength="6" required>
+                                </div>
+                            </div>
+
+                            <button type="submit" class="btn auth-submit-btn" id="btn-nova-senha-submit">
+                                <i class="fa-solid fa-check"></i> Salvar nova senha
+                            </button>
+                        </form>
+                    </div>
+
+                    <div id="auth-error" class="auth-error" style="display: none;">
+                        <i class="fa-solid fa-circle-exclamation"></i> <span>Email ou senha incorretos.</span>
+                    </div>
+
+                    <div id="auth-sucesso" class="auth-sucesso" style="display: none;">
+                        <i class="fa-solid fa-circle-check"></i> <span></span>
+                    </div>
+
+                    <footer class="auth-footer">
+                        <span>Desenvolvido por Lexion Consultoria · 2026 <span class="auth-versao" id="auth-versao"></span></span>
+                        <a class="auth-footer-link" href="https://lexionconsultoria.com.br" target="_blank" rel="noopener noreferrer">lexionconsultoria.com.br</a>
+                        <button type="button" class="auth-footer-link" onclick="openModal('modal-privacy-policy')">Privacidade e LGPD</button>
+                    </footer>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="app-container" id="app-container">
+        <!-- SIDEBAR -->
+        <aside class="sidebar" id="sidebar">
+            <div class="sidebar-header">
+                <div class="logo">
+                    <img src="/assets/logo_alabama.png" class="logo-mark" id="sidebar-logo-icon" alt="">
+                    <span id="sidebar-salon-name">Alabama<span class="logo-dot">.</span></span>
+                </div>
+                <button class="sidebar-close" id="sidebar-close-btn">
+                    <i class="fa-solid fa-xmark"></i>
+                </button>
+            </div>
+            
+            <nav class="sidebar-menu">
+                <a href="#" class="menu-item active" data-target="dashboard">
+                    <i class="fa-solid fa-chart-pie"></i>
+                    <span>Dashboard</span>
+                </a>
+                <a href="#" class="menu-item" data-target="agenda">
+                    <i class="fa-solid fa-calendar-days"></i>
+                    <span>Agenda</span>
+                </a>
+                <a href="#" class="menu-item" data-target="vendas">
+                    <i class="fa-solid fa-bag-shopping"></i>
+                    <span>Vendas</span>
+                </a>
+                <a href="#" class="menu-item feature-paused" data-target="mensagens" aria-hidden="true" tabindex="-1">
+                    <i class="fa-solid fa-message"></i>
+                    <span>Mensagens</span>
+                    <span class="badge badge-info" id="badge-messages">0</span>
+                </a>
+                <a href="#" class="menu-item" data-target="clientes">
+                    <i class="fa-solid fa-users"></i>
+                    <span>Clientes</span>
+                    <span class="badge badge-alert" id="badge-recall" style="display:none;">0</span>
+                </a>
+                <a href="#" class="menu-item" data-target="fidelidade">
+                    <i class="fa-solid fa-star"></i>
+                    <span>Fidelidade</span>
+                </a>
+                <a href="#" class="menu-item feature-paused" data-target="leads" aria-hidden="true" tabindex="-1">
+                    <i class="fa-solid fa-rectangle-list"></i>
+                    <span>Kanban de Leads</span>
+                    <span class="badge badge-info" id="badge-leads" style="display:none;">0</span>
+                </a>
+                <a href="#" class="menu-item" data-target="estoque">
+                    <i class="fa-solid fa-boxes-stacked"></i>
+                    <span>Estoque</span>
+                    <span class="badge badge-alert" id="badge-estoque" style="display:none;">0</span>
+                </a>
+                <!-- Comissões é a única aba que o barbeiro vê além da própria
+                     agenda e dos próprios clientes. Quem recorta as linhas é a
+                     RLS (docs/21_comissoes.sql), não esta tela. -->
+                <a href="#" class="menu-item" data-target="comissoes">
+                    <i class="fa-solid fa-hand-holding-dollar"></i>
+                    <span>Comissões</span>
+                </a>
+                <a href="#" class="menu-item" data-target="crediario">
+                    <i class="fa-solid fa-file-invoice-dollar"></i>
+                    <span>Crediário</span>
+                    <span class="badge badge-alert" id="badge-crediario" style="display:none;">0</span>
+                </a>
+                <a href="#" class="menu-item" data-target="financeiro">
+                    <i class="fa-solid fa-wallet"></i>
+                    <span>Financeiro</span>
+                </a>
+                <!-- O Link de Agendamento saiu daqui e virou sub-aba de
+                     Configurações: ele é uma configuração do salão (o slug, a
+                     mensagem que acompanha o link), não uma tela de operação
+                     do dia. O mockup de celular que simulava a experiência do
+                     cliente foi removido junto — quem quer ver a página de
+                     verdade abre o próprio link. -->
+                <a href="#" class="menu-item" data-target="configuracoes">
+                    <i class="fa-solid fa-sliders"></i>
+                    <span>Configurações</span>
+                </a>
+            </nav>
+            
+            <div class="sidebar-footer">
+                <div class="user-profile" style="display: flex; justify-content: space-between; align-items: center; width: 100%;">
+                    <div style="display: flex; align-items: center; gap: 10px; min-width: 0; flex: 1;">
+                        <div class="profile-info">
+                            <span class="profile-name">Alabama Barbearia</span>
+                            <!-- O crédito vira a porta da ajuda. Quem tem dúvida procura
+                                 no rodapé quem fez o sistema; é o lugar onde a pessoa já
+                                 olha, e não mais um ícone competindo com o menu. -->
+                            <button type="button" class="profile-role profile-role-ajuda" id="btn-abrir-ajuda"
+                                    title="Abrir o guia rápido">
+                                <i class="fa-regular fa-circle-question"></i>
+                                <!-- Sem o "· 2026" daqui: com o ícone, a barra lateral corta
+                                     o texto no meio do ano. O ano segue no rodapé do guia e
+                                     na tela de entrada, que é onde ele é lido. -->
+                                <span>Desenvolvido por Lexion Consultoria</span>
+                            </button>
+                        </div>
+                    </div>
+                    <button id="btn-logout-sidebar" title="Sair do Sistema" style="background: none; border: none; color: var(--danger); cursor: pointer; font-size: 1.2rem; padding: 5px;">
+                        <i class="fa-solid fa-right-from-bracket"></i>
+                    </button>
+                </div>
+            </div>
+        </aside>
+
+        <!-- MAIN CONTENT AREA -->
+        <main class="main-content">
+            <!-- TOP HEADER -->
+            <header class="top-header">
+                <div class="header-left">
+                    <button class="sidebar-toggle" id="sidebar-toggle-btn">
+                        <i class="fa-solid fa-bars"></i>
+                    </button>
+                    <h1 class="header-title" id="page-title">Dashboard</h1>
+                </div>
+                
+                <div class="header-right">
+                    <div class="quick-actions">
+                        <button class="btn btn-encaixe" id="btn-encaixe-topo" onclick="abrirEncaixe()">
+                            <i class="fa-solid fa-person-walking-arrow-right"></i> Chegou agora
+                        </button>
+                        <button class="btn btn-primary" id="btn-quick-appointment">
+                            <i class="fa-solid fa-plus"></i> Novo Agendamento
+                        </button>
+                    </div>
+                    <div class="header-date" id="current-date-display">
+                        <i class="fa-regular fa-calendar"></i>
+                        <span></span>
+                    </div>
+                </div>
+            </header>
+
+            <!-- PAGES CONTAINER -->
+            <div class="pages-container">
+                <!-- 1. DASHBOARD PAGE -->
+                <section class="page-section active" id="page-dashboard">
+                    <!-- Metrics Cards Grid -->
+                    <!-- Os valores nascem como "—" de propósito: quem os
+                         preenche é renderDashboard(). Um número de exemplo aqui
+                         vira faturamento inventado na tela durante o
+                         carregamento, e é o primeiro que o dono lê. -->
+                    <div class="metrics-grid">
+                        <div class="metric-card glass-effect">
+                            <div class="metric-icon bg-purple-soft">
+                                <i class="fa-solid fa-calendar-check text-purple"></i>
+                            </div>
+                            <div class="metric-details">
+                                <span class="metric-label">Agendamentos Hoje</span>
+                                <h3 class="metric-value" id="dash-total-appts">—</h3>
+                            </div>
+                        </div>
+                        <div class="metric-card glass-effect">
+                            <div class="metric-icon bg-blue-soft">
+                                <i class="fa-solid fa-circle-dollar-to-slot text-blue"></i>
+                            </div>
+                            <div class="metric-details">
+                                <span class="metric-label">Previsão Financeira</span>
+                                <h3 class="metric-value" id="dash-expected-revenue">—</h3>
+                            </div>
+                        </div>
+                        <div class="metric-card glass-effect">
+                            <div class="metric-icon bg-green-soft">
+                                <i class="fa-solid fa-money-bill-trend-up text-green"></i>
+                            </div>
+                            <div class="metric-details">
+                                <span class="metric-label">Recebido Hoje</span>
+                                <h3 class="metric-value" id="dash-actual-revenue">—</h3>
+                            </div>
+                        </div>
+                        <div class="metric-card glass-effect click-tab" data-target="clientes" style="cursor: pointer;">
+                            <div class="metric-icon bg-red-soft">
+                                <i class="fa-solid fa-users-viewfinder text-red"></i>
+                            </div>
+                            <div class="metric-details">
+                                <span class="metric-label">Clientes p/ Retorno</span>
+                                <h3 class="metric-value" id="dash-recall-count">—</h3>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Dashboard Layout Grid -->
+                    <div class="dashboard-layout">
+                        <!-- Column 1: Today's agenda list -->
+                        <div class="dashboard-panel glass-effect flex-2">
+                            <div class="panel-header">
+                                <h4 class="panel-title"><i class="fa-solid fa-clock-rotate-left"></i> Próximos Atendimentos</h4>
+                                <div class="dash-agenda-legend">
+                                    <span class="legend-item"><span class="legend-color" style="background: var(--primary-light); border: 1px solid var(--primary);"></span> Hoje</span>
+                                    <span class="legend-item"><span class="legend-color" style="background: var(--bg-secondary); border: 1px solid var(--border-color);"></span> Futuro</span>
+                                </div>
+                            </div>
+                            <div class="panel-body">
+                                <div class="atendimentos-lista" id="dash-atendimentos-list">
+                                    <!-- Populated dynamically via JS -->
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Column 2: CRM + Leads Quick Actions -->
+                        <div class="dashboard-side-panels">
+                            <!-- CRM Panel -->
+                            <div class="dashboard-panel glass-effect">
+                                <div class="panel-header">
+                                    <h4 class="panel-title"><i class="fa-solid fa-bullhorn text-purple"></i> Ações Recomendadas CRM</h4>
+                                </div>
+                                <div class="panel-body">
+                                    <div class="crm-quick-actions" id="dash-crm-list">
+                                        <!-- CRM alert list populated dynamically -->
+                                    </div>
+                                    <button class="btn btn-secondary btn-full click-tab" data-target="clientes" style="margin-top: 12px;">
+                                        Ver todos os clientes sumidos <i class="fa-solid fa-arrow-right-long" style="margin-left: 8px;"></i>
+                                    </button>
+                                </div>
+                            </div>
+
+                            <!-- Birthdays Panel -->
+                            <div class="dashboard-panel glass-effect" style="margin-top: 20px;">
+                                <div class="panel-header">
+                                    <h4 class="panel-title"><i class="fa-solid fa-cake-candles" style="color: #f43f5e;"></i> Próximos Aniversariantes</h4>
+                                </div>
+                                <div class="panel-body">
+                                    <div class="crm-quick-actions" id="dash-birthdays-list">
+                                        <!-- Birthdays populated dynamically -->
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Estoque: só aparece quando há item no mínimo. Um card
+                                 vazio ocupando espaço todo dia treina a pessoa a
+                                 ignorar a área. -->
+                            <div class="dashboard-panel glass-effect" id="dash-estoque-panel" style="margin-top: 20px; display:none;">
+                                <div class="panel-header">
+                                    <h4 class="panel-title"><i class="fa-solid fa-box-open" style="color: var(--warning);"></i> Estoque no mínimo</h4>
+                                </div>
+                                <div class="panel-body">
+                                    <div class="crm-quick-actions" id="dash-estoque-list"></div>
+                                    <button class="btn btn-secondary btn-full click-tab" data-target="estoque" style="margin-top: 12px;">
+                                        Ver produtos e estoque <i class="fa-solid fa-arrow-right-long" style="margin-left: 8px;"></i>
+                                    </button>
+                                </div>
+                            </div>
+
+
+                            <!-- Leads Panel -->
+                            <div class="dashboard-panel glass-effect feature-paused">
+                                <div class="panel-header">
+                                    <h4 class="panel-title"><i class="fa-solid fa-star text-amber"></i> Conversão de Leads</h4>
+                                </div>
+                                <div class="panel-body">
+                                    <div class="leads-quick-stats">
+                                        <div class="lead-progress-container">
+                                            <div class="lead-progress-labels">
+                                                <span>Aguardando agendamento</span>
+                                                <strong id="dash-leads-pending-count">9 leads</strong>
+                                            </div>
+                                            <div class="progress-bar-bg">
+                                                <div class="progress-bar-fill" id="dash-leads-progress-bar" style="width: 45%;"></div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="recent-leads" id="dash-recent-leads">
+                                        <!-- Recent leads listed here -->
+                                    </div>
+                                    <button class="btn btn-secondary btn-full click-tab" data-target="leads" style="margin-top: 12px;">
+                                        Ir para o Kanban de Leads <i class="fa-solid fa-arrow-right-long" style="margin-left: 8px;"></i>
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- 2. AGENDA PAGE -->
+                <section class="page-section" id="page-agenda">
+                    <div class="agenda-controls">
+                        <div class="agenda-filters">
+                            <button class="btn btn-secondary btn-active" id="btn-agenda-view-day">Dia</button>
+                            <button class="btn btn-secondary" id="btn-agenda-view-week">Semana</button>
+                            <button class="btn btn-secondary" id="btn-agenda-view-month">Mês</button>
+                        </div>
+                        <div class="agenda-navigation">
+                            <button class="btn btn-icon" id="btn-agenda-prev"><i class="fa-solid fa-chevron-left"></i></button>
+                            <span class="agenda-current-date-title" id="agenda-current-date-title">Quarta-feira, 08/07/2026</span>
+                            <button class="btn btn-icon" id="btn-agenda-next"><i class="fa-solid fa-chevron-right"></i></button>
+                        </div>
+                        <div class="agenda-actions">
+                            <button class="btn btn-encaixe" onclick="abrirEncaixe()">
+                                <i class="fa-solid fa-person-walking-arrow-right"></i> Chegou agora
+                            </button>
+                            <button class="btn btn-primary" id="btn-new-appointment">
+                                <i class="fa-solid fa-plus"></i> Agendar Horário
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Mobile Professional Switcher -->
+                    <div class="mobile-prof-switcher" id="mobile-prof-switcher">
+                        <!-- Populated dynamically via JS -->
+                    </div>
+
+                    <!-- Interactive Calendar View -->
+                    <div class="calendar-wrapper glass-effect">
+                        <!-- Hours vs Professional Columns (Day View is standard and premium here) -->
+                        <div class="calendar-header-cols" id="calendar-header-cols">
+                            <!-- Professional header columns generated dynamically -->
+                        </div>
+                        <div class="calendar-body-scroll">
+                            <div class="calendar-time-grid">
+                                <div class="calendar-time-axis" id="calendar-time-axis">
+                                    <!-- Hours axis e.g., 08:00, 09:00, etc. -->
+                                </div>
+                                <div class="calendar-columns-container" id="calendar-columns-container">
+                                    <!-- Columns per professional, with appointments absolute-positioned inside -->
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Week / Month View Placeholder Container -->
+                    <div id="calendar-alternate-view" class="calendar-alternate-view glass-effect" style="display: none;">
+                        <!-- Generated dynamically if Week or Month are selected -->
+                    </div>
+                </section>
+
+                <!-- ============================================================
+                     EVOLUÇÃO DE VENDAS — as quatro abas novas.
+                     Portadas do projeto de origem (lexion_salao), onde foram
+                     testadas. O banco que as sustenta são os scripts docs/14 a
+                     docs/28, aplicados em 10/09/2026.
+                     ============================================================ -->
+                <section class="page-section" id="page-vendas">
+                    <!-- Sem título nem subtítulo aqui: o nome da aba já está no
+                         topo da página e no menu lateral, e repeti-lo a cada
+                         abertura só empurrava para baixo o que a pessoa veio ver.
+                         O selo "Checkout ativo" também saiu: ele dizia que o
+                         sistema está funcionando, o que o botão logo ao lado já
+                         provava — e quando NÃO está, quem avisa é a tarja de
+                         migration pendente, aqui embaixo. -->
+                    <div class="sales-schema-warning" id="sales-schema-warning" hidden>
+                        <i class="fa-solid fa-database"></i>
+                        <div>
+                            <strong>Estrutura de Vendas pendente no Supabase</strong>
+                            <span>Execute <code>docs/sql/14_vendas_base.sql</code> e <code>docs/sql/15_finalizacao_venda.sql</code>. Os registros anteriores continuam disponíveis abaixo.</span>
+                        </div>
+                    </div>
+
+                    <!-- O "Nova venda" vive NA MESMA FAIXA dos indicadores, à
+                         esquerda deles. Sozinho numa linha própria acima, ele
+                         gastava uma faixa inteira da tela para um botão só — e
+                         a ação principal da aba ficava longe do primeiro número
+                         que a pessoa procura ao abrir. -->
+                    <div class="sales-metrics-row">
+                        <button class="btn btn-primary sales-new-sale-btn" id="btn-new-sale" type="button">
+                            <i class="fa-solid fa-plus"></i> Nova venda
+                        </button>
+
+                        <div class="metrics-grid sales-metrics-grid">
+                        <div class="metric-card glass-effect">
+                            <div class="metric-icon bg-purple-soft"><i class="fa-solid fa-receipt text-purple"></i></div>
+                            <div class="metric-details">
+                                <span class="metric-label">Vendas hoje</span>
+                                <h3 class="metric-value" id="sales-today-count">0</h3>
+                            </div>
+                        </div>
+                        <div class="metric-card glass-effect">
+                            <div class="metric-icon bg-green-soft"><i class="fa-solid fa-sack-dollar text-green"></i></div>
+                            <div class="metric-details">
+                                <span class="metric-label">Total vendido hoje</span>
+                                <h3 class="metric-value text-green" id="sales-today-total">R$ 0,00</h3>
+                            </div>
+                        </div>
+                        <div class="metric-card glass-effect">
+                            <div class="metric-icon bg-blue-soft"><i class="fa-solid fa-scissors text-blue"></i></div>
+                            <div class="metric-details">
+                                <span class="metric-label">Serviços vendidos</span>
+                                <h3 class="metric-value" id="sales-today-services">0</h3>
+                            </div>
+                        </div>
+                        <div class="metric-card glass-effect">
+                            <div class="metric-icon bg-amber-soft"><i class="fa-solid fa-box-open text-warning"></i></div>
+                            <div class="metric-details">
+                                <span class="metric-label">Produtos vendidos</span>
+                                <h3 class="metric-value" id="sales-today-products">0</h3>
+                            </div>
+                        </div>
+                        <div class="metric-card glass-effect">
+                            <div class="metric-icon bg-red-soft"><i class="fa-solid fa-clock text-red"></i></div>
+                            <div class="metric-details">
+                                <span class="metric-label">Pagamentos pendentes</span>
+                                <h3 class="metric-value text-red" id="sales-pending-count">0</h3>
+                            </div>
+                        </div>
+                        </div>
+                    </div>
+
+                    <!-- Caixa do Dia e Confirmar Pagamentos moraram no Financeiro
+                         até a Fase C. Vieram para cá porque são as duas ações
+                         que ABREM e FECHAM dinheiro no dia, e dinheiro passou a
+                         nascer aqui. O Financeiro ficou com a leitura. -->
+                    <div class="sales-operacao-grid">
+                        <!-- id usado por ELEMENTOS_SO_DO_DONO (13-inicializacao.js):
+                             a aba Vendas é do profissional também, mas a gaveta não. -->
+                        <div class="dashboard-panel glass-effect" id="painel-caixa-do-dia" style="border-left: 4px solid var(--primary);">
+                            <div class="panel-header" style="justify-content: space-between; align-items: center; display: flex;">
+                                <h4 class="panel-title"><i class="fa-solid fa-cash-register"></i> Caixa do Dia</h4>
+                                <span id="cash-register-status-badge" class="status-badge inactive">Fechado</span>
+                            </div>
+                            <div class="panel-body" style="display: flex; gap: 20px; align-items: stretch; flex-wrap: wrap;">
+                                <div style="flex: 1; min-width: 150px; background: var(--bg-tertiary); border-radius: 10px; padding: 15px;">
+                                    <p style="color: var(--text-muted); font-size: 0.8rem; margin-bottom: 5px;"><i class="fa-solid fa-vault"></i> Saldo em Gaveta</p>
+                                    <h2 id="cash-register-balance" style="font-size: 1.8rem; color: var(--text-primary);">R$ 0,00</h2>
+                                </div>
+
+                                <!-- Pendentes em dinheiro de dias ANTERIORES esperando
+                                     decisão. Só aparece quando existem: ver
+                                     renderPendentesAntigos, em 15-caixa.js. -->
+                                <div id="cash-pendentes-antigos" style="flex: 2; min-width: 250px; display: none;"></div>
+
+                                <div id="cash-register-actions">
+                                    <button class="btn btn-primary" id="btn-open-register" onclick="openModal('modal-open-register')"><i class="fa-solid fa-lock-open"></i> Abrir Caixa</button>
+                                    <button class="btn btn-danger" id="btn-close-register" style="display: none;" onclick="window.closeCashRegister()"><i class="fa-solid fa-lock"></i> Fechar Caixa</button>
+                                    <button class="btn btn-secondary" id="btn-extrato-dia" onclick="gerarExtratoDia()"><i class="fa-regular fa-file-pdf"></i> Extrato do Dia</button>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="dashboard-panel glass-effect">
+                            <div class="panel-header">
+                                <h4 class="panel-title"><i class="fa-solid fa-money-check-dollar text-warning"></i> Confirmar Pagamentos</h4>
+                            </div>
+                            <div class="panel-body">
+                                <div class="crm-quick-actions" id="dash-pending-payments-list" style="max-height: 250px; overflow-y: auto; padding-right: 5px;">
+                                    <!-- Pending payments populated dynamically -->
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="dashboard-panel glass-effect sales-history-panel">
+                        <div class="panel-header sales-history-header">
+                            <div>
+                                <h4 class="panel-title"><i class="fa-solid fa-clock-rotate-left"></i> Histórico de vendas</h4>
+                                <p class="panel-description">Registros anteriores são exibidos sem alterar os dados originais.</p>
+                            </div>
+                            <span class="sales-result-count" id="sales-result-count">0 registros</span>
+                        </div>
+
+                        <div class="sales-filters" aria-label="Filtros do histórico de vendas">
+                            <div class="sales-filter-field">
+                                <label for="sales-filter-period">Período</label>
+                                <select class="form-control" id="sales-filter-period">
+                                    <option value="today" selected>Hoje</option>
+                                    <option value="7">7 dias</option>
+                                    <option value="30">30 dias</option>
+                                    <option value="all">Todo o histórico</option>
+                                </select>
+                            </div>
+                            <div class="sales-filter-field">
+                                <label for="sales-filter-client">Cliente</label>
+                                <select class="form-control" id="sales-filter-client">
+                                    <option value="all">Todos os clientes</option>
+                                </select>
+                            </div>
+                            <div class="sales-filter-field">
+                                <label for="sales-filter-professional">Profissional</label>
+                                <select class="form-control" id="sales-filter-professional">
+                                    <option value="all">Todos os profissionais</option>
+                                </select>
+                            </div>
+                            <div class="sales-filter-field">
+                                <label for="sales-filter-status">Situação</label>
+                                <select class="form-control" id="sales-filter-status">
+                                    <option value="all">Todas</option>
+                                    <option value="paid">Recebida</option>
+                                    <option value="pending">Pendente</option>
+                                    <option value="partial">Parcial</option>
+                                    <option value="on_credit">A prazo</option>
+                                    <option value="cancelled">Cancelada</option>
+                                    <option value="refunded">Estornada</option>
+                                </select>
+                            </div>
+                            <div class="sales-filter-field">
+                                <label for="sales-filter-method">Pagamento</label>
+                                <select class="form-control" id="sales-filter-method">
+                                    <option value="all">Todas as formas</option>
+                                    <option value="pix">Pix</option>
+                                    <option value="cash">Dinheiro</option>
+                                    <option value="debit_card">Débito</option>
+                                    <option value="credit_card">Crédito</option>
+                                    <option value="credit_account">Crediário</option>
+                                    <option value="other">Outro</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <div class="table-container sales-table-container">
+                            <table class="data-table sales-table">
+                                <thead>
+                                    <tr>
+                                        <th>Venda</th>
+                                        <th>Data e hora</th>
+                                        <th>Cliente</th>
+                                        <th>Profissional</th>
+                                        <!-- "Profissional" é quem ATENDE (base da comissão);
+                                             "Vendido por" é quem OPEROU o sistema. Na venda de
+                                             balcão feita pela recepção são pessoas diferentes. -->
+                                        <th>Vendido por</th>
+                                        <th>Origem</th>
+                                        <th>Situação</th>
+                                        <th>Pagamento</th>
+                                        <th style="text-align:right;">Total</th>
+                                        <th style="text-align:right;">Detalhes</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="sales-history-body"></tbody>
+                            </table>
+                        </div>
+                    </div>
+                </section>
+
+                <section class="page-section" id="page-comissoes">
+                    <!-- O "Marcar como paga" desceu para o cabeçalho da tabela (mais
+                         abaixo). Ele age sobre as LINHAS MARCADAS, e sozinho no topo
+                         da página ficava longe do que marca — além de flutuar
+                         desalinhado depois que o título da aba saiu daqui. -->
+                    <div class="sales-schema-warning" id="comissoes-schema-warning" hidden>
+                        <i class="fa-solid fa-database"></i>
+                        <div>
+                            <strong>Razão de comissões pendente no Supabase</strong>
+                            <span>Execute <code>docs/sql/21_comissoes.sql</code>. Enquanto isso, a estimativa antiga continua no Financeiro.</span>
+                        </div>
+                    </div>
+
+                    <div class="metrics-grid sales-metrics-grid">
+                        <div class="metric-card glass-effect">
+                            <div class="metric-icon bg-amber-soft"><i class="fa-solid fa-hourglass-half text-warning"></i></div>
+                            <div class="metric-details">
+                                <span class="metric-label">A pagar no período</span>
+                                <h3 class="metric-value text-warning" id="com-total-pendente">R$ 0,00</h3>
+                            </div>
+                        </div>
+                        <div class="metric-card glass-effect">
+                            <div class="metric-icon bg-green-soft"><i class="fa-solid fa-circle-check text-green"></i></div>
+                            <div class="metric-details">
+                                <span class="metric-label">Já pago no período</span>
+                                <h3 class="metric-value text-green" id="com-total-pago">R$ 0,00</h3>
+                            </div>
+                        </div>
+                        <div class="metric-card glass-effect">
+                            <div class="metric-icon bg-purple-soft"><i class="fa-solid fa-scissors text-purple"></i></div>
+                            <div class="metric-details">
+                                <span class="metric-label">Serviços com comissão</span>
+                                <h3 class="metric-value" id="com-qtd-itens">0</h3>
+                            </div>
+                        </div>
+                        <div class="metric-card glass-effect">
+                            <div class="metric-icon bg-blue-soft"><i class="fa-solid fa-percent text-blue"></i></div>
+                            <div class="metric-details">
+                                <span class="metric-label">Base líquida</span>
+                                <h3 class="metric-value" id="com-total-base">R$ 0,00</h3>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Só aparece quando há atendimento antigo no período: a
+                         comissão daqueles não foi congelada e continua sendo
+                         estimada pelo cadastro atual. -->
+                    <div class="comissao-aviso-legado" id="comissoes-aviso-legado" hidden></div>
+
+                    <div class="dashboard-panel glass-effect sales-history-panel">
+                        <div class="panel-header sales-history-header">
+                            <div>
+                                <h4 class="panel-title"><i class="fa-solid fa-list-check"></i> Histórico de comissões</h4>
+                                <p class="panel-description">
+                                    O percentual e a base ficam gravados na venda. Mudar o preço ou o
+                                    percentual depois não mexe no que já foi apurado.
+                                </p>
+                            </div>
+                            <div class="sales-history-actions">
+                                <span class="sales-result-count" id="comissoes-result-count">0 registros</span>
+                                <button class="btn btn-primary" id="btn-pagar-comissoes" type="button" disabled>
+                                    <i class="fa-solid fa-circle-check"></i> Marcar como paga
+                                </button>
+                            </div>
+                        </div>
+
+                        <div class="sales-filters" aria-label="Filtros das comissões">
+                            <div class="sales-filter-field">
+                                <label for="com-filter-period">Período</label>
+                                <select class="form-control" id="com-filter-period">
+                                    <option value="today" selected>Hoje</option>
+                                    <option value="7">7 dias</option>
+                                    <option value="30">30 dias</option>
+                                    <option value="all">Todo o histórico</option>
+                                </select>
+                            </div>
+                            <div class="sales-filter-field" id="com-filter-prof-field">
+                                <label for="com-filter-professional">Profissional</label>
+                                <select class="form-control" id="com-filter-professional">
+                                    <option value="all">Todos os profissionais</option>
+                                </select>
+                            </div>
+                            <div class="sales-filter-field">
+                                <label for="com-filter-status">Situação</label>
+                                <select class="form-control" id="com-filter-status">
+                                    <option value="all">Todas</option>
+                                    <option value="pending" selected>A pagar</option>
+                                    <option value="paid">Pagas</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <div class="table-container sales-table-container">
+                            <table class="data-table sales-table">
+                                <thead>
+                                    <tr>
+                                        <th class="com-col-check" id="com-th-check">
+                                            <input type="checkbox" id="com-marcar-todas" aria-label="Selecionar todas">
+                                        </th>
+                                        <th>Venda</th>
+                                        <th>Data</th>
+                                        <th>Profissional</th>
+                                        <th>Serviço</th>
+                                        <th>Bruto</th>
+                                        <th>Desconto</th>
+                                        <th>Base</th>
+                                        <th>%</th>
+                                        <th>Comissão</th>
+                                        <th>Situação</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="comissoes-body">
+                                    <!-- Populado por renderComissoes() -->
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </section>
+
+                <section class="page-section" id="page-crediario">
+                    <div class="sales-schema-warning" id="crediario-schema-warning" hidden>
+                        <i class="fa-solid fa-database"></i>
+                        <div>
+                            <strong>Crediário pendente no Supabase</strong>
+                            <span>Execute <code>docs/sql/23_crediario.sql</code>. Enquanto isso, a venda a prazo fica indisponível no checkout.</span>
+                        </div>
+                    </div>
+
+                    <div class="metrics-grid sales-metrics-grid">
+                        <div class="metric-card glass-effect">
+                            <div class="metric-icon bg-red-soft"><i class="fa-solid fa-triangle-exclamation text-red"></i></div>
+                            <div class="metric-details">
+                                <span class="metric-label">Atrasado</span>
+                                <h3 class="metric-value text-red" id="cred-total-atrasado">R$ 0,00</h3>
+                            </div>
+                        </div>
+                        <div class="metric-card glass-effect">
+                            <div class="metric-icon bg-amber-soft"><i class="fa-solid fa-calendar-day text-warning"></i></div>
+                            <div class="metric-details">
+                                <span class="metric-label">Vence em 7 dias</span>
+                                <h3 class="metric-value text-warning" id="cred-total-proximo">R$ 0,00</h3>
+                            </div>
+                        </div>
+                        <div class="metric-card glass-effect">
+                            <div class="metric-icon bg-purple-soft"><i class="fa-solid fa-hand-holding-dollar text-purple"></i></div>
+                            <div class="metric-details">
+                                <span class="metric-label">Total em aberto</span>
+                                <h3 class="metric-value" id="cred-total-aberto">R$ 0,00</h3>
+                            </div>
+                        </div>
+                        <div class="metric-card glass-effect">
+                            <div class="metric-icon bg-green-soft"><i class="fa-solid fa-users text-green"></i></div>
+                            <div class="metric-details">
+                                <span class="metric-label">Clientes devendo</span>
+                                <h3 class="metric-value" id="cred-qtd-clientes">0</h3>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="dashboard-panel glass-effect sales-history-panel">
+                        <div class="panel-header sales-history-header">
+                            <div>
+                                <h4 class="panel-title"><i class="fa-solid fa-list-check"></i> Parcelas</h4>
+                                <p class="panel-description">
+                                    Receber aqui lança o dinheiro no Financeiro e no caixa, na data de hoje.
+                                </p>
+                            </div>
+                            <span class="sales-result-count" id="crediario-result-count">0 parcelas</span>
+                        </div>
+
+                        <div class="sales-filters" aria-label="Filtros do crediário">
+                            <div class="sales-filter-field">
+                                <label for="cred-filter-status">Situação</label>
+                                <select class="form-control" id="cred-filter-status">
+                                    <option value="open" selected>Em aberto</option>
+                                    <option value="overdue">Atrasadas</option>
+                                    <option value="paid">Pagas</option>
+                                    <option value="all">Todas</option>
+                                </select>
+                            </div>
+                            <div class="sales-filter-field">
+                                <label for="cred-filter-client">Cliente</label>
+                                <select class="form-control" id="cred-filter-client">
+                                    <option value="all">Todos os clientes</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <div class="table-container sales-table-container">
+                            <table class="data-table sales-table">
+                                <thead>
+                                    <tr>
+                                        <th>Venda</th>
+                                        <th>Cliente</th>
+                                        <th>Parcela</th>
+                                        <th>Vencimento</th>
+                                        <th>Valor</th>
+                                        <th>Em aberto</th>
+                                        <th>Situação</th>
+                                        <th style="text-align:right;">Ação</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="crediario-body"></tbody>
+                            </table>
+                        </div>
+                    </div>
+                </section>
+
+                <section class="page-section" id="page-fidelidade">
+                    <div class="sales-schema-warning" id="fidelidade-schema-warning" hidden>
+                        <i class="fa-solid fa-database"></i>
+                        <div>
+                            <strong>Fidelidade pendente no Supabase</strong>
+                            <span>Execute <code>docs/sql/25_fidelidade.sql</code>. Enquanto isso, a pontuação não acontece.</span>
+                        </div>
+                    </div>
+
+                    <div class="metrics-grid sales-metrics-grid">
+                        <div class="metric-card glass-effect">
+                            <div class="metric-icon bg-purple-soft"><i class="fa-solid fa-users text-purple"></i></div>
+                            <div class="metric-details">
+                                <span class="metric-label">Clientes no clube</span>
+                                <h3 class="metric-value" id="fid-total-clientes">0</h3>
+                            </div>
+                        </div>
+                        <div class="metric-card glass-effect">
+                            <div class="metric-icon bg-blue-soft"><i class="fa-solid fa-star text-blue"></i></div>
+                            <div class="metric-details">
+                                <span class="metric-label">Pontos em aberto</span>
+                                <h3 class="metric-value" id="fid-total-pontos">0</h3>
+                            </div>
+                        </div>
+                        <div class="metric-card glass-effect">
+                            <div class="metric-icon bg-green-soft"><i class="fa-solid fa-gift text-green"></i></div>
+                            <div class="metric-details">
+                                <span class="metric-label">Benefícios disponíveis</span>
+                                <h3 class="metric-value text-green" id="fid-total-disponiveis">0</h3>
+                            </div>
+                        </div>
+                        <div class="metric-card glass-effect">
+                            <div class="metric-icon bg-amber-soft"><i class="fa-solid fa-rotate text-warning"></i></div>
+                            <div class="metric-details">
+                                <span class="metric-label">Resgatados</span>
+                                <h3 class="metric-value" id="fid-total-resgatados">0</h3>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="dashboard-panel glass-effect sales-history-panel">
+                        <div class="panel-header sales-history-header">
+                            <div>
+                                <h4 class="panel-title"><i class="fa-solid fa-heart"></i> Clientes do clube</h4>
+                                <p class="panel-description">Todo cliente cadastrado já participa. Desmarque "Participa da Fidelidade" no cadastro dele para abrir uma exceção.</p>
+                            </div>
+                            <span class="sales-result-count" id="fidelidade-result-count">0 clientes</span>
+                        </div>
+
+                        <div class="sales-filters" aria-label="Filtros da fidelidade">
+                            <div class="sales-filter-field">
+                                <label for="fid-search">Buscar</label>
+                                <input type="text" class="form-control" id="fid-search" placeholder="Nome ou WhatsApp">
+                            </div>
+                            <div class="sales-filter-field">
+                                <label for="fid-filter-status">Situação</label>
+                                <select class="form-control" id="fid-filter-status">
+                                    <option value="all" selected>Todos</option>
+                                    <option value="available">Benefício disponível</option>
+                                    <option value="progress">Em progresso</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <div class="table-container sales-table-container">
+                            <table class="data-table sales-table">
+                                <thead>
+                                    <tr>
+                                        <th>Cliente</th>
+                                        <th>WhatsApp</th>
+                                        <th>Progresso</th>
+                                        <th>Situação</th>
+                                        <th style="text-align:right;">Ação</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="fidelidade-body"></tbody>
+                            </table>
+                        </div>
+                        <div class="paginacao" id="fidelidade-pagination" hidden></div>
+                    </div>
+                </section>
+
+                <!-- CENTRAL DE MENSAGENS E AUTOMAÇÕES -->
+                <section class="page-section" id="page-mensagens">
+                    <div class="mobile-page-intro glass-effect">
+                        <div>
+                            <span class="eyebrow">Automação do dia</span>
+                            <h3>Lembretes no controle</h3>
+                            <p>Acompanhe confirmações e aja apenas quando precisar.</p>
+                        </div>
+                        <button class="btn btn-primary" id="btn-process-messages"><i class="fa-solid fa-paper-plane"></i> Processar agora</button>
+                    </div>
+                    <div class="message-kpis" id="message-kpis"></div>
+                    <div class="automation-rules glass-effect">
+                        <div class="panel-header">
+                            <div><span class="eyebrow">Régua automática</span><h4 class="panel-title">Regras ativas</h4></div>
+                        </div>
+                        <div class="automation-rule-list" id="automation-rule-list"></div>
+                    </div>
+                    <div class="messages-toolbar">
+                        <div class="segmented-control" id="message-filter">
+                            <button class="active" data-message-filter="all">Todas</button>
+                            <button data-message-filter="pending">Pendentes</button>
+                            <button data-message-filter="attention">Atenção</button>
+                        </div>
+                    </div>
+                    <div class="message-job-list" id="message-job-list"></div>
+                </section>
+
+                <!-- 3. CLIENTES PAGE -->
+                <section class="page-section" id="page-clientes">
+                    <div class="section-actions-bar">
+                        <div class="search-box">
+                            <i class="fa-solid fa-magnifying-glass"></i>
+                            <input type="text" id="input-search-clients" placeholder="Buscar cliente por nome ou WhatsApp...">
+                        </div>
+                        <div class="filter-controls">
+                            <select id="select-filter-clients-status" class="form-control" style="width: auto;">
+                                <option value="all">Todos os Status</option>
+                                <option value="reco">Recorrentes</option>
+                                <option value="sumido">Sumidos (Atrasados)</option>
+                                <option value="novo">Novos</option>
+                            </select>
+                        </div>
+                        <button class="btn btn-primary" id="btn-add-client">
+                            <i class="fa-solid fa-user-plus"></i> Cadastrar Cliente
+                        </button>
+                    </div>
+
+                    <div class="table-container glass-effect">
+                        <table class="data-table" id="table-clients">
+                            <thead>
+                                <tr>
+                                    <th>Nome</th>
+                                    <th>WhatsApp</th>
+                                    <th>Frequência</th>
+                                    <th>Último Corte</th>
+                                    <th>Status Retorno</th>
+                                    <th>Total Gasto</th>
+                                    <th style="text-align: right;">Ações</th>
+                                </tr>
+                            </thead>
+                            <tbody id="tbody-clients">
+                                <!-- Clients list populated dynamically -->
+                            </tbody>
+                        </table>
+                    </div>
+                    <div class="paginacao" id="clients-pagination" hidden></div>
+                </section>
+
+                <!-- 4. KANBAN LEADS PAGE -->
+                <section class="page-section" id="page-leads">
+                    <div class="section-actions-bar">
+                        <div class="search-box">
+                            <i class="fa-solid fa-magnifying-glass"></i>
+                            <input type="text" id="input-search-leads" placeholder="Buscar leads...">
+                        </div>
+                        <button class="btn btn-primary" id="btn-add-lead">
+                            <i class="fa-solid fa-plus"></i> Novo Lead
+                        </button>
+                    </div>
+
+                    <!-- Mobile Stages Tabs -->
+                    <div class="mobile-kanban-tabs" id="mobile-leads-tabs">
+                        <!-- Populated dynamically via JS to sync badge values -->
+                    </div>
+
+                    <!-- Kanban Board -->
+                    <div class="kanban-board">
+                        <!-- Column 1: Novo Lead -->
+                        <div class="kanban-column glass-effect" data-stage="new">
+                            <div class="kanban-column-header">
+                                <span class="column-dot bg-blue"></span>
+                                <h5 class="column-title">Novo Lead</h5>
+                                <span class="column-badge" id="badge-stage-new">0</span>
+                            </div>
+                            <div class="kanban-cards-container" id="container-stage-new">
+                                <!-- Cards populated dynamically -->
+                            </div>
+                        </div>
+
+                        <!-- Column 2: Em Conversa -->
+                        <div class="kanban-column glass-effect" data-stage="talking">
+                            <div class="kanban-column-header">
+                                <span class="column-dot bg-amber"></span>
+                                <h5 class="column-title">Em Conversa</h5>
+                                <span class="column-badge" id="badge-stage-talking">0</span>
+                            </div>
+                            <div class="kanban-cards-container" id="container-stage-talking">
+                                <!-- Cards -->
+                            </div>
+                        </div>
+
+                        <!-- Column 3: Link Enviado -->
+                        <div class="kanban-column glass-effect" data-stage="link_sent">
+                            <div class="kanban-column-header">
+                                <span class="column-dot bg-purple"></span>
+                                <h5 class="column-title">Link Enviado</h5>
+                                <span class="column-badge" id="badge-stage-link-sent">0</span>
+                            </div>
+                            <div class="kanban-cards-container" id="container-stage-link_sent">
+                                <!-- Cards -->
+                            </div>
+                        </div>
+
+                        <!-- Column 4: Agendado -->
+                        <div class="kanban-column glass-effect" data-stage="scheduled">
+                            <div class="kanban-column-header">
+                                <span class="column-dot bg-green"></span>
+                                <h5 class="column-title">Agendado</h5>
+                                <span class="column-badge" id="badge-stage-scheduled">0</span>
+                            </div>
+                            <div class="kanban-cards-container" id="container-stage-scheduled">
+                                <!-- Cards -->
+                            </div>
+                        </div>
+
+                        <!-- Column 5: Retorno Futuro -->
+                        <div class="kanban-column glass-effect" data-stage="follow_up">
+                            <div class="kanban-column-header">
+                                <span class="column-dot bg-indigo"></span>
+                                <h5 class="column-title">Retorno Futuro</h5>
+                                <span class="column-badge" id="badge-stage-follow-up">0</span>
+                            </div>
+                            <div class="kanban-cards-container" id="container-stage-follow_up">
+                                <!-- Cards -->
+                            </div>
+                        </div>
+
+                        <!-- Column 6: Perdido -->
+                        <div class="kanban-column glass-effect" data-stage="lost">
+                            <div class="kanban-column-header">
+                                <span class="column-dot bg-gray"></span>
+                                <h5 class="column-title">Perdido</h5>
+                                <span class="column-badge" id="badge-stage-lost">0</span>
+                            </div>
+                            <div class="kanban-cards-container" id="container-stage-lost">
+                                <!-- Cards -->
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- 5. ESTOQUE PAGE -->
+                <section class="page-section" id="page-estoque">
+                    <div id="estoque-alerta"></div>
+
+                    <div class="metrics-grid estoque-resumo" id="estoque-resumo">
+                        <!-- Resumo populado por renderResumoDoEstoque() -->
+                    </div>
+
+                    <div class="dashboard-panel glass-effect" style="margin-bottom: 20px;">
+                        <div class="panel-header-with-action">
+                            <div>
+                                <h4 class="panel-title">Produtos</h4>
+                                <p class="panel-description">
+                                    Quem tem estoque aparece na vitrine do link público.
+                                </p>
+                            </div>
+                            <div class="estoque-acoes">
+                                <button class="btn btn-secondary" id="btn-estoque-entrada">
+                                    <i class="fa-solid fa-arrow-down text-green"></i> Entrada
+                                </button>
+                                <button class="btn btn-secondary" id="btn-estoque-saida">
+                                    <i class="fa-solid fa-arrow-up text-red"></i> Saída
+                                </button>
+                                <button class="btn btn-primary" id="btn-add-product">
+                                    <i class="fa-solid fa-plus"></i> Produto
+                                </button>
+                            </div>
+                        </div>
+                        <div class="services-list-grid" id="estoque-produtos-grid">
+                            <!-- Produtos populados por renderProdutos() -->
+                        </div>
+                    </div>
+
+                    <div class="dashboard-panel glass-effect">
+                        <div class="panel-header estoque-painel-cabecalho">
+                            <div>
+                                <h4 class="panel-title">Movimentações</h4>
+                                <p class="panel-description">
+                                    Cada entrada e cada saída, com o motivo. É o que explica
+                                    o saldo de hoje.
+                                </p>
+                            </div>
+                        </div>
+                        <div id="estoque-movimentos"></div>
+                    </div>
+                </section>
+
+                <!-- 6. FINANCEIRO PAGE -->
+                <section class="page-section" id="page-financeiro">
+                    <!-- Top Controls: Timeframe and Professional Filters -->
+                    <div class="dashboard-panel glass-effect finance-top-controls" style="margin-bottom: 20px; padding: 15px; border-left: 4px solid var(--secondary);">
+                        <div class="finance-filter-group">
+                            <span class="finance-filter-label"><i class="fa-regular fa-calendar"></i> Selecione o Período</span>
+                            <div class="finance-period-filters" id="finance-period-filters" style="display: flex; gap: 10px;">
+                                <button class="btn btn-secondary" id="btn-period-daily" onclick="setFinancePeriodFilter('daily')">Hoje</button>
+                                <button class="btn btn-secondary" id="btn-period-weekly" onclick="setFinancePeriodFilter('weekly')">7 Dias</button>
+                                <button class="btn btn-primary" id="btn-period-monthly" onclick="setFinancePeriodFilter('monthly')">30 Dias</button>
+                            </div>
+                        </div>
+
+                        <div class="finance-filter-group">
+                            <span class="finance-filter-label"><i class="fa-solid fa-user-tie"></i> Filtrar por Profissional</span>
+                            <div class="prof-filters" id="finance-prof-filters" style="display: flex; gap: 10px; overflow-x: auto; padding-bottom: 5px;">
+                                <!-- Buttons populated dynamically -->
+                            </div>
+                        </div>
+
+                        <div class="finance-filter-group">
+                            <span class="finance-filter-label"><i class="fa-regular fa-file-pdf"></i> Extrato do Período</span>
+                            <div style="display: flex; gap: 10px;">
+                                <button class="btn btn-secondary" id="btn-extrato-periodo" onclick="gerarExtratoPeriodo()"><i class="fa-solid fa-file-arrow-down"></i> Gerar PDF</button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Abrir/fechar caixa e Confirmar Pagamentos moraram aqui até a Fase C.
+                         Foram para a aba Vendas (são ações que abrem/fecham dinheiro, e dinheiro
+                         passou a nascer lá) — ver o comentário em #page-vendas. Aqui ficou a
+                         LEITURA do dia: a projeção não é o mesmo número de "Total vendido hoje"
+                         em Vendas, de propósito — uma é o que se espera receber pela agenda, a
+                         outra é o que já foi realmente vendido. -->
+                    <div class="dashboard-panel glass-effect" style="margin-bottom: 20px; border-left: 4px solid var(--primary);">
+                        <div class="panel-header" style="justify-content: space-between; align-items: center; display: flex;">
+                            <h4 class="panel-title"><i class="fa-solid fa-chart-simple"></i> Resumo do Dia</h4>
+                            <a href="#" class="click-tab finance-link-caixa" data-target="vendas">
+                                <i class="fa-solid fa-cash-register"></i> Abrir/fechar caixa em Vendas
+                            </a>
+                        </div>
+                        <div class="panel-body" style="display: flex; gap: 20px; align-items: stretch; flex-wrap: wrap;">
+                            <!-- GERAL: Projeção Faturamento + Gastos do Dia -->
+                            <div id="cash-info-geral" style="display: flex; gap: 15px; flex: 2; min-width: 250px;">
+                                <div style="flex: 1; background: var(--bg-tertiary); border-radius: 10px; padding: 15px;">
+                                    <p style="color: var(--text-muted); font-size: 0.8rem; margin-bottom: 5px;"><i class="fa-solid fa-chart-line text-green"></i> Projeção Faturamento Hoje</p>
+                                    <h3 id="cash-proj-revenue" style="font-size: 1.4rem; color: var(--success);">R$ 0,00</h3>
+                                </div>
+                                <div style="flex: 1; background: var(--bg-tertiary); border-radius: 10px; padding: 15px;">
+                                    <p style="color: var(--text-muted); font-size: 0.8rem; margin-bottom: 5px;"><i class="fa-solid fa-arrow-down text-red"></i> Gastos do Dia</p>
+                                    <h3 id="cash-day-expenses" style="font-size: 1.4rem; color: var(--danger);">R$ 0,00</h3>
+                                </div>
+                            </div>
+
+                            <!-- PROFISSIONAL: Comissão Dia + Agendamentos + Comissão Mês -->
+                            <div id="cash-info-prof" style="display: none; gap: 15px; flex: 3; min-width: 300px;">
+                                <div style="flex: 1; background: var(--bg-tertiary); border-radius: 10px; padding: 15px;">
+                                    <p style="color: var(--text-muted); font-size: 0.8rem; margin-bottom: 5px;"><i class="fa-solid fa-coins text-warning"></i> Comissão Hoje</p>
+                                    <h3 id="cash-prof-commission-day" style="font-size: 1.4rem; color: var(--warning);">R$ 0,00</h3>
+                                </div>
+                                <div style="flex: 1; background: var(--bg-tertiary); border-radius: 10px; padding: 15px;">
+                                    <p style="color: var(--text-muted); font-size: 0.8rem; margin-bottom: 5px;"><i class="fa-solid fa-calendar-check text-blue"></i> Agendamentos Hoje</p>
+                                    <h3 id="cash-prof-appts-day" style="font-size: 1.4rem; color: var(--info);">0</h3>
+                                </div>
+                                <div style="flex: 1; background: var(--bg-tertiary); border-radius: 10px; padding: 15px;">
+                                    <p style="color: var(--text-muted); font-size: 0.8rem; margin-bottom: 5px;"><i class="fa-solid fa-sack-dollar text-purple"></i> Projeção Comissão Mês</p>
+                                    <h3 id="cash-prof-commission-month" style="font-size: 1.4rem; color: var(--purple);">R$ 0,00</h3>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- Finance Stats Summary -->
+                    <div class="metrics-grid">
+                        <div class="metric-card glass-effect">
+                            <div class="metric-icon bg-green-soft">
+                                <i class="fa-solid fa-arrow-trend-up text-green"></i>
+                            </div>
+                            <div class="metric-details">
+                                <span class="metric-label">Total Entradas</span>
+                                <h3 class="metric-value text-green" id="fin-total-income">R$ 0</h3>
+                            </div>
+                        </div>
+                        <div class="metric-card glass-effect">
+                            <div class="metric-icon bg-red-soft">
+                                <i class="fa-solid fa-arrow-trend-down text-red"></i>
+                            </div>
+                            <div class="metric-details">
+                                <span class="metric-label">Total Saídas</span>
+                                <h3 class="metric-value text-red" id="fin-total-expenses">R$ 0</h3>
+                            </div>
+                        </div>
+                        <div class="metric-card glass-effect">
+                            <div class="metric-icon bg-purple-soft">
+                                <i class="fa-solid fa-scale-balanced text-purple"></i>
+                            </div>
+                            <div class="metric-details">
+                                <span class="metric-label">Saldo / Lucro Líquido</span>
+                                <h3 class="metric-value text-purple" id="fin-net-profit">R$ 0</h3>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Finance Grid -->
+                    <div class="finance-grid">
+                        <!-- Chart and Lists -->
+                        <div class="dashboard-panel glass-effect flex-1-5" style="grid-column: span 2;">
+                            <div class="panel-header">
+                                <h4 class="panel-title"><i class="fa-solid fa-list-check"></i> Histórico de Transações</h4>
+                                <div class="finance-list-actions">
+                                    <button class="btn btn-secondary" id="btn-add-income"><i class="fa-solid fa-plus text-green"></i> Entrada</button>
+                                    <button class="btn btn-secondary" id="btn-add-expense"><i class="fa-solid fa-plus text-red"></i> Saída</button>
+                                </div>
+                            </div>
+                            <div class="panel-body">
+                                <div class="table-container-embedded">
+                                    <table class="data-table small-text">
+                                        <thead>
+                                            <tr>
+                                                <th>Data</th>
+                                                <th>Tipo</th>
+                                                <th>Descrição</th>
+                                                <th>Profissional</th>
+                                                <th>Forma de Pagto</th>
+                                                <th>Valor</th>
+                                                <th style="text-align: right;">Ação</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody id="tbody-transactions">
+                                            <!-- Financial records populated dynamically -->
+                                        </tbody>
+                                    </table>
+                                </div>
+                                <div class="paginacao" id="transactions-pagination" hidden></div>
+                            </div>
+                        </div>
+
+                        <!-- Side Reports -->
+                        <div class="dashboard-side-panels">
+                            <!-- Confirmar Pagamentos foi para a aba Vendas — ver o comentário
+                                 acima e o painel em #page-vendas. -->
+                            <div class="dashboard-panel glass-effect">
+                                <div class="panel-header">
+                                    <h4 class="panel-title"><i class="fa-solid fa-chart-pie text-purple"></i> Faturamento por Serviço</h4>
+                                </div>
+                                <div class="panel-body">
+                                    <div class="chart-box-mock" id="chart-service-revenue" style="max-height: 200px; overflow-y: auto; padding-right: 8px;">
+                                        <!-- Mock graph displaying bars representing revenue per service -->
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="dashboard-panel glass-effect">
+                                <div class="panel-header">
+                                    <h4 class="panel-title"><i class="fa-solid fa-credit-card text-blue"></i> Métodos de Pagamento</h4>
+                                </div>
+                                <div class="panel-body">
+                                    <div class="payment-methods-stats" id="chart-payment-methods">
+                                        <!-- Mock details for payment splits (Pix, Dinheiro, etc) -->
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- 6. CONFIGURAÇÕES PAGE -->
+                <section class="page-section" id="page-configuracoes">
+                    <div class="config-tabs-container">
+                        <!-- Horizontal secondary sub-navigation -->
+                        <div class="config-subnav">
+                            <button class="btn btn-secondary btn-active" data-config-tab="servicos">Serviços Oferecidos</button>
+                            <button class="btn btn-secondary" data-config-tab="profissionais">Profissionais</button>
+                            <button class="btn btn-secondary" data-config-tab="empresa">Dados do Estabelecimento</button>
+                            <button class="btn btn-secondary" data-config-tab="fidelidade">Fidelidade</button>
+                            <button class="btn btn-secondary" data-config-tab="link">Link de Agendamento</button>
+                            <button class="btn btn-secondary" data-config-tab="cobranca">Cobrança</button>
+                        </div>
+
+                        <div class="config-tab-content glass-effect active" id="config-tab-servicos">
+                            <div class="panel-header-with-action">
+                                <div>
+                                    <h4 class="panel-title">Gerenciar Serviços</h4>
+                                    <p class="panel-description">Defina o preço, duração em minutos e a visibilidade no link público.</p>
+                                </div>
+                                <button class="btn btn-primary" id="btn-add-service">
+                                    <i class="fa-solid fa-plus"></i> Adicionar Serviço
+                                </button>
+                            </div>
+                            <div class="services-list-grid" id="services-config-grid">
+                                <!-- Services populated here dynamically -->
+                            </div>
+                        </div>
+
+                        <div class="config-tab-content glass-effect" id="config-tab-profissionais" style="display:none;">
+                            <div class="panel-header-with-action">
+                                <div>
+                                    <h4 class="panel-title">Profissionais Ativos</h4>
+                                    <p class="panel-description">Gerencie a equipe e sua agenda individual no sistema.</p>
+                                </div>
+                                <button class="btn btn-primary" id="btn-add-professional">
+                                    <i class="fa-solid fa-plus"></i> Adicionar Profissional
+                                </button>
+                            </div>
+                            <div class="professionals-list-grid" id="professionals-config-grid">
+                                <!-- Professionals list populated dynamically -->
+                            </div>
+                        </div>
+
+                        <div class="config-tab-content glass-effect" id="config-tab-empresa" style="display:none;">
+                            <div class="panel-header">
+                                <h4 class="panel-title">Dados do Estabelecimento</h4>
+                                <p class="panel-description">Esses dados serão exibidos na página pública de agendamento.</p>
+                            </div>
+                            <form class="config-form" id="form-business-info">
+                                <div class="form-group">
+                                    <label for="biz-avatar">Foto do Perfil / Logomarca</label>
+                                    <input type="file" id="biz-avatar" class="form-control" accept="image/*">
+                                </div>
+                                <div class="form-row">
+                                    <div class="form-group">
+                                        <label for="biz-type"><i class="fa-solid fa-shapes"></i> Tipo de Estabelecimento</label>
+                                        <select id="biz-type" class="form-control" style="background: rgba(255,255,255,0.05); color: #fff;">
+                                            <option value="barbearia">✂️ Barbearia</option>
+                                            <option value="salao">💇 Salão de Beleza / Cabelo</option>
+                                            <option value="estetica">✨ Clínica de Estética & Manicure</option>
+                                        </select>
+                                    </div>
+                                    <div class="form-group">
+                                        <label><i class="fa-solid fa-palette"></i> Identidade Visual (Cor Primária)</label>
+                                        <div style="display: flex; gap: 8px; align-items: center;">
+                                            <input type="color" id="biz-primary-color" value="#d4af37" style="width: 44px; height: 38px; padding: 2px; border-radius: 8px; border: 1px solid rgba(255,255,255,0.2); background: transparent; cursor: pointer;">
+                                            <div id="theme-presets-bar" style="display: flex; gap: 6px; flex-wrap: wrap; align-items: center;">
+                                                <button type="button" class="btn btn-secondary btn-sm" onclick="document.getElementById('biz-primary-color').value='#d4af37'; window.ThemeManager.applyColors('#d4af37')" style="padding: 4px 8px; font-size: 0.75rem;">Ouro</button>
+                                                <button type="button" class="btn btn-secondary btn-sm" onclick="document.getElementById('biz-primary-color').value='#f43f5e'; window.ThemeManager.applyColors('#f43f5e')" style="padding: 4px 8px; font-size: 0.75rem;">Rose</button>
+                                                <button type="button" class="btn btn-secondary btn-sm" onclick="document.getElementById('biz-primary-color').value='#8b5cf6'; window.ThemeManager.applyColors('#8b5cf6')" style="padding: 4px 8px; font-size: 0.75rem;">Violeta</button>
+                                                <button type="button" class="btn btn-secondary btn-sm" onclick="document.getElementById('biz-primary-color').value='#0284c7'; window.ThemeManager.applyColors('#0284c7')" style="padding: 4px 8px; font-size: 0.75rem;">Azul</button>
+                                                <button type="button" class="btn btn-secondary btn-sm" onclick="document.getElementById('biz-primary-color').value='#10b981'; window.ThemeManager.applyColors('#10b981')" style="padding: 4px 8px; font-size: 0.75rem;">Verde</button>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="form-row">
+                                    <div class="form-group">
+                                        <label for="biz-name">Nome do Estabelecimento</label>
+                                        <input type="text" id="biz-name" class="form-control" value="Alabama Barbearia">
+                                    </div>
+                                    <div class="form-group">
+                                        <label for="biz-slug">Link Slug (ex: seu-nome)</label>
+                                        <div class="input-prefix-wrapper">
+                                            <span class="input-prefix" id="biz-slug-prefix">seu-dominio.com/</span>
+                                            <input type="text" id="biz-slug" class="form-control" value="agendamento">
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="form-row">
+                                    <div class="form-group">
+                                        <label for="biz-phone">WhatsApp para contato</label>
+                                        <input type="text" id="biz-phone" class="form-control" maxlength="15" value="(11) 99999-8888">
+                                    </div>
+                                    <div class="form-group">
+                                        <label for="biz-instagram">Instagram</label>
+                                        <div class="input-prefix-wrapper">
+                                            <span class="input-prefix">@</span>
+                                            <input type="text" id="biz-instagram" class="form-control" value="barbearia.lexion">
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="form-group">
+                                    <label for="biz-whatsapp-msg"><i class="fa-brands fa-whatsapp text-success"></i> Mensagem Padrão de Retorno (WhatsApp)</label>
+                                    <p style="font-size: 11px; color: var(--text-muted); margin-top: -5px; margin-bottom: 5px;">Tags: <code>{nome}</code> = nome do cliente · <code>{dia}</code> = dia da semana · <code>{link}</code> = link de agendamento.</p>
+                                    <textarea id="biz-whatsapp-msg" class="form-control" rows="2" placeholder="Ex: Olá {nome}! Tudo bem? Vimos que faz um tempo que você não nos visita... {link}"></textarea>
+                                </div>
+                                <!-- A Mensagem Padrão de Agendamento saiu daqui e foi para a
+                                     sub-aba "Link de Agendamento", que é onde ela é usada: o
+                                     dono escreve o texto e vê a prévia com o link montado, na
+                                     mesma tela, sem precisar ir e voltar entre duas sub-abas
+                                     para conferir o que acabou de escrever. -->
+                                <div class="form-group">
+                                    <label for="biz-whatsapp-birthday-msg"><i class="fa-brands fa-whatsapp text-success"></i> Mensagem de Aniversário (WhatsApp)</label>
+                                    <p style="font-size: 11px; color: var(--text-muted); margin-top: -5px; margin-bottom: 5px;">Usada no botão <strong>Parabéns</strong> do painel de aniversariantes. Tags: <code>{nome}</code> = primeiro nome do cliente · <code>{salao}</code> = nome da barbearia · <code>{link}</code> = link de agendamento.</p>
+                                    <textarea id="biz-whatsapp-birthday-msg" class="form-control" rows="2" placeholder="Ex: Olá {nome}! A equipe da barbearia te deseja um Feliz Aniversário! 🎉"></textarea>
+                                </div>
+                                <div class="form-group">
+                                    <label for="biz-address">Endereço Completo</label>
+                                    <input type="text" id="biz-address" class="form-control" value="Av. Paulista, 1000 - Bela Vista, São Paulo - SP">
+                                </div>
+                                <div class="form-group">
+                                    <label>Horário de Funcionamento</label>
+                                    <p style="font-size: 11px; color: var(--text-muted); margin-top: -5px; margin-bottom: 8px;">Define os horários oferecidos no link de agendamento. Dia desmarcado não aceita agendamento.</p>
+                                    <!-- Preenchido por renderHorarioFuncionamento() em app.js -->
+                                    <div class="hours-grid" id="biz-hours-grid"></div>
+                                </div>
+                                <button type="submit" class="btn btn-primary" style="margin-top: 10px;">Salvar Alterações</button>
+                            </form>
+                        </div>
+
+                        <div class="config-tab-content glass-effect" id="config-tab-fidelidade" style="display:none;">
+                            <div id="fidelidade-config">
+                                <div class="panel-header">
+                                    <div>
+                                        <h4 class="panel-title"><i class="fa-solid fa-sliders"></i> Configuração do clube</h4>
+                                        <p class="panel-description" id="fid-cfg-empty-hint">
+                                            Ainda não configurado. Ative e defina a meta para começar a pontuar.
+                                        </p>
+                                    </div>
+                                </div>
+                                <form id="form-fidelidade-config" class="fid-config-form">
+                                    <label class="fid-toggle">
+                                        <input type="checkbox" id="fid-cfg-active" checked>
+                                        <span>
+                                            <strong>Programa ativo</strong>
+                                            <small>Desligado, nenhuma venda nova pontua</small>
+                                        </span>
+                                    </label>
+                                    <div class="form-row">
+                                        <div class="form-group">
+                                            <label for="fid-cfg-name">Nome do clube</label>
+                                            <input type="text" id="fid-cfg-name" class="form-control" placeholder="Clube de Fidelidade">
+                                        </div>
+                                        <div class="form-group">
+                                            <label for="fid-cfg-goal">Meta (pontos para o benefício)</label>
+                                            <input type="number" id="fid-cfg-goal" class="form-control" min="1" step="1" value="10">
+                                        </div>
+                                        <div class="form-group">
+                                            <label for="fid-cfg-points">Pontos por serviço</label>
+                                            <input type="number" id="fid-cfg-points" class="form-control" min="1" step="1" value="1">
+                                        </div>
+                                    </div>
+                                    <div class="form-row">
+                                        <div class="form-group">
+                                            <label for="fid-cfg-benefit-desc">Descrição do benefício</label>
+                                            <input type="text" id="fid-cfg-benefit-desc" class="form-control" placeholder="1 serviço grátis">
+                                        </div>
+                                        <div class="form-group">
+                                            <label for="fid-cfg-benefit-type">Tipo do desconto</label>
+                                            <select id="fid-cfg-benefit-type" class="form-control">
+                                                <option value="amount">R$</option>
+                                                <option value="percent">%</option>
+                                            </select>
+                                        </div>
+                                        <div class="form-group">
+                                            <label for="fid-cfg-benefit-value">Valor do desconto</label>
+                                            <input type="number" id="fid-cfg-benefit-value" class="form-control" min="0" step="0.01" placeholder="0,00">
+                                        </div>
+                                    </div>
+                                    <p class="form-hint">
+                                        O benefício vira um desconto aplicado no checkout quando o balcão escolhe usá-lo —
+                                        a mesma tela de ajuste de venda que já existe desde o começo.
+                                    </p>
+                                    <div class="form-group">
+                                        <label for="fid-cfg-message"><i class="fa-brands fa-whatsapp text-success"></i> Aviso de meta atingida (WhatsApp)</label>
+                                        <p style="font-size: 11px; color: var(--text-muted); margin-top: -5px; margin-bottom: 5px;">
+                                            Enviada pelo botão de WhatsApp na aba <strong>Fidelidade</strong>, para o cliente que já bateu a meta.
+                                            Tags: <code>{nome}</code> · <code>{clube}</code> · <code>{beneficio}</code> ·
+                                            <code>{pontos}</code> · <code>{meta}</code> · <code>{salao}</code> · <code>{link}</code>.
+                                        </p>
+                                        <textarea id="fid-cfg-message" class="form-control" rows="3"></textarea>
+                                    </div>
+                                    <button type="submit" class="btn btn-primary">Salvar configuração</button>
+                                </form>
+                            </div>
+                        </div>
+
+                        <!-- Sub-aba "Link de Agendamento". Era uma aba própria do menu, com um
+                             mockup de celular ao lado; sobrou o que o dono usa de verdade — o
+                             endereço e a mensagem que acompanha o link, editável aqui mesmo. -->
+                        <div class="config-tab-content glass-effect" id="config-tab-link" style="display:none;">
+                            <div class="panel-header">
+                                <h4 class="panel-title"><i class="fa-solid fa-share-nodes text-purple"></i> Link de Agendamento</h4>
+                                <p class="panel-description">Este é o principal canal de captação. Cole na biografia do Instagram e mande no WhatsApp.</p>
+                            </div>
+
+                            <div class="link-copier-box glass-effect">
+                                <span class="link-label">Link do seu Estabelecimento:</span>
+                                <div class="link-copier">
+                                    <code id="biz-link-url">https://seu-dominio.com/agendamento</code>
+                                    <button class="btn btn-secondary btn-sm" id="btn-copy-link"><i class="fa-regular fa-copy"></i> Copiar Link</button>
+                                </div>
+
+                                <!-- Dois campos, e não um só editável: o de cima é o MODELO, com
+                                     as tags; o de baixo é a mensagem montada, que é a que vai
+                                     para o cliente. Liberar a edição direto no texto montado
+                                     faria o dono salvar o link fixo do dia no lugar da tag
+                                     {link} — e a mensagem pararia de acompanhar uma troca de
+                                     slug ou de domínio depois. -->
+                                <form class="booking-msg-composer" id="form-booking-msg" style="margin-top: 14px;">
+                                    <span class="link-label"><i class="fa-brands fa-whatsapp text-success"></i> Mensagem que acompanha o link:</span>
+                                    <p style="font-size: 11px; color: var(--text-muted); margin: -2px 0 6px;">
+                                        Tags: <code>{dia}</code> = dia da semana · <code>{link}</code> = seu link (montado sozinho).
+                                    </p>
+                                    <textarea id="biz-whatsapp-booking-msg" class="form-control" rows="3" style="font-size: 13px; resize: vertical;"
+                                              placeholder="Ex: Bom dia, agende seu horário para hoje {dia}, não deixe pra última hora 💈 {link}"></textarea>
+
+                                    <span class="link-label" style="margin-top: 14px;">Como chega ao cliente:</span>
+                                    <!-- readonly, e não disabled: o texto continua selecionável e
+                                         copiável. É este campo que os dois botões abaixo enviam. -->
+                                    <textarea id="booking-msg-draft" class="form-control is-readonly" rows="3" style="font-size: 13px; resize: vertical;" readonly></textarea>
+
+                                    <div style="display: flex; gap: 8px; margin-top: 10px;">
+                                        <button type="submit" class="btn btn-primary btn-sm" style="flex: 1;">Salvar mensagem</button>
+                                        <button type="button" class="btn btn-success btn-sm" id="btn-share-whatsapp-link" style="flex: 1;"><i class="fa-brands fa-whatsapp"></i> Enviar no WhatsApp</button>
+                                        <button type="button" class="btn btn-secondary btn-sm" id="btn-copy-booking-msg" title="Copiar mensagem"><i class="fa-regular fa-copy"></i></button>
+                                    </div>
+                                </form>
+                            </div>
+
+                            <div class="simulator-instructions-box glass-effect" style="margin-top: 20px;">
+                                <h5>Como funciona o fluxo do cliente:</h5>
+                                <ol class="sim-steps-list">
+                                    <li>O cliente seleciona um serviço no celular.</li>
+                                    <li>Escolhe o profissional de sua preferência.</li>
+                                    <li>Seleciona a data e um horário livre disponível.</li>
+                                    <li>Informa seu nome e WhatsApp (sem precisar criar conta/senhas complexas).</li>
+                                    <li><strong>O agendamento é inserido na sua agenda em tempo real!</strong></li>
+                                </ol>
+                                <div class="alert-box alert-info">
+                                    <i class="fa-solid fa-lightbulb"></i>
+                                    <span>Abra o próprio link no seu celular para ver exatamente o que o cliente vê. O que você agendar por ali entra na agenda de verdade.</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Cobrança: o texto que sai no botão de WhatsApp da parcela
+                             do crediário. Era uma string fixa dentro de crediario.js até
+                             a migration 26 (business_info.whatsappChargeMessage). -->
+                        <div class="config-tab-content glass-effect" id="config-tab-cobranca" style="display:none;">
+                            <div class="panel-header">
+                                <h4 class="panel-title"><i class="fa-brands fa-whatsapp text-success"></i> Mensagem de Cobrança</h4>
+                                <p class="panel-description">Usada no botão de WhatsApp da parcela em aberto, no Dashboard e na aba Crediário.</p>
+                            </div>
+                            <form class="config-form" id="form-cobranca-msg">
+                                <div class="form-group">
+                                    <label for="biz-whatsapp-charge-msg">Texto enviado ao cliente</label>
+                                    <p style="font-size: 11px; color: var(--text-muted); margin-top: -5px; margin-bottom: 5px;">
+                                        Tags: <code>{nome}</code> = primeiro nome do cliente · <code>{parcela}</code> = número da parcela ·
+                                        <code>{valor}</code> = quanto está em aberto · <code>{vencimento}</code> = data de vencimento ·
+                                        <code>{salao}</code> = nome do estabelecimento · <code>{link}</code> = link de agendamento.
+                                    </p>
+                                    <textarea id="biz-whatsapp-charge-msg" class="form-control" rows="4"></textarea>
+                                </div>
+                                <div class="form-group">
+                                    <label>Prévia</label>
+                                    <p style="font-size: 11px; color: var(--text-muted); margin-top: -5px; margin-bottom: 5px;">
+                                        Com uma parcela de exemplo — é assim que a mensagem chega no WhatsApp do cliente.
+                                    </p>
+                                    <div id="cobranca-msg-preview" class="msg-preview"></div>
+                                </div>
+                                <button type="submit" class="btn btn-primary" style="margin-top: 10px;">Salvar mensagem</button>
+                            </form>
+                        </div>
+                    </div>
+                </section>
+
+            </div>
+        </main>
+    </div>
+
+    <!-- MODAL: ADD/EDIT APPOINTMENT -->
+    <div class="modal-backdrop" id="modal-appointment">
+        <div class="modal-dialog glass-effect">
+            <div class="modal-header">
+                <h4 class="modal-title" id="appointment-modal-title">Novo Agendamento</h4>
+                <button class="modal-close" data-close-modal="modal-appointment">&times;</button>
+            </div>
+            <form id="form-appointment" novalidate>
+                <input type="hidden" id="appt-id">
+                <div class="modal-body">
+                    <div id="appt-readonly-summary" style="display:none; margin-bottom: 20px; padding: 15px; background: rgba(255,255,255,0.03); border-radius: 12px; border: 1px solid rgba(255,255,255,0.05);">
+                        <h4 id="summary-client-name" style="margin: 0 0 8px 0; font-size: 18px; color: var(--text);"></h4>
+                        <div style="display:flex; flex-direction:column; gap:4px;">
+                            <div style="font-size: 13px; color: var(--text-muted); display:flex; align-items:center; gap:6px;"><i class="fa-solid fa-scissors"></i> <span id="summary-service-name"></span></div>
+                            <div style="font-size: 13px; color: var(--text-muted); display:flex; align-items:center; gap:6px;"><i class="fa-solid fa-user-tie"></i> <span id="summary-prof-name"></span></div>
+                        </div>
+                    </div>
+
+                    <div id="appt-create-fields">
+                        <div class="form-group">
+                            <label for="appt-client-select">Cliente</label>
+                            <div class="input-select-plus">
+                                <select id="appt-client-select" class="form-control" required>
+                                    <!-- Populated dynamically -->
+                                </select>
+                                <button type="button" class="btn btn-secondary" id="btn-quick-add-client-from-appt" title="Cadastrar novo cliente">
+                                    <i class="fa-solid fa-user-plus"></i>
+                                </button>
+                            </div>
+                        </div>
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label for="appt-service-select">Serviço</label>
+                                <select id="appt-service-select" class="form-control" required>
+                                    <!-- Populated dynamically -->
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label for="appt-prof-select">Profissional</label>
+                                <select id="appt-prof-select" class="form-control" required>
+                                    <!-- Populated dynamically -->
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div id="appt-edit-actions" style="display:none; gap:10px; margin-bottom: 20px;">
+                        <button type="button" class="btn btn-secondary" style="flex:1; justify-content:center;" onclick="document.getElementById('appt-edit-payment-fields').style.display='block'; this.style.display='none';"><i class="fa-solid fa-sack-dollar"></i> Pagamento</button>
+                        <button type="button" class="btn btn-secondary" style="flex:1; justify-content:center;" onclick="document.getElementById('appt-edit-time-fields').style.display='block'; this.style.display='none';"><i class="fa-regular fa-clock"></i> Horário</button>
+                    </div>
+
+                    <div id="appt-edit-time-fields">
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label for="appt-date">Data</label>
+                                <input type="date" id="appt-date" class="form-control" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="appt-time">Horário</label>
+                                <input type="time" id="appt-time" class="form-control" required>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Este bloco deixou de receber dinheiro (v1.6.0).
+                         Valor, forma de pagamento e carrinho de produtos saíram
+                         da tela — quem cobra é o checkout da aba Vendas, que
+                         grava a venda inteira numa transação só.
+                         Sobrou o que NÃO é cobrança: "A cobrar" e "Cortesia",
+                         que são as saídas que destravam o fechamento do caixa.
+
+                         ⚠️ Os campos escondidos abaixo continuam no DOM DE
+                         PROPÓSITO, e não por esquecimento: `app.js` e
+                         `estoque.js` ainda os leem em 21 pontos, e apagá-los
+                         daqui faria esses trechos estourarem em `null.value`
+                         no meio do salvamento de um agendamento. A remoção de
+                         verdade é a limpeza desses 21 pontos, anotada nos
+                         Próximos Passos do AGENT_HANDOFF. -->
+                    <div id="appt-edit-payment-fields">
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label for="appt-payment">Cobrança</label>
+                                <select id="appt-payment" class="form-control">
+                                    <option value="pending">A cobrar</option>
+                                    <option value="free">Cortesia (não cobrar)</option>
+                                </select>
+                            </div>
+                            <div class="form-group" style="display:none;">
+                                <label for="appt-payment-value">Valor (R$)</label>
+                                <input type="number" step="0.01" id="appt-payment-value" class="form-control" placeholder="Automático">
+                            </div>
+                        </div>
+                        <div class="form-group" style="display:none;">
+                            <label for="appt-payment-method">Modo de Pagamento</label>
+                            <select id="appt-payment-method" class="form-control">
+                                <option value="pix">Pix</option>
+                                <option value="credit_card">Cartão de Crédito</option>
+                                <option value="debit_card">Cartão de Débito</option>
+                                <option value="cash">Dinheiro</option>
+                            </select>
+                        </div>
+
+                        <!-- "Leva a pomada junto?" é uma pergunta da hora de pagar.
+                             O bloco some sozinho quando não há produto com estoque. -->
+                        <div class="form-group" id="appt-produtos-bloco" style="display:none;">
+                            <label for="appt-produto">Levou algum produto?</label>
+                            <div class="appt-produto-linha">
+                                <select id="appt-produto" class="form-control"></select>
+                                <!-- SEM `min` de propósito. Este campo mora dentro do
+                                     formulário do agendamento: um valor fora da faixa
+                                     faz o navegador barrar o "Salvar Pagamento" INTEIRO,
+                                     sem erro visível. O piso de 1 é aplicado no JS, no
+                                     evento `change`. -->
+                                <input type="number" id="appt-produto-qtd" class="form-control"
+                                       step="1" value="1" aria-label="Quantidade">
+                                <button type="button" class="btn btn-secondary" id="btn-appt-add-produto">
+                                    <i class="fa-solid fa-plus"></i>
+                                </button>
+                            </div>
+                            <div id="appt-produtos-lista"></div>
+                            <p class="form-hint">
+                                Entra como um lançamento separado no Financeiro e baixa do estoque
+                                quando o pagamento for salvo. <strong>A comissão continua sendo
+                                calculada só sobre o serviço.</strong>
+                            </p>
+                        </div>
+                    </div>
+
+                    <div id="appt-create-fields-secondary">
+                        <div class="form-group">
+                            <label for="appt-status">Status Atendimento</label>
+                            <select id="appt-status" class="form-control">
+                                <option value="scheduled">Agendado</option>
+                                <option value="confirmed">Confirmado</option>
+                                <option value="in_progress">Em atendimento</option>
+                                <option value="done">Concluído (Realizado)</option>
+                                <option value="no_show">Faltou (Não Compareceu)</option>
+                                <option value="cancelled">Cancelado</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="appt-notes">Observações</label>
+                            <textarea id="appt-notes" class="form-control" rows="2" placeholder="Observações do atendimento, restrições, etc."></textarea>
+                        </div>
+                        <div class="appointment-communication" id="appointment-communication">
+                            <div class="communication-heading">
+                                <div><span class="eyebrow">Comunicação</span><strong>Lembretes deste horário</strong></div>
+                                <button type="button" class="btn btn-secondary btn-sm" id="btn-send-reminder-now"><i class="fa-solid fa-paper-plane"></i> Enviar agora</button>
+                            </div>
+                            <div id="appointment-message-timeline" class="message-timeline-empty">Salve o agendamento para programar os lembretes.</div>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-close-modal="modal-appointment">Cancelar</button>
+                    <button type="button" class="btn btn-danger" id="btn-delete-appointment" style="display:none; margin-right: auto;">Excluir</button>
+                    <button type="submit" class="btn btn-primary" id="btn-save-appointment">Salvar Agendamento</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- MODAL: CLIENTE 360 -->
+    <div class="modal-backdrop" id="modal-client-detail">
+        <div class="modal-dialog modal-dialog-wide glass-effect">
+            <div class="modal-header">
+                <div><span class="eyebrow">Cliente 360°</span><h4 class="modal-title" id="client-detail-title">Cliente</h4></div>
+                <button class="modal-close" data-close-modal="modal-client-detail">&times;</button>
+            </div>
+            <div class="modal-body" id="client-detail-content"></div>
+            <div class="modal-footer sticky-mobile-actions">
+                <button type="button" class="btn btn-secondary" data-close-modal="modal-client-detail">Fechar</button>
+                <button type="button" class="btn btn-primary" id="btn-client-detail-appointment"><i class="fa-solid fa-calendar-plus"></i> Agendar</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- MODAL: ADD/EDIT CLIENT -->
+    <div class="modal-backdrop" id="modal-client">
+        <div class="modal-dialog glass-effect">
+            <div class="modal-header">
+                <h4 class="modal-title" id="client-modal-title">Cadastrar Cliente</h4>
+                <button class="modal-close" data-close-modal="modal-client">&times;</button>
+            </div>
+            <form id="form-client">
+                <input type="hidden" id="client-id">
+                <div class="modal-body">
+                    <div class="form-group">
+                        <label for="client-name">Nome Completo</label>
+                        <input type="text" id="client-name" class="form-control" placeholder="Ex: João da Silva" required oninput="this.value = this.value.replace(/[0-9]/g, '')">
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="client-phone">WhatsApp/Telefone</label>
+                            <input type="text" id="client-phone" class="form-control" placeholder="Ex: (11) 99999-8888" maxlength="15" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="client-instagram">Instagram</label>
+                            <input type="text" id="client-instagram" class="form-control" placeholder="Ex: @joao.silva">
+                        </div>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="client-birth">Data de Nascimento</label>
+                            <input type="date" id="client-birth" class="form-control" min="1920-01-01">
+                        </div>
+                        <div class="form-group">
+                            <label for="client-frequency">Frequência Média de Retorno (dias)</label>
+                            <input type="number" id="client-frequency" class="form-control" placeholder="Ex: 21" min="1" value="30">
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label for="client-notes">Observações</label>
+                        <textarea id="client-notes" class="form-control" rows="3" placeholder="Gostos do cliente, detalhes específicos de cortes anteriores..."></textarea>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-danger" id="btn-delete-client" style="display: none; margin-right: auto;">Excluir</button>
+                    <button type="button" class="btn btn-secondary" data-close-modal="modal-client">Cancelar</button>
+                    <button type="submit" class="btn btn-primary">Salvar Cliente</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- MODAL: ADD/EDIT LEAD -->
+    <div class="modal-backdrop" id="modal-lead">
+        <div class="modal-dialog glass-effect">
+            <div class="modal-header">
+                <h4 class="modal-title" id="lead-modal-title">Novo Lead de Contato</h4>
+                <button class="modal-close" data-close-modal="modal-lead">&times;</button>
+            </div>
+            <form id="form-lead">
+                <input type="hidden" id="lead-id">
+                <div class="modal-body">
+                    <div class="form-group">
+                        <label for="lead-name">Nome do Lead</label>
+                        <input type="text" id="lead-name" class="form-control" placeholder="Ex: Maria Souza" required>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="lead-phone">WhatsApp/Telefone</label>
+                            <input type="text" id="lead-phone" class="form-control" placeholder="Ex: (11) 98888-7777" maxlength="15" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="lead-source">Origem do Lead</label>
+                            <select id="lead-source" class="form-control">
+                                <option value="instagram">Instagram Direct</option>
+                                <option value="whatsapp">WhatsApp</option>
+                                <option value="manual">Manual/Presencial</option>
+                                <option value="website">Site/Link</option>
+                                <option value="referral">Indicação</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label for="lead-stage">Coluna (Estágio)</label>
+                        <select id="lead-stage" class="form-control">
+                            <option value="new">Novo Lead</option>
+                            <option value="talking">Em Conversa</option>
+                            <option value="link_sent">Link de Agendamento Enviado</option>
+                            <option value="scheduled">Agendado</option>
+                            <option value="follow_up">Retorno Futuro</option>
+                            <option value="lost">Perdido / Sem Retorno</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="lead-notes">Notas da Conversa</label>
+                        <textarea id="lead-notes" class="form-control" rows="3" placeholder="Escreva o que ela perguntou, valores enviados, etc..."></textarea>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-close-modal="modal-lead">Cancelar</button>
+                    <button type="button" class="btn btn-danger" id="btn-delete-lead" style="display:none; margin-right: auto;">Excluir</button>
+                    <button type="submit" class="btn btn-primary">Salvar Lead</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- MODAL: ADD TRANSACTION -->
+    <!-- MODAL: OPEN REGISTER -->
+    <div class="modal-backdrop" id="modal-open-register">
+        <div class="modal-dialog glass-effect">
+            <div class="modal-header">
+                <h4 class="modal-title">Abrir Caixa do Dia</h4>
+                <button class="modal-close" data-close-modal="modal-open-register">&times;</button>
+            </div>
+            <form id="form-open-register">
+                <div class="modal-body">
+                    <div class="form-group">
+                        <label for="register-initial-cash">Troco Inicial / Fundo de Caixa (R$)</label>
+                        <input type="number" id="register-initial-cash" class="form-control" placeholder="Ex: 50.00" step="0.01" min="0" required>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-close-modal="modal-open-register">Cancelar</button>
+                    <button type="submit" class="btn btn-primary">Confirmar Abertura</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- MODAL: CLOSE REGISTER -->
+    <div class="modal-backdrop" id="modal-close-register">
+        <div class="modal-dialog glass-effect">
+            <div class="modal-header">
+                <h4 class="modal-title"><i class="fa-solid fa-lock text-danger"></i> Fechar Caixa do Dia</h4>
+                <button class="modal-close" data-close-modal="modal-close-register">&times;</button>
+            </div>
+            <div class="modal-body">
+                <div id="close-register-pending-list" style="margin-bottom: 15px;">
+                    <!-- Populated dynamically -->
+                </div>
+                <div style="background: var(--bg-tertiary); border-radius: 10px; padding: 15px; margin-bottom: 10px;">
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
+                        <span style="color: var(--text-muted);">Fundo Inicial</span>
+                        <strong id="close-reg-initial">R$ 0,00</strong>
+                    </div>
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
+                        <span style="color: var(--text-muted);">Entradas em Dinheiro</span>
+                        <strong class="text-green" id="close-reg-cash-in">R$ 0,00</strong>
+                    </div>
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
+                        <span style="color: var(--text-muted);">Saídas em Dinheiro</span>
+                        <strong class="text-red" id="close-reg-cash-out">R$ 0,00</strong>
+                    </div>
+                    <hr style="border-color: var(--border-color); margin: 10px 0;">
+                    <div style="display: flex; justify-content: space-between; align-items: center;">
+                        <span style="font-weight: 700; color: var(--text-primary);">Saldo Final em Gaveta</span>
+                        <strong style="font-size: 1.3rem; color: var(--primary);" id="close-reg-final">R$ 0,00</strong>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-close-modal="modal-close-register">Cancelar</button>
+                <button type="button" class="btn btn-danger" id="btn-confirm-close-register"><i class="fa-solid fa-lock"></i> Confirmar Fechamento</button>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal-backdrop" id="modal-transaction">
+        <div class="modal-dialog glass-effect">
+            <div class="modal-header">
+                <h4 class="modal-title" id="transaction-modal-title">Registrar Transação</h4>
+                <button class="modal-close" data-close-modal="modal-transaction">&times;</button>
+            </div>
+            <form id="form-transaction">
+                <input type="hidden" id="trans-type">
+                <div class="modal-body">
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="trans-amount">Valor (R$)</label>
+                            <input type="number" id="trans-amount" class="form-control" step="0.01" min="0.01" placeholder="Ex: 50.00" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="trans-date">Data</label>
+                            <input type="date" id="trans-date" class="form-control" required>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label for="trans-description">Descrição</label>
+                        <input type="text" id="trans-description" class="form-control" placeholder="Ex: Compra de Shampoos / Corte João" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="trans-profId">Profissional (Opcional)</label>
+                        <select id="trans-profId" class="form-control">
+                            <option value="">Barbearia (Geral)</option>
+                            <!-- Options populated dynamically -->
+                        </select>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="trans-category">Categoria</label>
+                            <select id="trans-category" class="form-control" required>
+                                <!-- Options depend on Income / Expense -->
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="trans-method">Forma de Pagamento</label>
+                            <select id="trans-method" class="form-control" required>
+                                <option value="pix">Pix</option>
+                                <option value="credit_card">Cartão de Crédito</option>
+                                <option value="debit_card">Cartão de Débito</option>
+                                <option value="cash">Dinheiro</option>
+                                <option value="other">Outro</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <!-- Só aparece quando a categoria é "Venda de Produto".
+                         É o que liga a entrada de dinheiro à baixa no estoque. -->
+                    <div class="form-group" id="trans-produto-bloco" style="display:none;">
+                        <label for="trans-produto">Produto vendido</label>
+                        <div class="form-row" style="margin:0;">
+                            <select id="trans-produto" class="form-control"></select>
+                            <input type="number" id="trans-produto-qtd" class="form-control" min="1" step="1" value="1"
+                                   style="max-width:90px;" aria-label="Quantidade">
+                        </div>
+                        <select id="trans-produto-cliente" class="form-control" style="margin-top:8px;"
+                                aria-label="Cliente que comprou">
+                            <option value="">Não identificado</option>
+                        </select>
+                        <p class="form-hint" id="trans-produto-aviso">O valor é preenchido sozinho e o estoque baixa ao salvar.</p>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-close-modal="modal-transaction">Cancelar</button>
+                    <button type="submit" class="btn btn-primary">Registrar</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- MODAL: ADD SERVICE -->
+    <!-- MODAL: GUIA RAPIDO (AJUDA) -->
+    <!-- Sem <form> de propósito: não há nada para salvar, e closeModal() só
+         mexe em formulário. O conteúdo é montado por ajuda.js. -->
+    <div class="modal-backdrop" id="modal-ajuda">
+        <div class="modal-dialog glass-effect modal-ajuda-dialog">
+            <div class="modal-header">
+                <h4 class="modal-title"><i class="fa-regular fa-circle-question"></i> Guia rápido</h4>
+                <button class="modal-close" data-close-modal="modal-ajuda">&times;</button>
+            </div>
+            <div class="modal-body">
+                <div class="ajuda-busca-caixa">
+                    <i class="fa-solid fa-magnifying-glass"></i>
+                    <input type="search" id="ajuda-busca" class="form-control"
+                           placeholder="Buscar: caixa, produto, fila, comissão..."
+                           aria-label="Buscar no guia">
+                </div>
+
+                <section id="ajuda-secao-passos">
+                    <h5 class="ajuda-secao-titulo">Primeiros passos</h5>
+                    <p class="ajuda-secao-descricao" id="ajuda-passos-descricao">
+                        A ordem importa: serviço sem duração não monta a grade, e grade
+                        sem horário de funcionamento não abre o link.
+                    </p>
+                    <div id="ajuda-passos"></div>
+                </section>
+
+                <section>
+                    <h5 class="ajuda-secao-titulo">Dúvidas frequentes</h5>
+                    <div id="ajuda-duvidas"></div>
+                </section>
+
+                <!-- O fim do guia é onde a pessoa chega quando não achou a
+                     resposta. Deixar o suporte só no rodapé, ao lado do botão
+                     Fechar, faz o contato competir com a saída. -->
+                <section class="ajuda-suporte">
+                    <i class="fa-brands fa-whatsapp"></i>
+                    <div class="ajuda-suporte-texto">
+                        <strong>Não achou o que procurava?</strong>
+                        <span>Em caso de dúvidas, entre em contato com o suporte da Lexion Consultoria.</span>
+                    </div>
+                    <a class="btn btn-success ajuda-suporte-botao" href="https://wa.me/5516997603600?text=Ol%C3%A1%2C%20preciso%20de%20ajuda%20com%20o%20sistema%20da%20Alabama%20Barbearia."
+                       target="_blank" rel="noopener noreferrer">
+                        <i class="fa-brands fa-whatsapp"></i> (16) 99760-3600
+                    </a>
+                </section>
+            </div>
+            <div class="modal-footer ajuda-rodape">
+                <span class="ajuda-rodape-credito">
+                    <!-- O telefone também aqui, e não só no bloco do fim: o rodapé
+                         não rola junto com o guia, então é o único ponto de contato
+                         que a pessoa alcança sem passar por 25 perguntas. -->
+                    <a class="ajuda-rodape-suporte" href="https://wa.me/5516997603600?text=Ol%C3%A1%2C%20preciso%20de%20ajuda%20com%20o%20sistema%20da%20Alabama%20Barbearia." target="_blank" rel="noopener noreferrer">
+                        <i class="fa-brands fa-whatsapp"></i> Suporte (16) 99760-3600
+                    </a>
+                    <span class="ajuda-rodape-linha">
+                        Desenvolvido por Lexion Consultoria · 2026 —
+                        <a href="https://lexionconsultoria.com.br" target="_blank" rel="noopener noreferrer">lexionconsultoria.com.br</a>
+                    </span>
+                </span>
+                <button type="button" class="btn btn-primary" data-close-modal="modal-ajuda">Fechar</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- MODAL: PRODUTO (cadastro) -->
+    <div class="modal-backdrop" id="modal-product">
+        <div class="modal-dialog glass-effect">
+            <div class="modal-header">
+                <h4 class="modal-title" id="product-modal-title">Novo Produto</h4>
+                <button class="modal-close" data-close-modal="modal-product">&times;</button>
+            </div>
+            <form id="form-product">
+                <input type="hidden" id="product-id">
+                <div class="modal-body">
+                    <div class="form-group">
+                        <label for="product-name">Nome do Produto</label>
+                        <input type="text" id="product-name" class="form-control" placeholder="Ex: Pomada Modeladora" required>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="product-category">Categoria</label>
+                            <input type="text" id="product-category" class="form-control" list="lista-categorias-produto" placeholder="Ex: Geladeira">
+                            <datalist id="lista-categorias-produto"></datalist>
+                            <p class="form-hint">Agrupa a vitrine. Cada barbearia organiza do seu jeito.</p>
+                        </div>
+                        <div class="form-group">
+                            <label for="product-price">Preço (R$)</label>
+                            <input type="number" id="product-price" class="form-control" step="0.01" min="0" placeholder="Ex: 45.00" required>
+                        </div>
+                    </div>
+                    <div class="form-row">
+                        <!-- Só no cadastro. Na edição a quantidade vira extrato:
+                             quem muda saldo é Entrada/Saída, não este campo. -->
+                        <div class="form-group" id="product-bloco-estoque">
+                            <label for="product-stock">Quantidade inicial</label>
+                            <input type="number" id="product-stock" class="form-control" min="0" step="1" value="0">
+                        </div>
+                        <div class="form-group">
+                            <label for="product-min-stock">Avisar abaixo de</label>
+                            <input type="number" id="product-min-stock" class="form-control" min="0" step="1" value="0">
+                            <p class="form-hint">0 desliga o aviso deste item.</p>
+                        </div>
+                    </div>
+                    <p class="form-hint" id="product-estoque-atual" style="display:none;">
+                        <span id="product-estoque-atual-texto"></span>
+                    </p>
+                    <div class="form-group">
+                        <label for="product-photo">Foto (opcional)</label>
+                        <input type="file" id="product-photo" class="form-control" accept="image/*">
+                        <img id="product-photo-preview" src="" alt="Prévia" style="display:none; width:64px; height:64px; border-radius:8px; object-fit:cover; margin-top:8px; border:2px solid var(--primary);">
+                        <p class="form-hint">Reduzida para 200px antes de salvar — a vitrine é carregada no celular do cliente.</p>
+                    </div>
+                    <div class="form-group">
+                        <label class="checkbox-container">
+                            <input type="checkbox" id="product-active" checked>
+                            <span class="checkmark"></span>
+                            Ativo e visível na vitrine do link público
+                        </label>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-danger" id="btn-delete-product" style="display:none;">Excluir</button>
+                    <button type="button" class="btn btn-secondary" data-close-modal="modal-product">Cancelar</button>
+                    <button type="submit" class="btn btn-primary">Salvar Produto</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- MODAL: MOVIMENTACAO DE ESTOQUE -->
+    <div class="modal-backdrop" id="modal-stock-movement">
+        <div class="modal-dialog glass-effect">
+            <div class="modal-header">
+                <h4 class="modal-title" id="stock-movement-title">Entrada no estoque</h4>
+                <button class="modal-close" data-close-modal="modal-stock-movement">&times;</button>
+            </div>
+            <form id="form-stock-movement">
+                <input type="hidden" id="mov-type" value="in">
+                <div class="modal-body">
+                    <div class="form-group">
+                        <label for="mov-produto">Produto</label>
+                        <select id="mov-produto" class="form-control" required></select>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="mov-qtd">Quantidade</label>
+                            <input type="number" id="mov-qtd" class="form-control" min="1" step="1" value="1" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="mov-motivo">Motivo</label>
+                            <select id="mov-motivo" class="form-control" required></select>
+                        </div>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group" id="mov-bloco-valor">
+                            <label for="mov-valor" id="mov-rotulo-valor">Valor unitário (R$)</label>
+                            <input type="number" id="mov-valor" class="form-control" step="0.01" min="0" placeholder="0,00">
+                            <p class="form-hint">Total: <strong id="mov-total">—</strong></p>
+                        </div>
+                        <div class="form-group">
+                            <label for="mov-data">Data</label>
+                            <input type="date" id="mov-data" class="form-control" required>
+                        </div>
+                    </div>
+                    <div class="form-group" id="mov-bloco-cliente" style="display:none;">
+                        <label for="mov-cliente">Quem comprou (opcional)</label>
+                        <select id="mov-cliente" class="form-control">
+                            <option value="">Não identificado</option>
+                        </select>
+                        <p class="form-hint">
+                            É este campo que responde quem levou o produto — ele aparece
+                            no extrato, ao lado do movimento.
+                        </p>
+                    </div>
+                    <div id="mov-bloco-caixa">
+                        <div class="form-group">
+                            <label for="mov-forma">Forma de Pagamento</label>
+                            <select id="mov-forma" class="form-control">
+                                <option value="pix">Pix</option>
+                                <option value="credit_card">Cartão de Crédito</option>
+                                <option value="debit_card">Cartão de Débito</option>
+                                <option value="dinheiro">Dinheiro</option>
+                                <option value="other">Outro</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label class="checkbox-container">
+                                <input type="checkbox" id="mov-lancar" checked>
+                                <span class="checkmark"></span>
+                                <span id="mov-rotulo-lancar">Lançar a entrada no Financeiro</span>
+                            </label>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label for="mov-obs">Observação (opcional)</label>
+                        <input type="text" id="mov-obs" class="form-control" placeholder="Ex: nota 4471, fornecedor X">
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-close-modal="modal-stock-movement">Cancelar</button>
+                    <button type="submit" class="btn btn-primary">Registrar movimento</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- MODAL: ENCAIXE ("Chegou agora") -->
+    <div class="modal-backdrop" id="modal-encaixe">
+        <div class="modal-dialog glass-effect">
+            <div class="modal-header">
+                <h4 class="modal-title"><i class="fa-solid fa-person-walking-arrow-right"></i> Chegou agora</h4>
+                <button class="modal-close" data-close-modal="modal-encaixe">&times;</button>
+            </div>
+            <form id="form-encaixe">
+                <div class="modal-body">
+                    <div class="form-group">
+                        <label for="encaixe-servico">Serviço</label>
+                        <select id="encaixe-servico" class="form-control" required></select>
+                    </div>
+                    <div class="form-group">
+                        <label for="encaixe-prof">Profissional</label>
+                        <select id="encaixe-prof" class="form-control">
+                            <option value="">Qualquer profissional (Mais rápido)</option>
+                        </select>
+                    </div>
+
+                    <!-- O resultado aparece assim que o serviço é escolhido: quem
+                         está no balcão vê o encaixe antes de digitar o nome. -->
+                    <div id="encaixe-vaga"></div>
+
+                    <div class="form-group">
+                        <label for="encaixe-nome">Nome do cliente</label>
+                        <input type="text" id="encaixe-nome" class="form-control" placeholder="Ex: João da Silva"
+                               autocomplete="off" required oninput="this.value = this.value.replace(/[0-9]/g, '')">
+                        <div id="encaixe-sugestoes" class="encaixe-sugestoes"></div>
+                    </div>
+                    <div class="form-group">
+                        <label for="encaixe-phone">WhatsApp</label>
+                        <input type="text" id="encaixe-phone" class="form-control" placeholder="Ex: (11) 98888-7777" maxlength="15" required>
+                        <p class="form-hint">É por este número que o cliente acompanha a vez dele no link da barbearia.</p>
+                    </div>
+
+                    <input type="hidden" id="encaixe-client-id">
+                    <input type="hidden" id="encaixe-prof-id">
+                    <input type="hidden" id="encaixe-hora">
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-close-modal="modal-encaixe">Cancelar</button>
+                    <button type="submit" class="btn btn-primary" id="btn-encaixe-confirmar">
+                        <i class="fa-solid fa-check"></i> Encaixar
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <div class="modal-backdrop" id="modal-service">
+        <div class="modal-dialog glass-effect">
+            <div class="modal-header">
+                <h4 class="modal-title">Novo Serviço</h4>
+                <button class="modal-close" data-close-modal="modal-service">&times;</button>
+            </div>
+            <form id="form-service">
+                <input type="hidden" id="service-id">
+                <div class="modal-body">
+                    <div class="form-group">
+                        <label for="service-name">Nome do Serviço</label>
+                        <input type="text" id="service-name" class="form-control" placeholder="Ex: Corte Degradê + Barba" required>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="service-price">Preço (R$)</label>
+                            <input type="number" id="service-price" class="form-control" step="0.01" min="0" placeholder="Ex: 60.00" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="service-duration">Duração (minutos)</label>
+                            <input type="number" id="service-duration" class="form-control" min="5" placeholder="Ex: 30" required>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label class="checkbox-container">
+                            <input type="checkbox" id="service-active" checked>
+                            <span class="checkmark"></span>
+                            Ativo e visível no agendamento público
+                        </label>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-close-modal="modal-service">Cancelar</button>
+                    <button type="button" class="btn btn-danger" id="btn-delete-service" style="display:none; margin-right: auto;">Excluir</button>
+                    <button type="submit" class="btn btn-primary">Salvar Serviço</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- MODAL: ADD PROFESSIONAL -->
+    <div class="modal-backdrop" id="modal-professional">
+        <div class="modal-dialog glass-effect">
+            <div class="modal-header">
+                <h4 class="modal-title">Novo Profissional</h4>
+                <button class="modal-close" data-close-modal="modal-professional">&times;</button>
+            </div>
+            <form id="form-professional">
+                <input type="hidden" id="prof-id">
+                <div class="modal-body">
+                    <div class="form-group">
+                        <label for="prof-name">Nome do Profissional</label>
+                        <input type="text" id="prof-name" class="form-control" placeholder="Ex: Carlos Albuquerque" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="prof-phone">WhatsApp/Telefone</label>
+                        <input type="text" id="prof-phone" class="form-control" placeholder="Ex: (11) 97777-6666" maxlength="15" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="prof-photo">Foto do Profissional</label>
+                        <input type="file" id="prof-photo" class="form-control" accept="image/*">
+                        <img id="prof-photo-preview" src="" alt="Prévia da foto" style="display:none; width:64px; height:64px; border-radius:50%; object-fit:cover; margin-top:8px; border:2px solid var(--accent);">
+                    </div>
+                    <div class="form-group">
+                        <label for="prof-commission">Comissão sobre Serviço (%)</label>
+                        <input type="number" id="prof-commission" class="form-control" placeholder="Ex: 50" min="0" max="100" required>
+                    </div>
+                    <div class="form-group">
+                        <label class="checkbox-container">
+                            <input type="checkbox" id="prof-active" checked>
+                            <span class="checkmark"></span>
+                            Ativo (recebe agendamentos)
+                        </label>
+                    </div>
+
+                    <!-- ACESSO AO SISTEMA
+                         Fica no cadastro do profissional de propósito: o dono
+                         não deve precisar procurar uma tela de usuários para
+                         responder "esse barbeiro entra no sistema?". -->
+                    <div class="prof-acesso" id="prof-acesso-bloco">
+                        <div class="prof-acesso-titulo">
+                            <i class="fa-solid fa-key"></i> Acesso ao sistema
+                        </div>
+                        <p class="prof-acesso-texto">
+                            Com acesso, ele entra com o próprio e-mail e vê a agenda dele,
+                            clientes, vendas, estoque, fidelidade e a comissão dele.
+                            Caixa, crediário e configurações continuam só seus.
+                        </p>
+                        <div class="form-group">
+                            <label for="prof-email">E-mail de acesso</label>
+                            <input type="email" id="prof-email" class="form-control" placeholder="Ex: carlos@gmail.com" autocomplete="off">
+                        </div>
+                        <div class="prof-acesso-estado" id="prof-acesso-estado"></div>
+                        <div class="prof-acesso-acoes">
+                            <button type="button" class="btn btn-secondary btn-sm" id="btn-prof-criar-acesso">
+                                <i class="fa-solid fa-user-plus"></i> Liberar acesso
+                            </button>
+                            <button type="button" class="btn btn-danger btn-sm" id="btn-prof-remover-acesso" style="display:none;">
+                                <i class="fa-solid fa-user-slash"></i> Remover acesso
+                            </button>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-close-modal="modal-professional">Cancelar</button>
+                    <button type="button" class="btn btn-danger" id="btn-delete-professional" style="display:none; margin-right: auto;">Excluir</button>
+                    <button type="submit" class="btn btn-primary">Salvar Profissional</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- MODAL: SENHA DE PRIMEIRO ACESSO
+         Modal próprio, e não um aviso dentro do cadastro, porque esta senha
+         aparece UMA vez: o servidor sorteia, entrega e não guarda em lugar
+         nenhum. Fechar o cadastro sem copiar significaria refazer o acesso. -->
+    <div class="modal-backdrop" id="modal-acesso-criado">
+        <div class="modal-dialog glass-effect">
+            <div class="modal-header">
+                <h4 class="modal-title"><i class="fa-solid fa-key"></i> Acesso liberado</h4>
+                <button class="modal-close" data-close-modal="modal-acesso-criado">&times;</button>
+            </div>
+            <div class="modal-body">
+                <p style="color: var(--text-muted); font-size: 13px; margin-bottom: 14px;">
+                    Passe estes dados para <strong id="acesso-criado-nome">o profissional</strong>.
+                    Ele entra na mesma tela de login que você usa.
+                </p>
+                <div class="acesso-credencial">
+                    <span>E-mail</span>
+                    <strong id="acesso-criado-email">—</strong>
+                </div>
+                <div class="acesso-credencial">
+                    <span>Senha temporária</span>
+                    <strong id="acesso-criado-senha">—</strong>
+                </div>
+                <div class="acesso-aviso">
+                    <i class="fa-solid fa-triangle-exclamation"></i>
+                    <div>
+                        <strong>Esta senha aparece uma vez só.</strong>
+                        <span>Copie agora. Se perder, é só remover e liberar o acesso de novo —
+                        uma senha nova é sorteada. No primeiro login ele pode trocar por uma
+                        dele em "Esqueci minha senha".</span>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" id="btn-copiar-acesso">
+                    <i class="fa-regular fa-copy"></i> Copiar
+                </button>
+                <button type="button" class="btn btn-primary" data-close-modal="modal-acesso-criado">Já anotei</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- MODAL: INDISPONIBILIDADE DO PROFISSIONAL -->
+    <div class="modal-backdrop" id="modal-indisponibilidade">
+        <div class="modal-dialog glass-effect">
+            <div class="modal-header">
+                <h4 class="modal-title">Indisponibilidade — <span id="indisp-prof-nome"></span></h4>
+                <button class="modal-close" data-close-modal="modal-indisponibilidade">&times;</button>
+            </div>
+            <form id="form-indisponibilidade">
+                <input type="hidden" id="indisp-prof-id">
+                <div class="modal-body">
+                    <p class="panel-description" style="margin-top:0;">Os horários marcados aqui deixam de aparecer no link de agendamento.</p>
+
+                    <div class="form-group">
+                        <label for="indisp-data">Data</label>
+                        <input type="date" id="indisp-data" class="form-control" required>
+                    </div>
+                    <div class="form-group">
+                        <label class="checkbox-container">
+                            <input type="checkbox" id="indisp-dia-inteiro" checked>
+                            <span class="checkmark"></span>
+                            O dia inteiro
+                        </label>
+                    </div>
+                    <div class="form-row" id="indisp-faixa" style="display:none;">
+                        <div class="form-group">
+                            <label for="indisp-inicio">Das</label>
+                            <input type="time" id="indisp-inicio" class="form-control" value="08:00">
+                        </div>
+                        <div class="form-group">
+                            <label for="indisp-fim">Até</label>
+                            <input type="time" id="indisp-fim" class="form-control" value="12:00">
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label for="indisp-motivo">Motivo (opcional)</label>
+                        <input type="text" id="indisp-motivo" class="form-control" placeholder="Ex: Médico, folga, viagem" maxlength="60">
+                        <p style="font-size:11px; color:var(--text-muted); margin-top:6px;">Fica só no sistema — o cliente nunca vê o motivo.</p>
+                    </div>
+
+                    <button type="submit" class="btn btn-primary btn-full">
+                        <i class="fa-solid fa-plus"></i> Adicionar
+                    </button>
+
+                    <hr style="border:0; border-top:1px solid rgba(255,255,255,0.08); margin:18px 0 12px;">
+                    <h5 class="panel-title" style="font-size:14px; margin-bottom:8px;">Marcadas</h5>
+                    <div id="indisp-lista"></div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-close-modal="modal-indisponibilidade">Fechar</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- MODAL: WHATSAPP CRM MOCK SIMULATOR -->
+    <div class="modal-backdrop" id="modal-whatsapp-crm">
+        <div class="modal-dialog glass-effect whatsapp-dialog">
+            <div class="modal-header wa-header">
+                <div class="wa-user-info">
+                    <div class="wa-avatar"><i class="fa-solid fa-user"></i></div>
+                    <div>
+                        <h4 class="modal-title wa-title" id="wa-chat-name">Nome do Cliente</h4>
+                        <span class="wa-status">Online</span>
+                    </div>
+                </div>
+                <button class="modal-close wa-close" data-close-modal="modal-whatsapp-crm">&times;</button>
+            </div>
+            <div class="modal-body wa-chat-body">
+                <div class="wa-chat-container">
+                    <div class="wa-message wa-msg-received">
+                        <div class="wa-msg-bubble">
+                            <p>Olá! Quero agendar um corte de cabelo.</p>
+                            <span class="wa-msg-time">Ontem</span>
+                        </div>
+                    </div>
+                    <div class="wa-message wa-msg-sent">
+                        <div class="wa-msg-bubble">
+                            <p>Olá! Tudo bem? Claro, você pode agendar direto pelo nosso link: <a href="#" id="wa-link-placeholder" class="text-underline">seu-dominio.com/agendamento</a></p>
+                            <span class="wa-msg-time">Ontem</span>
+                        </div>
+                    </div>
+                    <!-- Template to draft message -->
+                    <div class="wa-chat-draft-box">
+                        <span class="draft-label">Sugestão de Mensagem de Retorno:</span>
+                        <div class="draft-content-text" id="wa-message-draft">
+                            <!-- Draft text generated dynamically -->
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer wa-footer">
+                <button type="button" class="btn btn-secondary" data-close-modal="modal-whatsapp-crm">Fechar</button>
+                <a href="#" target="_blank" class="btn btn-success" id="btn-send-real-whatsapp">
+                    <i class="fa-brands fa-whatsapp"></i> Simular Envio no WhatsApp
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <!-- MODAL: POLÍTICA DE PRIVACIDADE / LGPD -->
+    <div class="modal-backdrop privacy-modal" id="modal-privacy-policy">
+        <div class="modal-dialog modal-dialog-wide glass-effect">
+            <div class="modal-header">
+                <div>
+                    <span class="eyebrow">Privacidade</span>
+                    <h4 class="modal-title">Política de Privacidade e LGPD</h4>
+                </div>
+                <button class="modal-close" data-close-modal="modal-privacy-policy" onclick="closeModal('modal-privacy-policy')">&times;</button>
+            </div>
+            <div class="modal-body privacy-content">
+                <p>A Alabama Barbearia coleta apenas os dados necessários para gestão de agenda, atendimento e relacionamento com clientes do estabelecimento, como nome, telefone, histórico de agendamentos, serviços escolhidos e observações cadastradas pelo profissional.</p>
+                <p>Esses dados são usados para organizar horários, confirmar atendimentos, acompanhar retornos, registrar pagamentos e melhorar a experiência do cliente. Não vendemos dados pessoais e não compartilhamos informações com terceiros fora das ferramentas necessárias para operação do sistema.</p>
+                <p>O responsável pelo estabelecimento deve informar seus clientes sobre o uso dos dados e manter as informações corretas e atualizadas. O cliente pode solicitar correção, atualização ou exclusão de seus dados diretamente ao estabelecimento.</p>
+                <p>Adotamos separação de dados por conta, autenticação e políticas de acesso no banco de dados. Mesmo assim, recomenda-se usar senhas fortes, restringir acessos internos e evitar cadastrar informações sensíveis desnecessárias nas observações.</p>
+                <p>Esta versão é um MVP em evolução. Integrações futuras com WhatsApp, IA e automações seguirão o mesmo princípio: coletar o mínimo necessário e usar os dados somente para a finalidade informada.</p>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-primary" data-close-modal="modal-privacy-policy" onclick="closeModal('modal-privacy-policy')">Entendi</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- ============================================================
+         EVOLUÇÃO DE VENDAS — modais. Portados junto com as abas.
+         ============================================================ -->
+    <div class="modal-backdrop" id="modal-checkout">
+        <div class="modal-dialog modal-dialog-wide glass-effect checkout-dialog">
+            <div class="modal-header">
+                <div>
+                    <span class="eyebrow" id="checkout-eyebrow">Balcão</span>
+                    <h4 class="modal-title" id="checkout-title">Nova venda</h4>
+                </div>
+                <button class="modal-close" data-close-modal="modal-checkout">&times;</button>
+            </div>
+            <div class="modal-body checkout-body">
+                <div class="checkout-grid">
+                    <div class="checkout-column">
+                        <div class="checkout-block">
+                            <div class="checkout-block-head">
+                                <h5>Cliente</h5>
+                                <!-- O botão ocupa o lugar do aviso "opcional na venda de
+                                     balcão": quem abre esta tela com um cliente que ainda não
+                                     tem cadastro precisa de uma saída, e não de um lembrete. -->
+                                <button type="button" class="btn btn-secondary btn-sm" id="btn-checkout-new-client">
+                                    <i class="fa-solid fa-user-plus"></i> Cadastrar cliente
+                                </button>
+                            </div>
+                            <select id="checkout-client" class="form-control"></select>
+                            <div class="checkout-quick-client" id="checkout-quick-client" hidden>
+                                <input type="text" id="checkout-new-client-name" class="form-control" placeholder="Nome">
+                                <input type="tel" id="checkout-new-client-phone" class="form-control" placeholder="WhatsApp">
+                                <button type="button" class="btn btn-primary" id="btn-checkout-save-client">Salvar</button>
+                            </div>
+
+                            <!-- Fidelidade (Fase F). Só aparece quando o cliente
+                                 escolhido tem saldo suficiente — avisar sem ter
+                                 benefício de verdade só confundiria o balcão. -->
+                            <div class="fid-checkout-banner" id="checkout-loyalty-banner" hidden>
+                                <i class="fa-solid fa-gift"></i>
+                                <div>
+                                    <strong id="checkout-loyalty-text"></strong>
+                                    <small>O desconto some se você trocar de cliente antes de finalizar.</small>
+                                </div>
+                                <button type="button" class="btn btn-sm btn-primary" id="btn-checkout-loyalty-apply">
+                                    Aplicar
+                                </button>
+                            </div>
+                        </div>
+
+                        <!-- O bloco "Profissional responsável" saiu da tela: cada item de
+                             serviço já escolhe o seu, e um segundo seletor logo acima só
+                             criava a dúvida de qual dos dois manda. Numa venda que vem do
+                             atendimento, o profissional continua vindo do agendamento e é
+                             gravado do mesmo jeito — o que sumiu foi o campo, não o dado. -->
+                        <div class="checkout-block">
+                            <div class="checkout-block-head">
+                                <h5>Itens</h5>
+                                <span class="checkout-hint">Produto sem estoque não aparece</span>
+                            </div>
+                            <!-- Cada campo com o seu rótulo. Antes a linha de baixo era
+                                 [select][1][Preço][+] sem nenhum rótulo: quem preenchia
+                                 tinha que adivinhar que o "1" era quantidade, e o campo do
+                                 preço só se identificava enquanto estava vazio — assim que
+                                 recebia um número, o placeholder sumia junto com a pista. -->
+                            <div class="checkout-item-form">
+                                <div class="checkout-field checkout-field-tipo">
+                                    <label for="checkout-item-type">Tipo</label>
+                                    <select id="checkout-item-type" class="form-control">
+                                        <option value="service">Serviço</option>
+                                        <option value="product">Produto</option>
+                                    </select>
+                                </div>
+                                <div class="checkout-field checkout-field-item">
+                                    <label for="checkout-item-ref">O que está vendendo</label>
+                                    <select id="checkout-item-ref" class="form-control"></select>
+                                </div>
+                                <div class="checkout-field checkout-field-prof">
+                                    <label for="checkout-item-prof">Profissional</label>
+                                    <select id="checkout-item-prof" class="form-control"></select>
+                                </div>
+                                <div class="checkout-field checkout-field-qtd">
+                                    <label for="checkout-item-qty">Qtd.</label>
+                                    <input type="number" id="checkout-item-qty" class="form-control" step="1" min="1" value="1">
+                                </div>
+                                <div class="checkout-field checkout-field-preco">
+                                    <label for="checkout-item-price">Preço un.</label>
+                                    <input type="number" id="checkout-item-price" class="form-control" step="0.01" min="0"
+                                           placeholder="0,00">
+                                </div>
+                                <button type="button" class="btn btn-primary checkout-add-btn" id="btn-checkout-add-item">
+                                    <i class="fa-solid fa-plus"></i> Adicionar
+                                </button>
+                            </div>
+                            <div id="checkout-items"></div>
+                        </div>
+
+                        <!-- Desconto desceu para a coluna da esquerda, junto do que ele
+                             desconta. A da direita ficou com o dinheiro (pagamentos e
+                             resumo) — antes as duas colunas tinham alturas muito
+                             diferentes, e o total acabava fora da área visível. -->
+                        <div class="checkout-block">
+                            <div class="checkout-block-head">
+                                <h5>Desconto</h5>
+                                <span class="checkout-hint">Rateado entre os itens</span>
+                            </div>
+                            <div class="checkout-adjust">
+                                <div class="checkout-field checkout-field-tipo">
+                                    <label for="checkout-discount-type">Em</label>
+                                    <select id="checkout-discount-type" class="form-control">
+                                        <option value="amount">R$</option>
+                                        <option value="percent">%</option>
+                                    </select>
+                                </div>
+                                <div class="checkout-field">
+                                    <label for="checkout-discount-value">Valor do desconto</label>
+                                    <input type="number" id="checkout-discount-value" class="form-control"
+                                           step="0.01" min="0" placeholder="0,00">
+                                </div>
+                            </div>
+                            <!-- Acréscimo saiu da tela. O motor de cálculo continua sabendo
+                                 ratear um (venda antiga que tem acréscimo segue sendo lida e
+                                 impressa corretamente no recibo), mas a venda nova não cria
+                                 mais nenhum. -->
+                            <p class="form-hint">
+                                O desconto reduz a base da comissão na mesma proporção.
+                            </p>
+                        </div>
+                    </div>
+
+                    <div class="checkout-column">
+                        <div class="checkout-block">
+                            <div class="checkout-block-head">
+                                <h5>Pagamentos</h5>
+                                <span class="checkout-hint">Pode dividir em várias formas</span>
+                            </div>
+                            <div class="checkout-payment-form">
+                                <div class="checkout-field">
+                                    <label for="checkout-payment-method">Forma</label>
+                                    <select id="checkout-payment-method" class="form-control">
+                                        <option value="pix">Pix</option>
+                                        <option value="cash">Dinheiro</option>
+                                        <option value="debit_card">Débito</option>
+                                        <option value="credit_card">Crédito</option>
+                                    </select>
+                                </div>
+                                <div class="checkout-field">
+                                    <label for="checkout-payment-amount">Valor recebido</label>
+                                    <input type="number" id="checkout-payment-amount" class="form-control" step="0.01" min="0"
+                                           placeholder="0,00">
+                                </div>
+                                <button type="button" class="btn btn-primary checkout-add-btn" id="btn-checkout-add-payment">
+                                    <i class="fa-solid fa-plus"></i> Lançar
+                                </button>
+                            </div>
+                            <!-- "Valor entregue em dinheiro" saiu: o campo pedia a nota que o
+                                 cliente estendeu, só para a tela calcular o troco de volta —
+                                 conta que o balcão já faz de cabeça, e que confundia mais do
+                                 que ajudava. O que se lança agora é o que a venda recebeu. -->
+                            <div id="checkout-payments"></div>
+
+                            <!-- Crediário. Só aparece quando ainda falta receber:
+                                 oferecer "deixar a prazo" numa venda já quitada
+                                 é convite para criar dívida sem querer. -->
+                            <div class="checkout-credit" id="checkout-credit-block" hidden>
+                                <label class="checkout-credit-toggle">
+                                    <input type="checkbox" id="checkout-credit-on">
+                                    <span>
+                                        <strong>Compra a prazo</strong>
+                                    </span>
+                                </label>
+
+                                <div class="checkout-credit-fields" id="checkout-credit-fields" hidden>
+                                    <div class="form-row">
+                                        <div class="form-group">
+                                            <label for="checkout-credit-count">Parcelas</label>
+                                            <input type="number" id="checkout-credit-count" class="form-control"
+                                                   min="1" max="36" step="1" value="1">
+                                        </div>
+                                        <div class="form-group">
+                                            <label for="checkout-credit-first">1º vencimento</label>
+                                            <input type="date" id="checkout-credit-first" class="form-control">
+                                        </div>
+                                    </div>
+                                    <div id="checkout-credit-list"></div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="checkout-summary" id="checkout-summary"></div>
+
+                        <div class="checkout-block">
+                            <div class="checkout-field">
+                                <label for="checkout-notes">Observação (opcional)</label>
+                                <input type="text" id="checkout-notes" class="form-control"
+                                       placeholder="Anotação que fica no histórico da venda">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="checkout-errors" id="checkout-errors" hidden></div>
+            </div>
+            <div class="modal-footer checkout-footer">
+                <button type="button" class="btn btn-secondary" data-close-modal="modal-checkout">Cancelar</button>
+                <span class="checkout-total-chip" id="checkout-total-chip">R$ 0,00</span>
+                <button type="button" class="btn btn-primary" id="btn-checkout-finish" disabled>
+                    <i class="fa-solid fa-circle-check"></i> Finalizar venda
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal-backdrop" id="modal-venda-aviso">
+        <div class="modal-dialog glass-effect">
+            <div class="modal-header">
+                <h4 class="modal-title"><i class="fa-solid fa-circle-info text-purple"></i> Venda de balcão</h4>
+                <button class="modal-close" data-close-modal="modal-venda-aviso">&times;</button>
+            </div>
+            <div class="modal-body">
+                <p style="margin: 0 0 12px; line-height: 1.6;">
+                    Esta tela é para quem <strong>não tem horário marcado</strong> — quem passou no balcão
+                    para comprar um produto ou fazer um serviço sem agendar.
+                </p>
+                <p style="margin: 0 0 16px; line-height: 1.6; color: var(--text-muted);">
+                    Se o cliente <strong>está na agenda</strong>, feche a venda pelo botão
+                    <strong>Concluir e receber</strong> do próprio atendimento. Assim a venda fica amarrada
+                    ao agendamento, e o atendimento não continua aberto depois de pago.
+                </p>
+                <label class="checkout-credit-toggle" style="cursor: pointer;">
+                    <input type="checkbox" id="venda-aviso-nao-mostrar">
+                    <span><strong>Não mostrar este aviso de novo</strong></span>
+                </label>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-close-modal="modal-venda-aviso">Cancelar</button>
+                <button type="button" class="btn btn-primary" id="btn-venda-aviso-continuar">
+                    Continuar para a venda
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal-backdrop" id="modal-venda-recibo">
+        <div class="modal-dialog glass-effect">
+            <div class="modal-header">
+                <h4 class="modal-title"><i class="fa-solid fa-circle-check text-success"></i> Venda concluída</h4>
+                <button class="modal-close" data-close-modal="modal-venda-recibo">&times;</button>
+            </div>
+            <div class="modal-body">
+                <p id="venda-recibo-resumo" style="margin: 0 0 14px; line-height: 1.6;"></p>
+                <p style="margin: 0; color: var(--text-muted); line-height: 1.6;">
+                    Quer entregar o recibo ao cliente? Você também pode tirá-lo depois em
+                    <strong>Vendas → Detalhes</strong>.
+                </p>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-close-modal="modal-venda-recibo">Agora não</button>
+                <button type="button" class="btn btn-secondary" id="btn-venda-recibo-whatsapp" hidden>
+                    <i class="fa-brands fa-whatsapp"></i> Enviar no WhatsApp
+                </button>
+                <button type="button" class="btn btn-primary" id="btn-venda-recibo-pdf">
+                    <i class="fa-regular fa-file-pdf"></i> Gerar PDF
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal-backdrop" id="modal-sale-details">
+        <div class="modal-dialog modal-dialog-wide glass-effect">
+            <div class="modal-header">
+                <h4 class="modal-title"><i class="fa-solid fa-receipt text-purple"></i> Detalhes da venda</h4>
+                <button class="modal-close" data-close-modal="modal-sale-details">&times;</button>
+            </div>
+            <div class="modal-body" id="sale-detail-content"></div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" id="btn-sale-receipt-whatsapp" style="display:none;">
+                    <i class="fa-brands fa-whatsapp"></i> Enviar recibo
+                </button>
+                <button type="button" class="btn btn-secondary" id="btn-sale-receipt-view" style="display:none;">
+                    <i class="fa-solid fa-file-pdf"></i> Ver recibo
+                </button>
+                <button type="button" class="btn btn-secondary" data-close-modal="modal-sale-details">Fechar</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Receber uma parcela do crediário. Aceita mais de uma forma de
+         pagamento porque o cliente que volta para pagar fiado costuma dividir
+         ("metade agora no pix, metade em dinheiro"). -->
+    <div class="modal-backdrop" id="modal-receber-parcela">
+        <div class="modal-dialog glass-effect">
+            <div class="modal-header">
+                <h4 class="modal-title"><i class="fa-solid fa-hand-holding-dollar"></i> Receber parcela</h4>
+                <button class="modal-close" data-close-modal="modal-receber-parcela">&times;</button>
+            </div>
+            <div class="modal-body">
+                <div id="receber-resumo" class="receber-resumo"></div>
+
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="receber-metodo">Forma de pagamento</label>
+                        <select id="receber-metodo" class="form-control">
+                            <option value="pix">Pix</option>
+                            <option value="cash">Dinheiro</option>
+                            <option value="debit_card">Cartão de Débito</option>
+                            <option value="credit_card">Cartão de Crédito</option>
+                            <option value="other">Outro</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="receber-valor">Valor (R$)</label>
+                        <input type="number" id="receber-valor" class="form-control" step="0.01" min="0.01">
+                    </div>
+                </div>
+
+                <div class="form-group" id="receber-bloco-dinheiro" hidden>
+                    <label for="receber-entregue">Valor entregue em dinheiro</label>
+                    <input type="number" id="receber-entregue" class="form-control" step="0.01" min="0"
+                           placeholder="Deixe vazio se veio certinho">
+                </div>
+
+                <p class="form-hint" id="receber-aviso"></p>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-close-modal="modal-receber-parcela">Cancelar</button>
+                <button type="button" class="btn btn-primary" id="btn-confirmar-recebimento">
+                    <i class="fa-solid fa-circle-check"></i> Confirmar recebimento
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal-backdrop" id="modal-fidelidade-historico">
+        <div class="modal-dialog glass-effect">
+            <div class="modal-header">
+                <h4 class="modal-title" id="fidelidade-historico-titulo"><i class="fa-solid fa-star"></i> Histórico</h4>
+                <button class="modal-close" data-close-modal="modal-fidelidade-historico">&times;</button>
+            </div>
+            <div class="modal-body" id="fidelidade-historico-content"></div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-close-modal="modal-fidelidade-historico">Fechar</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Mobile Bottom Tab Bar -->
+    <!-- Toast Notification Container -->
+    <div class="toast-container" id="toast-container"></div>
+
+    <!-- Supabase JS Client -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+    <!-- Geração dos extratos em PDF (Financeiro). "defer" para não atrasar a
+         renderização: só são necessários quando o usuário clica em gerar. -->
+    <script defer src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script defer src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.8.2/jspdf.plugin.autotable.min.js"></script>
+
+    <!-- Camada de Configuração & Dados -->
+    <script src="/config.js"></script>
+    <script src="/theme.js"></script>
+    <script src="/saas-plan.js"></script>
+    <script src="/api.js?v=55"></script>
+
+    <!-- JavaScript Principal -->
+    <script src="/app.js?v=55"></script>
+
+    <!-- Funcionalidades acrescentadas depois. A ordem importa: elas leem o
+         estado global e as funções de cálculo que app.js define. -->
+    <script src="/estoque.js?v=55"></script>
+    <script src="/encaixe.js?v=55"></script>
+    <script src="/ajuda.js?v=55"></script>
+
+    <!-- Evolução de Vendas (banco: docs/14 a 28). A ordem entre eles TAMBÉM
+         importa, e não é a mesma coisa que a ordem acima: `venda-calculo`
+         precisa das constantes de `vendas-base`, `checkout` precisa do cálculo,
+         e `recibo` é chamado no fim do checkout. Portados do projeto de origem
+         (`lexion_salao`), onde nasceram como 22- a 28- e foram testados. -->
+    <script src="/vendas-base.js?v=55"></script>
+    <script src="/venda-calculo.js?v=55"></script>
+    <script src="/checkout.js?v=55"></script>
+    <script src="/comissoes.js?v=55"></script>
+    <script src="/crediario.js?v=55"></script>
+    <script src="/fidelidade.js?v=55"></script>
+    <script src="/recibo.js?v=55"></script>
+</body>
+</html>

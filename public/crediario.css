@@ -1,0 +1,139 @@
+/* ==========================================================================
+   CREDIÁRIO (Fase E)
+
+   Reaproveita `.sales-table` e `.sales-metrics-grid` pelo mesmo motivo das
+   Comissões: é a mesma família de tela (dinheiro, histórico, filtros).
+   ========================================================================== */
+
+/* Atrasada em vermelho na borda, e não na linha inteira: fundo colorido em
+   várias linhas seguidas deixa o texto ilegível e some com a hierarquia. */
+.parcela-atrasada td:first-child {
+    box-shadow: inset 3px 0 0 var(--danger);
+}
+
+.parcela-paga td { opacity: 0.6; }
+
+/* --- Crediário dentro do checkout ---------------------------------------- */
+
+.checkout-credit {
+    margin-top: 14px;
+    padding: 12px;
+    border: 1px solid rgba(245, 158, 11, .3);
+    border-radius: var(--radius-md);
+    background: rgba(245, 158, 11, .06);
+}
+
+.checkout-credit[hidden] { display: none; }
+
+.checkout-credit-toggle {
+    display: flex;
+    align-items: flex-start;
+    gap: 10px;
+    cursor: pointer;
+}
+
+.checkout-credit-toggle input {
+    width: 16px;
+    height: 16px;
+    margin-top: 2px;
+    accent-color: var(--warning);
+}
+
+.checkout-credit-toggle strong {
+    display: block;
+    color: var(--text-primary);
+    font-size: 13px;
+}
+
+.checkout-credit-toggle small {
+    color: var(--text-muted);
+    font-size: 12px;
+}
+
+.checkout-credit-fields { margin-top: 12px; }
+.checkout-credit-fields[hidden] { display: none; }
+
+.checkout-credit-linha {
+    display: grid;
+    grid-template-columns: 48px 1fr 110px;
+    gap: 8px;
+    align-items: center;
+    margin-bottom: 6px;
+}
+
+.checkout-credit-num {
+    color: var(--text-muted);
+    font-size: 12px;
+    font-weight: 700;
+}
+
+.checkout-credit-soma {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding-top: 8px;
+    margin-top: 4px;
+    border-top: 1px solid rgba(255, 255, 255, .08);
+    font-size: 13px;
+}
+
+.checkout-summary-credit {
+    color: var(--warning);
+}
+
+/* --- Modal de recebimento ------------------------------------------------- */
+
+.receber-resumo {
+    background: var(--bg-tertiary);
+    border-radius: 10px;
+    padding: 14px;
+    margin-bottom: 16px;
+}
+
+.receber-linha {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 6px;
+    font-size: 13px;
+    color: var(--text-muted);
+}
+
+.receber-linha strong { color: var(--text-primary); }
+
+.receber-saldo {
+    padding-top: 8px;
+    margin-top: 4px;
+    border-top: 1px solid rgba(255, 255, 255, .08);
+}
+
+.receber-saldo strong {
+    font-size: 1.2rem;
+    color: var(--primary);
+}
+
+.panel-link {
+    color: var(--text-muted);
+    font-size: 12px;
+    text-decoration: none;
+}
+.panel-link:hover { color: var(--primary); }
+
+@media (max-width: 768px) {
+    .checkout-credit-linha { grid-template-columns: 40px 1fr; }
+    .checkout-credit-linha input[data-credit-amount] { grid-column: 2; }
+}
+
+/* Prévia da mensagem de cobrança (Configurações → Cobrança). */
+.msg-preview {
+    padding: 12px 16px;
+    border-radius: var(--radius-md);
+    background-color: var(--bg-secondary);
+    border: 1px solid var(--border-color);
+    border-left: 3px solid var(--success);
+    font-size: 13px;
+    line-height: 1.55;
+    color: var(--text-muted);
+    white-space: pre-wrap;
+    word-break: break-word;
+}

@@ -1,0 +1,130 @@
+/* ==========================================================================
+   FIDELIDADE (Fase F)
+
+   A tabela reaproveita `.sales-table` e os cards `.sales-metrics-grid` — mesma
+   família de tela das outras abas de Vendas (dinheiro, histórico, filtros).
+   ========================================================================== */
+
+/* `.status-badge.pending` faltava desde a Fase D/E: Comissões e Crediário já
+   usam essa classe para "a pagar"/"em aberto" e caíam no cinza padrão sem cor
+   nenhuma. Definida aqui porque este arquivo carrega por último — vale para
+   as três abas, não só para esta. */
+.status-badge.pending { background-color: var(--warning-light); color: var(--warning); }
+
+/* --- Configuração do programa ---------------------------------------------- */
+
+.fid-config-form {
+    display: grid;
+    gap: 14px;
+    padding: 16px 20px 20px;
+}
+
+.fid-toggle {
+    display: flex;
+    align-items: flex-start;
+    gap: 10px;
+    cursor: pointer;
+}
+
+.fid-toggle input {
+    width: 16px;
+    height: 16px;
+    margin-top: 2px;
+    accent-color: var(--primary);
+}
+
+.fid-toggle strong {
+    display: block;
+    color: var(--text-main);
+    font-size: 13px;
+}
+
+.fid-toggle small {
+    color: var(--text-muted);
+    font-size: 12px;
+}
+
+/* --- Barra de progresso na tabela ------------------------------------------ */
+
+.fid-progress {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    min-width: 140px;
+}
+
+.fid-progress-track {
+    flex: 1;
+    height: 8px;
+    border-radius: var(--radius-full);
+    background: var(--bg-tertiary);
+    overflow: hidden;
+}
+
+.fid-progress-fill {
+    height: 100%;
+    border-radius: var(--radius-full);
+    background: var(--primary);
+    transition: width 0.25s ease;
+}
+
+.fid-progress-fill.fid-progress-completa { background: var(--success); }
+
+.fid-progress-label {
+    color: var(--text-muted);
+    font-size: 11px;
+    font-weight: 700;
+    white-space: nowrap;
+}
+
+.fid-progress-sem-meta {
+    color: var(--warning);
+    font-size: 11px;
+}
+
+/* --- Aviso de benefício disponível, dentro do checkout --------------------- */
+
+.fid-checkout-banner {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-top: 12px;
+    padding: 10px 12px;
+    border: 1px solid rgba(16, 185, 129, .3);
+    border-radius: var(--radius-md);
+    background: var(--success-light);
+}
+
+.fid-checkout-banner[hidden] { display: none; }
+
+.fid-checkout-banner > i {
+    color: var(--success);
+    font-size: 1.1rem;
+}
+
+.fid-checkout-banner div { flex: 1; min-width: 0; }
+
+.fid-checkout-banner strong {
+    display: block;
+    color: var(--text-main);
+    font-size: 12px;
+}
+
+.fid-checkout-banner small {
+    color: var(--text-muted);
+    font-size: 10px;
+}
+
+.fid-checkout-banner.fid-checkout-banner-aplicado {
+    background: var(--primary-light);
+    border-color: rgba(139, 92, 246, .35);
+}
+
+.fid-checkout-banner.fid-checkout-banner-aplicado > i { color: var(--primary); }
+
+/* `.form-row` já vira coluna no celular (10-responsivo.css); só o banner do
+   checkout precisa de ajuste próprio para o botão não ficar espremido. */
+@media (max-width: 768px) {
+    .fid-checkout-banner { flex-wrap: wrap; }
+    .fid-checkout-banner button { width: 100%; justify-content: center; }
+}

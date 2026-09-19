@@ -1,0 +1,136 @@
+-- ============================================================
+-- FECHA `anon` NAS RPCs QUE NUNCA FORAM PARA O PÚBLICO
+-- Cole e execute no SQL Editor do Supabase.
+-- Pode rodar mais de uma vez sem problema.
+-- ============================================================
+--
+-- O QUE ESTAVA ABERTO
+--
+-- Três scripts escreveram, cada um com um comentário explicando a intenção:
+--
+--   13: "`anon` fica de fora: movimentar estoque é operação de quem está logado"
+--   15: "`anon` fica de fora: concluir venda e operacao de quem esta logado"
+--   17: "`anon` não precisa — e não deve — poder chamá-la direto"
+--
+-- e todos usaram a mesma linha para conseguir isso:
+--
+--     REVOKE ALL ON FUNCTION ... FROM public;
+--
+-- **Essa linha não faz o que parece no Supabase.** `public` aqui é o pseudo-papel
+-- PUBLIC, não os papéis da API. O Supabase mantém um `ALTER DEFAULT PRIVILEGES`
+-- no schema `public` que concede EXECUTE **nominalmente** a `anon`,
+-- `authenticated` e `service_role` em toda função criada ali. Revogar de PUBLIC
+-- não encosta num grant nominal, então o de `anon` ficou de pé.
+--
+-- Conferido no banco em 07/09/2026 — as três com `anon=X` no `proacl`:
+--
+--     SELECT oid::regprocedure, proacl FROM pg_proc
+--     WHERE proname IN ('checar_limite','finalizar_venda','registrar_movimento_estoque');
+--
+-- `testes/testa_vendas_fase_b.js` chega a exigir que o script 15 não conceda a
+-- `anon`, e ele realmente não concede — o teste passa lendo o arquivo. Quem
+-- concede é o default privilege do Supabase, que nenhum teste de arquivo vê.
+--
+-- O QUE ISSO VALIA NA PRÁTICA
+--
+--   finalizar_venda             — barrada pela lógica: sem sessão,
+--                                 `salao_do_usuario()` é NULL e ela levanta
+--                                 42501 "Login sem salao vinculado".
+--   registrar_movimento_estoque — idem, mesma checagem, mesma recusa.
+--   checar_limite               — **esta não tinha nada barrando.** Não olha
+--                                 sessão nenhuma (não precisa: quem a chama são
+--                                 as RPCs públicas). É SECURITY DEFINER e
+--                                 escreve em `limite_publico`, que tem RLS
+--                                 negando tudo. Ou seja: qualquer pessoa com a
+--                                 chave do navegador podia postar em
+--                                 /rest/v1/rpc/checar_limite com um `p_nome`
+--                                 inventado e inserir linha por linha numa
+--                                 tabela interna, sem passar por RLS. A faxina
+--                                 preguiçosa do script 17 só apaga janelas com
+--                                 mais de 2 horas e só roda em 1% das chamadas,
+--                                 então a tabela cresce mais rápido do que
+--                                 encolhe.
+--
+-- Para as duas primeiras isto é defesa em profundidade — a porta já estava
+-- trancada por dentro, e aqui se tira a chave da fechadura. Para
+-- `checar_limite` é a correção de um buraco aberto.
+--
+-- Este script só mexe em permissão: **nenhuma função é recriada**, que é o
+-- cuidado que os scripts 10, 12, 13 e 17 pedem.
+
+-- ------------------------------------------------------------
+-- 1. checar_limite — nem anon nem authenticated
+-- ------------------------------------------------------------
+-- Quem a chama são `check_client_exists`, `check_week_appointments` e
+-- `get_public_queue`, todas SECURITY DEFINER: rodam como o dono da função e não
+-- usam o grant de quem chamou. Fechar aqui não afeta o link público.
+-- `authenticated` também sai — o painel nunca chamou esta função, e um login de
+-- profissional inflando a tabela de contadores é o mesmo problema.
+REVOKE EXECUTE ON FUNCTION public.checar_limite(text, integer, interval)
+    FROM anon, authenticated;
+
+-- ------------------------------------------------------------
+-- 2. finalizar_venda — só quem está logado
+-- ------------------------------------------------------------
+-- O GRANT para `authenticated` fica: é o checkout do painel
+-- (`public/api.js`, em `finalizarVenda`).
+REVOKE EXECUTE ON FUNCTION public.finalizar_venda(jsonb) FROM anon;
+
+-- ------------------------------------------------------------
+-- 3. registrar_movimento_estoque — só quem está logado
+-- ------------------------------------------------------------
+-- Mesma coisa: o painel chama autenticado (`public/api.js`). A vitrine pública
+-- continua sendo `get_public_products()`, que só lê.
+REVOKE EXECUTE ON FUNCTION public.registrar_movimento_estoque(
+    text, text, text, integer, text, numeric, text, text, text, text, text, date
+) FROM anon;
+
+-- ------------------------------------------------------------
+-- 4. Recarrega o cache de schema do PostgREST
+-- ------------------------------------------------------------
+NOTIFY pgrst, 'reload schema';
+
+-- ============================================================
+-- CONFERÊNCIA
+-- ============================================================
+--
+-- 1. Os grants ficaram como a intenção dos scripts dizia:
+--
+--      SELECT p.oid::regprocedure AS funcao,
+--             has_function_privilege('anon', p.oid, 'EXECUTE')          AS anon,
+--             has_function_privilege('authenticated', p.oid, 'EXECUTE') AS autenticado
+--      FROM pg_proc p JOIN pg_namespace n ON n.oid = p.pronamespace
+--      WHERE n.nspname = 'public'
+--        AND p.proname IN ('checar_limite','finalizar_venda','registrar_movimento_estoque');
+--
+--    Esperado:
+--      checar_limite                -> anon false, autenticado false
+--      finalizar_venda              -> anon false, autenticado true
+--      registrar_movimento_estoque  -> anon false, autenticado true
+--
+-- 2. **O link público não pode ter regredido.** É a conferência que importa:
+--    `checar_limite` é chamada por dentro das três RPCs públicas, e se o
+--    fechamento tivesse pegado nelas a página quebraria inteira.
+--
+--      SELECT check_client_exists('SEU-SLUG', 'UM-TELEFONE-DE-CLIENTE');
+--
+--    Tem que devolver `true`, não erro de permissão. Depois abra o link público
+--    e conclua um agendamento de verdade.
+--
+-- 3. O painel continua vendendo: faça um checkout completo e uma baixa de
+--    estoque com um login de proprietário.
+--
+-- ============================================================
+-- A ARMADILHA, PARA A PRÓXIMA VEZ
+-- ============================================================
+--
+-- Todo script novo que criar função em `public` nasce com `anon` podendo
+-- executá-la, porque o default privilege do Supabase concede antes de qualquer
+-- linha nossa rodar. Para fechar de verdade é preciso nomear os papéis:
+--
+--     REVOKE EXECUTE ON FUNCTION public.minha_funcao(...) FROM anon;
+--
+-- `REVOKE ... FROM public` sozinho **não basta** e passa a impressão errada de
+-- que a função está fechada. E a conferência tem de ser feita no banco, com
+-- `has_function_privilege('anon', ...)` — ler o arquivo .sql não mostra um grant
+-- que o arquivo nunca escreveu.

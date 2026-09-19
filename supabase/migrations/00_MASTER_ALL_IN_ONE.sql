@@ -880,7 +880,7 @@ BEGIN
         updated_at = now();
 
     -- Ações por evento do Asaas
-    IF p_event IN ('PAYMENT_CONFIRMED', 'PAYMENT_RECEIVED') THEN
+    IF p_event IN ('PAYMENT_CONFIRMED', 'PAYMENT_RECEIVED', 'PAYMENT_AUTHORIZED') THEN
         UPDATE public.business_info
         SET status = 'active'
         WHERE user_id = v_salon_id;

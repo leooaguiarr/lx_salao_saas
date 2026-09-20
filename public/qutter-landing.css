@@ -381,6 +381,18 @@ h1, h2, h3, h4, .font-heading {
     gap: 6px;
 }
 
+.badge-dot {
+    color: rgba(255, 255, 255, 0.4);
+    font-size: 0.75rem;
+}
+
+.badge-pill-spa {
+    color: #d1b8f0;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+}
+
 .badge-divider {
     color: rgba(255, 255, 255, 0.35);
     font-weight: 400;
@@ -392,62 +404,34 @@ h1, h2, h3, h4, .font-heading {
     font-weight: 600;
 }
 
-/* TÍTULO CENTRALIZADO COM GRADIENTE MESCLADO */
-.hero-title-centered {
-    font-size: clamp(2.4rem, 5.2vw, 4.1rem);
-    line-height: 1.12;
-    font-weight: 900;
-    text-transform: uppercase;
-    letter-spacing: -0.01em;
-    margin-bottom: 20px;
-}
-
-.hero-title-lead {
-    display: block;
-    font-size: 0.45em;
-    letter-spacing: 0.14em;
-    color: #dedee8;
-    font-weight: 700;
-    margin-bottom: 10px;
-}
-
-.hero-title-dual {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    flex-wrap: wrap;
-    gap: 8px 14px;
-}
-
-.text-gradient-feminine {
-    background: linear-gradient(135deg, #ffffff 0%, #fde2d8 35%, #e8a892 75%, #d88e76 100%);
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
-    filter: drop-shadow(0 0 24px rgba(232, 168, 146, 0.35));
-}
-
-.text-gradient-amp {
-    color: #e5be80;
-    font-weight: 400;
-}
-
-.text-gradient-masculine {
-    background: linear-gradient(135deg, #ffffff 0%, #fae1a2 35%, #c89547 75%, #9b6c25 100%);
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
-    filter: drop-shadow(0 0 24px rgba(200, 149, 71, 0.35));
-}
-
-.hero-subtitle-centered {
-    font-size: 1.15rem;
-    color: #c9c9d6;
-    margin: 0 auto 36px;
-    line-height: 1.7;
-    max-width: 760px;
-}
-
-.hero-subtitle-centered strong {
+/* TÍTULO EDITORIAL MINIMALISTA (ESTILO REVISTA DE LUXO) */
+.hero-title-editorial {
+    font-family: 'Cormorant Garamond', Georgia, serif;
+    font-size: clamp(2.8rem, 5.5vw, 4.5rem);
+    line-height: 1.15;
+    font-weight: 600;
+    letter-spacing: -0.015em;
     color: #ffffff;
+    margin-bottom: 22px;
+    text-shadow: 0 2px 16px rgba(0, 0, 0, 0.9);
+}
+
+.editorial-highlight {
+    font-family: 'Cormorant Garamond', Georgia, serif;
+    color: #e5be80;
+    font-style: italic;
+    font-weight: 600;
+}
+
+.hero-subtitle-editorial {
+    font-family: 'Plus Jakarta Sans', sans-serif;
+    font-size: 1.14rem;
+    color: #dedee8;
+    margin: 0 auto 36px;
+    line-height: 1.75;
+    max-width: 740px;
+    font-weight: 400;
+    text-shadow: 0 2px 12px rgba(0, 0, 0, 0.9);
 }
 
 /* DUAL VALUE PILLS (DOIS MUNDOS LADO A LADO) */
@@ -1284,8 +1268,12 @@ h1, h2, h3, h4, .font-heading {
 @media (max-width: 768px) {
     .top-bar { display: none; }
     .nav-menu { display: none; }
-    .hero-title { font-size: 2.3rem; }
-    .hero-subtitle { font-size: 1rem; }
+    .hero-title, .hero-title-editorial { font-size: 2.3rem; line-height: 1.18; }
+    .hero-subtitle, .hero-subtitle-editorial { font-size: 1rem; }
+    .hero-badge-hybrid { flex-wrap: wrap; justify-content: center; font-size: 0.76rem; padding: 6px 14px; gap: 6px; }
+    .hero-dual-pills { grid-template-columns: 1fr; gap: 12px; }
+    .hero-buttons-centered { flex-direction: column; width: 100%; }
+    .hero-buttons-centered button, .hero-buttons-centered a { width: 100%; justify-content: center; }
     .hero-stats-row { flex-direction: column; gap: 16px; }
     .features-grid-qutter { grid-template-columns: 1fr; }
     .footer-grid { grid-template-columns: 1fr; }

@@ -4114,9 +4114,27 @@ let publicBookingContainer = null;
 let publicSalonMode = false; // true = dados reais do Supabase (link público de verdade)
 let publicSlug = null;
 
+// Rotas internas do painel. O servidor entrega o index.html para qualquer
+// endereço sem extensão, então sem esta lista o /app seria lido como slug de
+// salão e o cliente veria "Link de agendamento não encontrado" no lugar do login.
+const ROTAS_INTERNAS = new Set([
+    'index.html',
+    'app',
+    'painel',
+    'login',
+    'admin',
+    'dashboard',
+    'home',
+    'landing',
+    'checkout',
+    'api'
+]);
+
 function getPublicSlugFromUrl() {
     const path = decodeURIComponent(location.pathname).replace(/^\/+|\/+$/g, '');
-    if (!path || path.toLowerCase() === 'index.html') return null;
+    if (!path) return null;
+    // Compara só o primeiro trecho: /app/qualquer-coisa também é rota interna.
+    if (ROTAS_INTERNAS.has(path.split('/')[0].toLowerCase())) return null;
     return path;
 }
 

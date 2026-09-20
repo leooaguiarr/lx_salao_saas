@@ -150,7 +150,9 @@ const DataService = {
     async enviarLinkDeRecuperacao(email) {
         if (!supabaseClient) throw new Error("Sistema indisponível no momento.");
         const { error } = await supabaseClient.auth.resetPasswordForEmail(email, {
-            redirectTo: location.origin,
+            // Precisa apontar para /app: a raiz do site hoje serve a landing
+            // page, que não carrega o painel nem a tela de nova senha.
+            redirectTo: `${location.origin}/app`,
         });
         if (error) throw error;
     },

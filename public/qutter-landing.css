@@ -86,8 +86,8 @@ h1, h2, h3, h4, .font-heading {
 .top-bar {
     background: #ffffff;
     color: #111116;
-    padding: 8px 0;
-    font-size: 0.85rem;
+    padding: 5px 0;
+    font-size: 0.78rem;
     font-weight: 500;
     border-bottom: 1px solid rgba(0,0,0,0.06);
     position: relative;
@@ -102,14 +102,14 @@ h1, h2, h3, h4, .font-heading {
 
 .top-bar-left {
     display: flex;
-    gap: 24px;
+    gap: 20px;
     align-items: center;
 }
 
 .top-bar-item {
     display: flex;
     align-items: center;
-    gap: 8px;
+    gap: 7px;
     color: #33333b;
 }
 
@@ -120,18 +120,18 @@ h1, h2, h3, h4, .font-heading {
 .top-bar-right {
     display: flex;
     align-items: center;
-    gap: 16px;
+    gap: 14px;
 }
 
 .top-bar-social {
     display: flex;
-    gap: 12px;
+    gap: 10px;
 }
 
 .top-bar-social a {
-    color: #444;
+    color: #555;
     transition: var(--transition);
-    font-size: 0.9rem;
+    font-size: 0.85rem;
 }
 
 .top-bar-social a:hover {
@@ -139,19 +139,19 @@ h1, h2, h3, h4, .font-heading {
 }
 
 /* ============================================================
-   NAVBAR (FIXA COM GLASSMORPHISM)
+   NAVBAR (FIXA COM GLASSMORPHISM - SLEEK & COMPACTA)
    ============================================================ */
 .qutter-nav {
     position: sticky;
     top: 0;
     left: 0;
     right: 0;
-    background: rgba(9, 9, 12, 0.88);
+    background: rgba(9, 9, 12, 0.90);
     backdrop-filter: blur(18px);
     -webkit-backdrop-filter: blur(18px);
-    border-bottom: 1px solid var(--border-dark);
+    border-bottom: 1px solid rgba(255, 255, 255, 0.08);
     z-index: 1000;
-    padding: 16px 0;
+    padding: 9px 0;
     transition: var(--transition);
 }
 
@@ -164,60 +164,43 @@ h1, h2, h3, h4, .font-heading {
 .brand-logo {
     display: flex;
     align-items: center;
-    gap: 12px;
+    gap: 10px;
     text-decoration: none;
     color: var(--text-light);
 }
 
-.brand-logo-icon {
-    width: 44px;
-    height: 44px;
-    background: linear-gradient(135deg, var(--gold) 0%, var(--gold-dark) 100%);
-    border-radius: var(--radius-sm);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    color: #fff;
-    font-size: 1.25rem;
-    box-shadow: 0 4px 16px var(--gold-glow);
-}
-
-.brand-logo-text {
-    display: flex;
-    flex-direction: column;
+.brand-logo-img {
+    height: 32px;
+    width: auto;
+    object-fit: contain;
+    display: block;
+    filter: drop-shadow(0 2px 8px rgba(255, 255, 255, 0.15));
 }
 
 .brand-logo-name {
-    font-size: 1.35rem;
-    font-weight: 800;
+    font-size: 1.22rem;
+    font-weight: 700;
     letter-spacing: -0.01em;
-    line-height: 1.1;
-    text-transform: uppercase;
+    line-height: 1;
+    color: #ffffff;
+    font-family: 'Plus Jakarta Sans', sans-serif;
 }
 
 .brand-logo-name span {
     color: var(--gold);
 }
 
-.brand-logo-tag {
-    font-size: 0.72rem;
-    color: var(--text-muted);
-    letter-spacing: 0.08em;
-    text-transform: uppercase;
-    font-weight: 600;
-}
-
 .nav-menu {
     display: flex;
     align-items: center;
-    gap: 32px;
+    gap: 24px;
     list-style: none;
 }
 
 .nav-link {
     color: var(--text-muted);
     text-decoration: none;
-    font-size: 0.92rem;
+    font-size: 0.85rem;
     font-weight: 600;
     transition: var(--transition);
     text-transform: uppercase;
@@ -231,7 +214,54 @@ h1, h2, h3, h4, .font-heading {
 .nav-actions {
     display: flex;
     align-items: center;
-    gap: 14px;
+    gap: 10px;
+}
+
+/* BOTÕES ESPECÍFICOS DO NAVBAR (PROPORCIONAIS E COMPACTOS) */
+.btn-nav-login {
+    background: rgba(255, 255, 255, 0.04);
+    color: #d6d6e2;
+    border: 1px solid rgba(255, 255, 255, 0.14);
+    padding: 7px 16px;
+    border-radius: var(--radius-sm);
+    text-decoration: none;
+    font-weight: 600;
+    font-size: 0.84rem;
+    display: inline-flex;
+    align-items: center;
+    gap: 7px;
+    cursor: pointer;
+    transition: var(--transition);
+}
+
+.btn-nav-login:hover {
+    border-color: var(--gold);
+    color: #ffffff;
+    background: rgba(200, 149, 71, 0.12);
+}
+
+.btn-nav-trial {
+    background: linear-gradient(135deg, var(--gold-light) 0%, var(--gold) 60%, var(--gold-dark) 100%);
+    color: #111116;
+    padding: 8px 18px;
+    border-radius: var(--radius-sm);
+    text-decoration: none;
+    font-weight: 700;
+    font-size: 0.84rem;
+    letter-spacing: 0.02em;
+    display: inline-flex;
+    align-items: center;
+    gap: 7px;
+    box-shadow: 0 2px 14px rgba(200, 149, 71, 0.35);
+    border: none;
+    cursor: pointer;
+    transition: var(--transition);
+}
+
+.btn-nav-trial:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 4px 18px rgba(200, 149, 71, 0.5);
+    background: linear-gradient(135deg, #eed099 0%, var(--gold-light) 60%, var(--gold) 100%);
 }
 
 /* BOTÕES ESTILO QUTTER */

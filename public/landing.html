@@ -11,7 +11,7 @@
     <!-- Font Awesome 6 -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <!-- Estilo de Luxo Qutter -->
-    <link rel="stylesheet" href="qutter-landing.css">
+    <link rel="stylesheet" href="qutter-landing.css?v=2">
 </head>
 <body>
 
@@ -73,33 +73,74 @@
         </div>
     </header>
 
-    <!-- HERO SECTION (ESTILO MONUMENTAL QUTTER) -->
+    <!-- HERO SECTION: DUAL SPLIT INTEGRADO (SALÃO FEMININO & BARBEARIA) -->
     <section class="hero-section" id="inicio">
         <div class="hero-bg"></div>
+        <div class="hero-split-overlay">
+            <div class="split-side-overlay feminine-glow"></div>
+            <div class="split-side-overlay masculine-glow"></div>
+        </div>
         <div class="hero-vignette"></div>
 
         <div class="container">
-            <div class="hero-content">
-                <div class="hero-badge">
-                    <i class="fa-solid fa-crown"></i> A Plataforma Mais Completa do Brasil
+            <div class="hero-content hero-content-centered">
+                <div class="hero-badge-hybrid">
+                    <span class="badge-pill-fem"><i class="fa-solid fa-wand-magic-sparkles"></i> Salão de Beleza</span>
+                    <span class="badge-divider">&</span>
+                    <span class="badge-pill-masc"><i class="fa-solid fa-scissors"></i> Barbearia</span>
+                    <span class="badge-sub">• Sistema Unificado</span>
                 </div>
-                <h1 class="hero-title">
-                    O SISTEMA DEFINITIVO PARA <span class="text-gradient-gold">SALÕES, BARBEARIAS & ESTÉTICA</span>
+
+                <h1 class="hero-title hero-title-centered">
+                    <span class="hero-title-lead">A PLATAFORMA COMPLETA PARA</span>
+                    <span class="hero-title-dual">
+                        <span class="text-gradient-feminine">SALÕES FEMININOS</span>
+                        <span class="text-gradient-amp">&</span>
+                        <span class="text-gradient-masculine">BARBEARIAS</span>
+                    </span>
                 </h1>
-                <p class="hero-subtitle">
-                    Agendamento online 24h sem aplicativo, cálculo automático de comissões por profissional, frente de caixa com PDV e clube de fidelidade. O software moderno que coloca seu negócio em outro nível.
+
+                <p class="hero-subtitle hero-subtitle-centered">
+                    De químicas, mechas e estética facial a barbas clássicas e cortes de precisão. O software unissex definitivo com <strong>agendamento online 24h sem app</strong>, cálculo automático de comissões por profissional, frente de caixa com PDV e clube de fidelidade.
                 </p>
 
-                <div class="hero-buttons">
-                    <button onclick="abrirModalTrial('equipe_4')" class="btn-qutter-gold" style="padding: 16px 36px; font-size: 1rem;">
+                <!-- DUAL VALUE PILLS: DUAS ESPECIALIDADES LADO A LADO -->
+                <div class="hero-dual-pills">
+                    <div class="dual-pill-card pill-feminine" onclick="selecionarNicho('salao'); document.getElementById('nichos').scrollIntoView({behavior:'smooth'});">
+                        <div class="pill-icon-wrap">
+                            <i class="fa-solid fa-spray-can-sparkles"></i>
+                        </div>
+                        <div class="pill-text-wrap">
+                            <strong>Para Salões de Beleza & Estética</strong>
+                            <span>Químicas, mechas, escovas, pacotes de sessões e manicure</span>
+                        </div>
+                        <i class="fa-solid fa-chevron-right pill-arrow"></i>
+                    </div>
+
+                    <div class="dual-pill-card pill-masculine" onclick="selecionarNicho('barbearia'); document.getElementById('nichos').scrollIntoView({behavior:'smooth'});">
+                        <div class="pill-icon-wrap">
+                            <i class="fa-solid fa-chair"></i>
+                        </div>
+                        <div class="pill-text-wrap">
+                            <strong>Para Barbearias & Studios</strong>
+                            <span>Encaixes rápidos, navalha, produtos de balcão e agilidade</span>
+                        </div>
+                        <i class="fa-solid fa-chevron-right pill-arrow"></i>
+                    </div>
+                </div>
+
+                <!-- BOTÕES DE AÇÃO CENTRAIS -->
+                <div class="hero-buttons hero-buttons-centered">
+                    <button onclick="abrirModalTrial('equipe_4')" class="btn-qutter-gold btn-hero-cta">
                         Começar Teste Grátis de 7 Dias <i class="fa-solid fa-arrow-right"></i>
                     </button>
-                    <a href="/app" class="btn-qutter-ghost" style="padding: 16px 28px; font-size: 1rem;">
+                    <a href="/app" class="btn-qutter-ghost btn-hero-demo">
                         <i class="fa-solid fa-desktop"></i> Ver Demonstração
                     </a>
                 </div>
 
-                <div class="hero-stats-row">
+                <!-- ESTATÍSTICAS E PROVAS SOCIAIS -->
+                <div class="hero-stats-row hero-stats-centered">
                     <div class="hero-stat">
                         <span class="hero-stat-number">+500</span>
                         <span class="hero-stat-label">Estabelecimentos Ativos</span>

@@ -283,12 +283,12 @@ h1, h2, h3, h4, .font-heading {
 }
 
 /* ============================================================
-   HERO SECTION (MONUMENTAL & UNISEX)
+   HERO SECTION: DUAL SPLIT INTEGRADO (FEMININO & MASCULINO)
    ============================================================ */
 .hero-section {
     position: relative;
-    padding: 90px 0 100px;
-    min-height: 85vh;
+    padding: 50px 0 70px;
+    min-height: 88vh;
     display: flex;
     align-items: center;
     overflow: hidden;
@@ -300,92 +300,325 @@ h1, h2, h3, h4, .font-heading {
     left: 0;
     right: 0;
     bottom: 0;
-    background: linear-gradient(to right, rgba(9, 9, 12, 0.95) 0%, rgba(9, 9, 12, 0.8) 50%, rgba(9, 9, 12, 0.6) 100%),
-                url('assets/hero_unisex_salon.jpg') center/cover no-repeat;
+    background: url('assets/hero_dual_split.jpg') center top/cover no-repeat;
     z-index: 1;
 }
 
-.hero-vignette {
+/* OVERLAY DUAL: Brilho sutil nas laterais para valorizar cada nicho */
+.hero-split-overlay {
     position: absolute;
     inset: 0;
-    background: radial-gradient(circle at 75% 50%, transparent 20%, #09090c 85%);
+    display: flex;
     z-index: 2;
     pointer-events: none;
 }
 
-.hero-content {
-    position: relative;
-    z-index: 3;
-    max-width: 720px;
+.split-side-overlay {
+    flex: 1;
+    height: 100%;
 }
 
-.hero-badge {
+.split-side-overlay.feminine-glow {
+    background: radial-gradient(circle at 18% 48%, rgba(245, 205, 190, 0.25) 0%, transparent 65%);
+}
+
+.split-side-overlay.masculine-glow {
+    background: radial-gradient(circle at 82% 48%, rgba(205, 155, 75, 0.25) 0%, transparent 65%);
+}
+
+/* VIGNETTE INVERTIDA: Escurece apenas o centro atrás do texto e mantém as laterais 100% nítidas e visíveis */
+.hero-vignette {
+    position: absolute;
+    inset: 0;
+    background: radial-gradient(ellipse at 50% 50%, rgba(9, 9, 12, 0.85) 0%, rgba(9, 9, 12, 0.68) 38%, rgba(9, 9, 12, 0.18) 70%, transparent 100%),
+                linear-gradient(to bottom, rgba(9, 9, 12, 0.75) 0%, transparent 18%, transparent 82%, #09090c 100%);
+    z-index: 3;
+    pointer-events: none;
+}
+
+.hero-content-centered {
+    position: relative;
+    z-index: 4;
+    margin: 0 auto;
+    text-align: center;
+    max-width: 960px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-shadow: 0 2px 16px rgba(0, 0, 0, 0.9);
+}
+
+/* BADGE HÍBRIDO SUPERIOR */
+.hero-badge-hybrid {
     display: inline-flex;
     align-items: center;
-    gap: 8px;
-    padding: 6px 16px;
-    background: rgba(200, 149, 71, 0.15);
-    border: 1px solid var(--border-gold);
+    gap: 10px;
+    padding: 8px 22px;
+    background: rgba(18, 16, 22, 0.8);
+    border: 1px solid rgba(255, 255, 255, 0.14);
     border-radius: 50px;
-    color: var(--gold-light);
-    font-size: 0.82rem;
+    backdrop-filter: blur(14px);
+    -webkit-backdrop-filter: blur(14px);
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.4);
+    margin-bottom: 24px;
+    font-size: 0.84rem;
     font-weight: 700;
     text-transform: uppercase;
-    letter-spacing: 0.06em;
-    margin-bottom: 24px;
+    letter-spacing: 0.05em;
 }
 
-.hero-title {
-    font-size: 3.8rem;
-    line-height: 1.05;
-    font-weight: 800;
+.badge-pill-fem {
+    color: #f7d2c4;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.badge-pill-masc {
+    color: #f5cf83;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.badge-divider {
+    color: rgba(255, 255, 255, 0.35);
+    font-weight: 400;
+}
+
+.badge-sub {
+    color: var(--text-muted);
+    font-size: 0.76rem;
+    font-weight: 600;
+}
+
+/* TÍTULO CENTRALIZADO COM GRADIENTE MESCLADO */
+.hero-title-centered {
+    font-size: clamp(2.4rem, 5.2vw, 4.1rem);
+    line-height: 1.12;
+    font-weight: 900;
     text-transform: uppercase;
     letter-spacing: -0.01em;
-    margin-bottom: 22px;
+    margin-bottom: 20px;
 }
 
-.hero-subtitle {
-    font-size: 1.15rem;
-    color: #c2c2ce;
-    margin-bottom: 34px;
-    line-height: 1.65;
-    max-width: 620px;
+.hero-title-lead {
+    display: block;
+    font-size: 0.45em;
+    letter-spacing: 0.14em;
+    color: #dedee8;
+    font-weight: 700;
+    margin-bottom: 10px;
 }
 
-.hero-buttons {
+.hero-title-dual {
     display: flex;
-    gap: 16px;
     align-items: center;
+    justify-content: center;
     flex-wrap: wrap;
-    margin-bottom: 44px;
+    gap: 8px 14px;
 }
 
-.hero-stats-row {
+.text-gradient-feminine {
+    background: linear-gradient(135deg, #ffffff 0%, #fde2d8 35%, #e8a892 75%, #d88e76 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    filter: drop-shadow(0 0 24px rgba(232, 168, 146, 0.35));
+}
+
+.text-gradient-amp {
+    color: #e5be80;
+    font-weight: 400;
+}
+
+.text-gradient-masculine {
+    background: linear-gradient(135deg, #ffffff 0%, #fae1a2 35%, #c89547 75%, #9b6c25 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    filter: drop-shadow(0 0 24px rgba(200, 149, 71, 0.35));
+}
+
+.hero-subtitle-centered {
+    font-size: 1.15rem;
+    color: #c9c9d6;
+    margin: 0 auto 36px;
+    line-height: 1.7;
+    max-width: 760px;
+}
+
+.hero-subtitle-centered strong {
+    color: #ffffff;
+}
+
+/* DUAL VALUE PILLS (DOIS MUNDOS LADO A LADO) */
+.hero-dual-pills {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 20px;
+    width: 100%;
+    max-width: 860px;
+    margin: 0 auto 38px;
+}
+
+.dual-pill-card {
     display: flex;
-    gap: 36px;
-    padding-top: 28px;
-    border-top: 1px solid rgba(255, 255, 255, 0.1);
+    align-items: center;
+    gap: 16px;
+    padding: 16px 22px;
+    border-radius: var(--radius-md);
+    backdrop-filter: blur(16px);
+    -webkit-backdrop-filter: blur(16px);
+    transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+    cursor: pointer;
+    text-align: left;
+}
+
+.dual-pill-card.pill-feminine {
+    background: linear-gradient(135deg, rgba(232, 168, 146, 0.12) 0%, rgba(18, 14, 16, 0.85) 100%);
+    border: 1px solid rgba(232, 168, 146, 0.28);
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+}
+
+.dual-pill-card.pill-feminine:hover {
+    transform: translateY(-3px);
+    border-color: #e8a892;
+    box-shadow: 0 10px 30px rgba(232, 168, 146, 0.28);
+    background: linear-gradient(135deg, rgba(232, 168, 146, 0.18) 0%, rgba(24, 18, 20, 0.9) 100%);
+}
+
+.dual-pill-card.pill-masculine {
+    background: linear-gradient(135deg, rgba(200, 149, 71, 0.12) 0%, rgba(18, 16, 12, 0.85) 100%);
+    border: 1px solid rgba(200, 149, 71, 0.28);
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+}
+
+.dual-pill-card.pill-masculine:hover {
+    transform: translateY(-3px);
+    border-color: #c89547;
+    box-shadow: 0 10px 30px rgba(200, 149, 71, 0.28);
+    background: linear-gradient(135deg, rgba(200, 149, 71, 0.18) 0%, rgba(26, 20, 14, 0.9) 100%);
+}
+
+.pill-icon-wrap {
+    width: 44px;
+    height: 44px;
+    border-radius: var(--radius-sm);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.25rem;
+    flex-shrink: 0;
+}
+
+.pill-feminine .pill-icon-wrap {
+    background: linear-gradient(135deg, #f7d2c4 0%, #e8a892 100%);
+    color: #2b1712;
+    box-shadow: 0 4px 14px rgba(232, 168, 146, 0.3);
+}
+
+.pill-masculine .pill-icon-wrap {
+    background: linear-gradient(135deg, #fae1a2 0%, #c89547 100%);
+    color: #231908;
+    box-shadow: 0 4px 14px rgba(200, 149, 71, 0.3);
+}
+
+.pill-text-wrap {
+    display: flex;
+    flex-direction: column;
+    flex: 1;
+}
+
+.pill-text-wrap strong {
+    font-size: 0.95rem;
+    font-weight: 700;
+    margin-bottom: 2px;
+}
+
+.pill-feminine .pill-text-wrap strong { color: #fcece6; }
+.pill-masculine .pill-text-wrap strong { color: #fbf0dc; }
+
+.pill-text-wrap span {
+    font-size: 0.78rem;
+    color: var(--text-muted);
+    line-height: 1.35;
+}
+
+.pill-arrow {
+    color: rgba(255, 255, 255, 0.3);
+    font-size: 0.85rem;
+    transition: transform 0.2s ease, color 0.2s ease;
+}
+
+.dual-pill-card:hover .pill-arrow {
+    transform: translateX(4px);
+    color: #ffffff;
+}
+
+/* BOTÕES DE AÇÃO CENTRAIS */
+.hero-buttons-centered {
+    display: flex;
+    justify-content: center;
+    gap: 16px;
+    margin-bottom: 46px;
+    flex-wrap: wrap;
+}
+
+.btn-hero-cta {
+    padding: 16px 36px !important;
+    font-size: 1rem !important;
+}
+
+.btn-hero-demo {
+    padding: 16px 28px !important;
+    font-size: 1rem !important;
+}
+
+/* PROVAS SOCIAIS E ESTATÍSTICAS */
+.hero-stats-centered {
+    display: flex;
+    justify-content: center;
+    gap: 52px;
+    padding-top: 32px;
+    border-top: 1px solid rgba(255, 255, 255, 0.09);
+    flex-wrap: wrap;
+    width: 100%;
+    max-width: 860px;
 }
 
 .hero-stat {
     display: flex;
     flex-direction: column;
+    align-items: center;
 }
 
 .hero-stat-number {
-    font-size: 1.8rem;
+    font-size: 1.85rem;
     font-weight: 800;
-    color: var(--gold-light);
+    color: #f7d9a8;
     font-family: 'Outfit', sans-serif;
     line-height: 1.1;
 }
 
 .hero-stat-label {
-    font-size: 0.82rem;
+    font-size: 0.8rem;
     color: var(--text-muted);
     text-transform: uppercase;
-    letter-spacing: 0.04em;
+    letter-spacing: 0.05em;
     font-weight: 600;
+}
+
+@media (max-width: 768px) {
+    .hero-dual-pills {
+        grid-template-columns: 1fr;
+        gap: 12px;
+    }
+    .hero-title-dual {
+        flex-direction: column;
+        gap: 4px;
+    }
+    .hero-stats-centered {
+        gap: 24px;
+    }
 }
 
 /* ============================================================
@@ -458,10 +691,26 @@ h1, h2, h3, h4, .font-heading {
 }
 
 .niche-tab-btn.active {
-    background: linear-gradient(135deg, var(--gold-light) 0%, var(--gold) 100%);
     color: #111116;
-    border-color: var(--gold);
-    box-shadow: 0 4px 20px var(--gold-glow);
+    transform: translateY(-2px);
+}
+
+#tab-barbearia.active {
+    background: linear-gradient(135deg, #fbe2a0 0%, #c89547 100%);
+    border-color: #c89547;
+    box-shadow: 0 4px 22px rgba(200, 149, 71, 0.45);
+}
+
+#tab-salao.active {
+    background: linear-gradient(135deg, #fde9e3 0%, #e8a892 100%);
+    border-color: #e8a892;
+    box-shadow: 0 4px 22px rgba(232, 168, 146, 0.45);
+}
+
+#tab-estetica.active {
+    background: linear-gradient(135deg, #eee3fc 0%, #ab8ee6 100%);
+    border-color: #ab8ee6;
+    box-shadow: 0 4px 22px rgba(171, 142, 230, 0.4);
 }
 
 .niche-showcase-box {

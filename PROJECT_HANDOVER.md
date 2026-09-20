@@ -118,9 +118,8 @@ node server.js
 Quando você ou outro agente for retomar o desenvolvimento, foque nas seguintes melhorias:
 
 1. **Ativar o Deploy Automático no Coolify (Webhook do GitHub)**:
-   - No Coolify ([http://72.62.139.92:8000](http://72.62.139.92:8000)), abrir a aplicação `lx_salao_saas` e copiar a URL da seção **Webhooks / Deploy Webhook**.
-   - No GitHub ([https://github.com/leooaguiarr/lx_salao_saas/settings/hooks](https://github.com/leooaguiarr/lx_salao_saas/settings/hooks)), adicionar a URL como webhook em formato `application/json` disparado a cada `push`.
-   - Assim que configurado, qualquer `git push origin main` fará deploy automático no ar sem necessidade de entrar no Coolify.
+   - ✅ **CONCLUÍDO E ATIVO**: Webhook oficial configurado no GitHub (`https://coolify.lexionconsultoria.tech/webhooks/source/github/events/manual/...`).
+   - Qualquer `git push origin main` agora dispara automaticamente a reconstrução e deploy do container no Coolify sem intervenção manual.
 
 2. **Validação de Fluxo de Pagamento Real no Asaas**:
    - Efetuar uma assinatura teste via Pix no modal de checkout do sistema e acompanhar o evento `PAYMENT_CONFIRMED` no log do webhook em `https://salao.lexionconsultoria.tech/api/asaas/webhook`.

@@ -158,7 +158,7 @@ function avisoDaVendaDeBalcaoDispensado() {
 
 window.abrirCheckoutDeBalcao = function () {
     if (!checkoutDisponivel()) {
-        showToast('O checkout precisa da estrutura de Vendas no Supabase (docs/sql/14 e 15).', 'warning');
+        showToast('O checkout precisa da estrutura de Vendas no Supabase (migração mestre).', 'warning');
         return;
     }
 
@@ -767,7 +767,7 @@ window.finalizarCheckout = async function () {
             retorno = await DataService.finalizarVenda(payload);
             if (!retorno || !retorno.ok) {
                 const motivo = retorno && retorno.faltaMigration
-                    ? 'A estrutura de Vendas ainda não foi aplicada no Supabase (docs/sql/15_finalizacao_venda.sql).'
+                    ? 'A estrutura de Vendas ainda não foi aplicada no Supabase (migração mestre 00_MASTER_ALL_IN_ONE.sql).'
                     : (retorno && retorno.motivo) || 'Não foi possível concluir a venda.';
                 showToast(motivo, 'danger');
                 return;

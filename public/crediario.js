@@ -340,7 +340,7 @@ async function confirmarRecebimento() {
             // dono achando que recebeu e o cliente devendo no banco.
             showToast(
                 retorno && retorno.faltaMigration
-                    ? 'Execute docs/sql/23_crediario.sql no Supabase para receber crediário.'
+                    ? 'Execute a migração mestre supabase/migrations/00_MASTER_ALL_IN_ONE.sql no Supabase para receber crediário.'
                     : ((retorno && retorno.motivo) || 'Não foi possível registrar o recebimento.'),
                 'danger'
             );

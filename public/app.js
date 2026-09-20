@@ -36,11 +36,8 @@ const STATE_KEYS = {
 // Logomarca exibida enquanto o salão não envia a sua nas Configurações.
 const LOGO_PADRAO = '/assets/logo_lexion.png';
 
-// Versão exibida no rodapé do login. Serve para saber o que está no ar sem
-// abrir o painel da Vercel — necessário desde que o deploy deixou de ser
-// imediato (ver a REGRA DE TRABALHO no AGENT_HANDOFF.md).
-// Subir junto com o deploy de cada parte funcional, não a cada commit.
-const VERSAO_DO_SISTEMA = '1.6.3';
+// Versão exibida no rodapé do login.
+const VERSAO_DO_SISTEMA = '2.0.0';
 
 let currentSelectedDate = new Date();
 

@@ -31,13 +31,8 @@ Thumbs.db
 .agents/
 .vscode/
 
-# Vercel CLI local
-.vercel/
-
-.vercel
+# Environment variables
 .env*
 
 # Supabase CLI local
 supabase/.temp/
-
-link.txt

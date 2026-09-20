@@ -294,7 +294,7 @@ async function pagarComissoesSelecionadas() {
         // o dono acha que pagou e o profissional continua vendo a pendência.
         showToast(
             resposta.faltaMigration
-                ? 'Execute docs/sql/21_comissoes.sql no Supabase para dar baixa em comissão.'
+                ? 'Execute a migração mestre supabase/migrations/00_MASTER_ALL_IN_ONE.sql no Supabase para dar baixa em comissão.'
                 : (resposta.motivo || 'Não foi possível dar baixa.'),
             'danger'
         );

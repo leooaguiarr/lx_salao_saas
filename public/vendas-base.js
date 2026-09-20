@@ -633,7 +633,7 @@ function renderSales() {
         botaoNovaVenda.disabled = !liberado;
         botaoNovaVenda.title = liberado
             ? ''
-            : 'Execute docs/sql/14_vendas_base.sql e docs/sql/15_finalizacao_venda.sql no Supabase.';
+            : 'Execute a migração mestre supabase/migrations/00_MASTER_ALL_IN_ONE.sql no Supabase.';
     }
 }
 

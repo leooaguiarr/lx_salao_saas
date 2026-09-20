@@ -1,7 +1,13 @@
 /**
- * Servidor de desenvolvimento LOCAL (não é usado em produção).
- * Em produção o site é servido como estático pelo Vercel, a partir de public/.
- * Uso: node server.js  →  http://localhost:8000
+ * ============================================================
+ * LEXION SALÃO & BARBEARIA SAAS — SERVIDOR UNIFICADO (WEB + API)
+ * ============================================================
+ * Servidor HTTP nativo em Node.js (sem dependências externas)
+ * Executado localmente e em produção via Docker / Coolify.
+ * - Landing page de luxo unissex: /
+ * - Painel administrativo e sistema SaaS: /app
+ * - Agendamento público dinâmico por slug: /<slug-do-salao>
+ * - Endpoints de autenticação, onboarding e webhook Asaas: /api/*
  */
 const http = require('http');
 const fs = require('fs');
@@ -10,15 +16,19 @@ const path = require('path');
 const PUBLIC_DIR = path.join(__dirname, 'public');
 
 const MIME_TYPES = {
-    '.html': 'text/html',
-    '.css': 'text/css',
-    '.js': 'text/javascript',
+    '.html': 'text/html; charset=utf-8',
+    '.css': 'text/css; charset=utf-8',
+    '.js': 'text/javascript; charset=utf-8',
+    '.json': 'application/json; charset=utf-8',
     '.png': 'image/png',
     '.jpg': 'image/jpeg',
     '.jpeg': 'image/jpeg',
     '.gif': 'image/gif',
     '.svg': 'image/svg+xml',
-    '.json': 'application/json'
+    '.ico': 'image/x-icon',
+    '.webp': 'image/webp',
+    '.woff': 'font/woff',
+    '.woff2': 'font/woff2'
 };
 
 const asaasService = require('./asaas-service');
@@ -395,45 +405,66 @@ const server = http.createServer(async (req, res) => {
     }
 
     // ------------------------------------------------------------
-    // 2. SERVIDOR DE ARQUIVOS ESTÁTICOS (SPA & Landing Page)
+    // 2. SERVIDOR DE ARQUIVOS ESTÁTICOS (SPA, Slugs & Landing Page)
     // ------------------------------------------------------------
-    let safeUrl = req.url.split('?')[0];
-    if (safeUrl === '/' || safeUrl === '/home') {
-        safeUrl = '/landing.html';
-    } else if (safeUrl === '/app' || safeUrl === '/painel' || safeUrl === '/login' || safeUrl === '/sistema') {
-        safeUrl = '/index.html';
+    const rawPath = decodeURIComponent(req.url.split('?')[0]);
+
+    // Rota da Landing Page oficial
+    if (rawPath === '/' || rawPath === '/home' || rawPath === '/landing') {
+        return serveStaticFile(res, path.join(PUBLIC_DIR, 'landing.html'));
     }
 
-    const filePath = path.join(PUBLIC_DIR, safeUrl);
-    if (!filePath.startsWith(PUBLIC_DIR)) {
-        res.writeHead(403);
-        res.end('Forbidden');
+    const requestedFile = path.join(PUBLIC_DIR, rawPath);
+    if (!requestedFile.startsWith(PUBLIC_DIR)) {
+        res.writeHead(403, { 'Content-Type': 'text/plain' });
+        return res.end('Forbidden');
+    }
+
+    // Se possui extensão de arquivo (ex: .js, .css, .png, .jpg, .ico, .svg, etc.)
+    if (path.extname(rawPath)) {
+        fs.stat(requestedFile, (err, stats) => {
+            if (!err && stats.isFile()) {
+                return serveStaticFile(res, requestedFile);
+            }
+            res.writeHead(404, { 'Content-Type': 'text/plain' });
+            res.end('404 Not Found');
+        });
         return;
     }
 
+    // Qualquer rota sem extensão (/app, /painel, /login, ou qualquer /<slug-do-salao>)
+    // serve o index.html para que o cliente SPA processe a sessão ou o agendamento público
+    return serveStaticFile(res, path.join(PUBLIC_DIR, 'index.html'));
+});
+
+// Helper para envio de arquivos estáticos com Content-Type e Cache-Control adequados
+function serveStaticFile(res, filePath) {
     fs.stat(filePath, (err, stats) => {
-        // Fallback SPA
-        let fallback = 'landing.html';
-        if (safeUrl.startsWith('/app') || safeUrl.startsWith('/painel')) {
-            fallback = 'index.html';
+        if (err || !stats.isFile()) {
+            res.writeHead(404, { 'Content-Type': 'text/plain' });
+            return res.end('404 Not Found');
         }
-        const finalPath = (err || !stats.isFile()) ? path.join(PUBLIC_DIR, fallback) : filePath;
 
-        const ext = path.extname(finalPath).toLowerCase();
+        const ext = path.extname(filePath).toLowerCase();
         const contentType = MIME_TYPES[ext] || 'application/octet-stream';
+        const isHtml = ext === '.html';
 
-        res.writeHead(200, { 'Content-Type': contentType });
+        res.writeHead(200, {
+            'Content-Type': contentType,
+            'Cache-Control': isHtml ? 'no-cache, no-store, must-revalidate' : 'public, max-age=86400'
+        });
 
-        const stream = fs.createReadStream(finalPath);
+        const stream = fs.createReadStream(filePath);
         stream.on('error', (streamErr) => {
-            console.error('Stream error:', streamErr);
+            console.error('[Static Stream Error]:', streamErr);
+            if (!res.headersSent) res.writeHead(500);
             res.end();
         });
         stream.pipe(res);
     });
-});
+}
 
 const PORT = process.env.PORT || 8000;
 server.listen(PORT, () => {
-    console.log(`Servidor rodando em http://localhost:${PORT}/`);
+    console.log(`[Lexion SaaS] Servidor rodando em http://localhost:${PORT}/`);
 });

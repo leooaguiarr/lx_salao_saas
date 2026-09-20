@@ -620,8 +620,8 @@ O sistema possui um guia de ajuda integrado, aberto pelo botão de interrogaçã
 - Aplicação web sem necessidade de instalação.
 - Front-end em HTML, CSS e JavaScript.
 - Banco de dados, autenticação e regras de segurança no Supabase.
-- Hospedagem como site estático na Vercel.
-- Atualização automática da produção após publicação aprovada no repositório principal.
+- Hospedagem em container Docker dedicado no Coolify (Hostinger VPS).
+- Atualização e deploy contínuo via repositório principal no GitHub.
 - Rotas públicas personalizadas para cada estabelecimento.
 - Funcionamento sem etapa de build, mantendo a publicação leve e direta.
 

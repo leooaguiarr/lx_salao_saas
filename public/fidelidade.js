@@ -292,7 +292,7 @@ async function resgatarBeneficio(clientId, saleId) {
     if (!retorno || !retorno.ok) {
         showToast(
             retorno && retorno.faltaMigration
-                ? 'Execute docs/sql/25_fidelidade.sql no Supabase para resgatar benefício.'
+                ? 'Execute a migração mestre supabase/migrations/00_MASTER_ALL_IN_ONE.sql no Supabase para resgatar benefício.'
                 : (retorno && retorno.motivo) || 'Não foi possível registrar o resgate.',
             'danger'
         );

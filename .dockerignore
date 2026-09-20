@@ -4,4 +4,6 @@ node_modules
 .agents
 .vscode
 *.log
-link.txt
+.env*
+docs/legacy_sql
+

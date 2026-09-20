@@ -119,7 +119,7 @@ window.gerarReciboVenda = async function (saleKey) {
     const row = linhaDaVendaParaRecibo(saleKey);
     if (!row) return;
     // No projeto de origem isto era `garantirPDF()`, que baixava o jsPDF sob
-    // demanda. A Alabama carrega as bibliotecas com <script defer> no
+    // demanda. O sistema carrega as bibliotecas com <script defer> no
     // index.html e checa com `pdfDisponivel()`, que já avisa por toast quando
     // ainda estão carregando — usar a função da casa evita duas maneiras
     // diferentes de resolver o mesmo problema no mesmo app.

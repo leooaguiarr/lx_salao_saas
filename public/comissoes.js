@@ -113,8 +113,7 @@ function atendimentosAntigosNoPeriodo() {
 /* --- Tela ---------------------------------------------------------------- */
 
 function renderComissoes() {
-    // `ehBarbeiro()` e o nome que a Alabama usa para o que o clone chamava de
-    // `ehAcessoRestrito()` — mesma regra, so um nome por conceito.
+    // `ehBarbeiro()` representa o acesso restrito a nível de profissional da equipe.
     const ehDono = !(DataService.isAuthenticated() && DataService.ehBarbeiro());
 
     const aviso = document.getElementById('comissoes-schema-warning');

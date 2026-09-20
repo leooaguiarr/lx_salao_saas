@@ -1,6 +1,6 @@
 -- ============================================================
 -- ENSAIO — patch da Fase E (script 23, seção 8) em finalizar_venda
--- Cole e execute no SQL Editor do Supabase da Alabama.
+-- Cole e execute no SQL Editor do Supabase.
 -- ============================================================
 --
 -- PRÉ-REQUISITO: docs/23_crediario_1_tabelas_e_rpcs.sql e

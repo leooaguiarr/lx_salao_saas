@@ -34,7 +34,7 @@ const STATE_KEYS = {
 };
 
 // Logomarca exibida enquanto o salão não envia a sua nas Configurações.
-const LOGO_PADRAO = '/assets/logo_alabama.png';
+const LOGO_PADRAO = '/assets/logo_lexion.png';
 
 // Versão exibida no rodapé do login. Serve para saber o que está no ar sem
 // abrir o painel da Vercel — necessário desde que o deploy deixou de ser
@@ -84,8 +84,8 @@ let data = {
     salonMembers: [],
     // False somente quando o login existe MAS a migração não foi aplicada. A
     // aba continua abrindo e avisa o passo que falta, sem derrubar o resto do
-    // app. Todas começam `true` porque o banco da Alabama já tem os scripts
-    // 14 a 28 aplicados (10/09/2026) — quem corrige isso é o loadAll.
+    // app. Todas começam `true` porque o banco do SaaS já tem os scripts
+    // 14 a 28 aplicados — quem corrige isso é o loadAll.
     salesSchemaReady: true,
     commissionsSchemaReady: true,
     creditSchemaReady: true,
@@ -138,7 +138,7 @@ async function loadData(escopo = 'completo') {
         data.professionals = sanitizeForStorage(loaded.professionals) || [];
         // Sem a migração 28 a coluna não vem na resposta do Supabase. Com a
         // lista vazia não dá para concluir nada, e o padrão é "existe": o banco
-        // da Alabama já rodou o 28. Mora junto com `professionals` porque lê
+        // do SaaS já rodou o 28. Mora junto com `professionals` porque lê
         // `professionals[0]` — solto, estouraria na volta em que ela não veio.
         data.accessSchemaReady = !data.professionals.length || 'email' in data.professionals[0];
     }
@@ -411,7 +411,7 @@ function initNavigation() {
 
     /* O endereço da aba vive no HASH (#vendas), nunca no caminho — e isso é
        decisão, não limitação. O caminho pertence ao link público, onde
-       `/alabama` é o nome do salão: com a aba no caminho, quem recebesse o
+       `/lexion` é o exemplo de slug: com a aba no caminho, quem recebesse o
        link de agendamento poderia trocar o slug por `/configuracoes` e cair na
        tela de login do painel. Atrás do `#`, ninguém tropeça nisso. */
     const ABAS_CONHECIDAS = [...menuItems].map(m => m.getAttribute('data-target')).filter(Boolean);
@@ -5324,7 +5324,7 @@ function updateUserProfileUI() {
         if (salonName) {
             salonNameEl.innerText = salonName;
         } else {
-            salonNameEl.innerHTML = 'Alabama<span class="logo-dot">.</span>';
+            salonNameEl.innerHTML = 'Lexion<span class="logo-dot">.</span>';
         }
     }
 
@@ -5332,7 +5332,7 @@ function updateUserProfileUI() {
     // arquivo padrão da marca. Trocar o src, e não o innerHTML — <img> é vazio.
     if (logoIconEl) {
         logoIconEl.src = savedAvatar || LOGO_PADRAO;
-        logoIconEl.alt = salonName || 'Alabama Barbearia';
+        logoIconEl.alt = salonName || 'Lexion Salão & Barbearia';
     }
 }
 

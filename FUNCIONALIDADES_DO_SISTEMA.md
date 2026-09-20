@@ -1,17 +1,17 @@
-# Alabama Barbearia — Sistema de Gestão e Agendamento
+# Lexion Salão & Barbearia — Sistema SaaS de Gestão e Agendamento
 
 ## Documento completo de funcionalidades
 
-**Versão documentada:** 1.5.0  
-**Tipo de sistema:** aplicação web responsiva para barbearias e salões  
-**Acesso público:** [alabamabarbearia.com.br](https://alabamabarbearia.com.br)  
-**Desenvolvimento:** Lexion Consultoria
+**Versão documentada:** 2.0.0  
+**Tipo de sistema:** aplicação web responsiva multi-tenant para salões de beleza, barbearias e clínicas de estética  
+**Acesso público:** [salao.lexionconsultoria.tech](https://salao.lexionconsultoria.tech)  
+**Desenvolvimento:** Lexion Consultoria Tecnológica
 
 ---
 
 ## 1. Visão geral
 
-O sistema da Alabama Barbearia reúne, em um único ambiente, as principais atividades necessárias para administrar a rotina do estabelecimento. Ele permite organizar a agenda, cadastrar clientes, controlar profissionais, acompanhar comissões, registrar receitas e despesas, abrir e fechar o caixa, controlar produtos e estoque e oferecer agendamento on-line ao cliente final.
+O sistema do Lexion Salão & Barbearia reúne, em um único ambiente, as principais atividades necessárias para administrar a rotina do estabelecimento. Ele permite organizar a agenda, cadastrar clientes, controlar profissionais, acompanhar comissões, registrar receitas e despesas, abrir e fechar o caixa, controlar produtos e estoque e oferecer agendamento on-line ao cliente final.
 
 O painel administrativo foi projetado para funcionar tanto no computador quanto no celular. Já o cliente da barbearia utiliza um link público de agendamento, sem precisar criar uma conta ou instalar aplicativo.
 
@@ -662,7 +662,7 @@ Esses módulos poderão ser retomados futuramente, após definição das regras 
 
 ## 24. Resumo final
 
-O sistema da Alabama Barbearia cobre o ciclo completo da operação:
+O sistema do Lexion Salão & Barbearia cobre o ciclo completo da operação:
 
 1. O estabelecimento configura serviços, equipe, horários, produtos e identidade visual.
 2. O cliente agenda sozinho pelo link público ou é incluído pelo operador.
@@ -679,4 +679,4 @@ O resultado é uma plataforma integrada para organizar o atendimento, reduzir ta
 
 ---
 
-<sub>Documento preparado a partir das funcionalidades implementadas e ativas na versão 1.5.0 do sistema Alabama Barbearia.</sub>
+<sub>Documento preparado a partir das funcionalidades implementadas e ativas no sistema Lexion Salão & Barbearia SaaS.</sub>

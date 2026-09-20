@@ -1,6 +1,6 @@
 -- ============================================================
 -- ENSAIO — script 27 (níveis de acesso) inteiro, com staff simulado
--- Cole e execute no SQL Editor do Supabase da Alabama.
+-- Cole e execute no SQL Editor do Supabase.
 -- ============================================================
 --
 -- PRÉ-REQUISITO: scripts 14 a 26 já aplicados de verdade (finalizar_venda

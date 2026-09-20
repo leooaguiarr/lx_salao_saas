@@ -1,9 +1,9 @@
-# Runbook — Evolução de Vendas + Níveis de Acesso na Alabama (Fase 1: banco)
+# Runbook — Evolução de Vendas + Níveis de Acesso (Fase 1: banco)
 
 > ## ✅ FASE 1 CONCLUÍDA EM 10/09/2026
 >
-> Os scripts 14 a 28 estão **todos aplicados e conferidos** no banco de produção
-> (`ekyonsvyeydfjxdytiyu`). A verificação final devolveu **19 de 19 objetos `ok`**:
+> Os scripts 14 a 28 estão **todos aplicados e conferidos** no banco de produção.
+> A verificação final devolveu **19 de 19 objetos `ok`**:
 > as 9 tabelas, as 4 RPCs, as 4 colunas novas e os dois patches em `finalizar_venda`.
 >
 > **O que resta deste runbook:** só o passo 6 (Edge Function). O passo seguinte do
@@ -11,7 +11,7 @@
 >
 > Este arquivo fica como registro do que foi feito e da ordem que funcionou.
 
-Ordem exata para colar no SQL Editor do Supabase do projeto `ekyonsvyeydfjxdytiyu`.
+Ordem exata para colar no SQL Editor do Supabase.
 Cada linha é um arquivo em `docs/`. **Não pule nenhuma, mesmo as que parecem só
 "correção de permissão".** Depois de cada aplicação real, conferir "erro zero"
 antes de ir para a próxima.
@@ -30,7 +30,7 @@ colado e rodado por você.
 - [x] `docs/diagnostico_banco.sql` — a fundação 01-13 estava intacta.
 - [x] Conferir `salon_members`. **Resultado:** dois logins, os dois `owner`
       (`lexionconsultoriatec@` e `vagner.dobarbosa@`), nenhum `staff` ainda —
-      os barbeiros não têm login. `professional_id` NULL nos dois, que é o
+      os profissionais não têm login. `professional_id` NULL nos dois, que é o
       normal para dono.
 
 ## 1. Fase A-D — núcleo de vendas + comissões (aplicar direto)
@@ -56,7 +56,7 @@ Aplicados em 10/09/2026.
 - [x] `docs/23_crediario_2_patch_real.sql`
 
 > **O ensaio (`23_crediario_2_patch_ENSAIO.sql`) não chegou a rodar.** Ele nunca
-> havia sido executado em lugar nenhum — foi escrito para a Alabama junto com a
+> havia sido executado em lugar nenhum — foi escrito junto com a
 > portabilidade, e cada tentativa descobria um defeito dele. O patch foi aplicado
 > direto, com o aval do Leonardo, por três razões: as quatro âncoras já tinham
 > sido vistas casando (uma tentativa fracassada imprimiu a função inteira já
@@ -110,7 +110,6 @@ Aplicados em 10/09/2026.
 
 - [x] Anotado em `AGENT_HANDOFF.md`: a fase completa, o comportamento do SQL
       Editor do Supabase e a pendência do RLS em `_backup_funcoes`.
-- [ ] Pendência aberta (não corrigida aqui): o `add_niveis_de_acesso.sql` da
-      Alabama não faz `REVOKE ALL FROM public` + `GRANT TO anon` em
+- [ ] Pendência aberta (não corrigida aqui): o `add_niveis_de_acesso.sql` não faz `REVOKE ALL FROM public` + `GRANT TO anon` em
       `meu_papel()`/`meu_profissional()` como a versão de origem — avaliar
       separadamente se isso afeta o link público.

@@ -8,8 +8,7 @@
 --
 -- Continuação de docs/diagnostico_banco.sql (que cobre 1-9 = scripts base,
 -- até add_niveis_de_acesso/add_produtos_e_estoque/add_movimentacao_estoque).
--- Este cobre a Evolução de Vendas + Níveis de Acesso novo, portados de
--- dashboard_salao (ver docs/../PORTABILIDADE_ALABAMA.md):
+-- Este cobre a Evolução de Vendas + Níveis de Acesso novo:
 --
 --   14. 14_vendas_base.sql ............... sales, sale_items, sale_payments
 --   15. 15_finalizacao_venda.sql ......... finalizar_venda, venda_em_json

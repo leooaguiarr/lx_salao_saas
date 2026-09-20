@@ -18,7 +18,7 @@
 
 /* Botão "Chegou agora": ação de encaixe rápido no balcão.
    Estilo secundário elegante (outline translúcido suave em tom dourado nobre),
-   seguindo o modelo da Lexion adaptado para a identidade da Alabama Barbearia,
+   seguindo o modelo da Lexion adaptado para a identidade do Lexion Salão & Barbearia,
    sem competir com o botão principal sólido de "Novo Agendamento". */
 .btn-encaixe {
     background-color: rgba(197, 160, 89, 0.12);

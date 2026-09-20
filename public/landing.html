@@ -11,7 +11,7 @@
     <!-- Font Awesome 6 -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <!-- Estilo de Luxo Qutter -->
-    <link rel="stylesheet" href="qutter-landing.css?v=3">
+    <link rel="stylesheet" href="qutter-landing.css?v=4">
 </head>
 <body>
 
@@ -100,31 +100,6 @@
                     Agendamento online 24h sem aplicativo, cálculo automático de comissões por profissional, frente de caixa com PDV e clube de fidelidade. O software moderno que coloca seu negócio em outro nível.
                 </p>
 
-                <!-- DUAL VALUE PILLS: DUAS ESPECIALIDADES LADO A LADO -->
-                <div class="hero-dual-pills">
-                    <div class="dual-pill-card pill-feminine" onclick="selecionarNicho('salao'); document.getElementById('nichos').scrollIntoView({behavior:'smooth'});">
-                        <div class="pill-icon-wrap">
-                            <i class="fa-solid fa-spray-can-sparkles"></i>
-                        </div>
-                        <div class="pill-text-wrap">
-                            <strong>Para Salões de Beleza & Estética</strong>
-                            <span>Químicas, mechas, escovas, pacotes de sessões e manicure</span>
-                        </div>
-                        <i class="fa-solid fa-chevron-right pill-arrow"></i>
-                    </div>
-
-                    <div class="dual-pill-card pill-masculine" onclick="selecionarNicho('barbearia'); document.getElementById('nichos').scrollIntoView({behavior:'smooth'});">
-                        <div class="pill-icon-wrap">
-                            <i class="fa-solid fa-chair"></i>
-                        </div>
-                        <div class="pill-text-wrap">
-                            <strong>Para Barbearias & Studios</strong>
-                            <span>Encaixes rápidos, navalha, produtos de balcão e agilidade</span>
-                        </div>
-                        <i class="fa-solid fa-chevron-right pill-arrow"></i>
-                    </div>
-                </div>
-
                 <!-- BOTÕES DE AÇÃO CENTRAIS -->
                 <div class="hero-buttons hero-buttons-centered">
                     <button onclick="abrirModalTrial('equipe_4')" class="btn-qutter-gold btn-hero-cta">
@@ -152,6 +127,31 @@
                     <div class="hero-stat">
                         <span class="hero-stat-number">7 Dias</span>
                         <span class="hero-stat-label">Sem Cartão de Crédito</span>
+                    </div>
+                </div>
+
+                <!-- DUAL VALUE PILLS: DUAS ESPECIALIDADES LADO A LADO (BASE DO HERO) -->
+                <div class="hero-dual-pills">
+                    <div class="dual-pill-card pill-feminine" onclick="selecionarNicho('salao'); document.getElementById('nichos').scrollIntoView({behavior:'smooth'});">
+                        <div class="pill-icon-wrap">
+                            <i class="fa-solid fa-spray-can-sparkles"></i>
+                        </div>
+                        <div class="pill-text-wrap">
+                            <strong>Para Salões de Beleza & Estética</strong>
+                            <span>Químicas, mechas, escovas, pacotes de sessões e manicure</span>
+                        </div>
+                        <i class="fa-solid fa-chevron-right pill-arrow"></i>
+                    </div>
+
+                    <div class="dual-pill-card pill-masculine" onclick="selecionarNicho('barbearia'); document.getElementById('nichos').scrollIntoView({behavior:'smooth'});">
+                        <div class="pill-icon-wrap">
+                            <i class="fa-solid fa-chair"></i>
+                        </div>
+                        <div class="pill-text-wrap">
+                            <strong>Para Barbearias & Studios</strong>
+                            <span>Encaixes rápidos, navalha, produtos de balcão e agilidade</span>
+                        </div>
+                        <i class="fa-solid fa-chevron-right pill-arrow"></i>
                     </div>
                 </div>
             </div>

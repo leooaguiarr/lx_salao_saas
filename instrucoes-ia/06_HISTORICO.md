@@ -16,3 +16,4 @@ Barbearia (julho a setembro de 2026), está em
 | 20/09/2026 | Correções de layout: barra lateral sem rolagem, cabeçalho sem transbordo, busca global removida. |
 | 21/09/2026 | **Painel instalável como aplicativo (PWA)**: manifest, service worker, ícones, botão "Instalar aplicativo" (iPhone com passo a passo), barra de abas inferior no celular, `minimum-scale=1`. Versão 2.1.0. |
 | 21/09/2026 | Criada a pasta `instrucoes-ia/`, que reúne as instruções para agentes. Substitui o `PROJECT_HANDOVER.md` da raiz. Correção: o botão de instalar aparecia mesmo com o app instalado (`[hidden]` vencido pelo CSS). |
+| 21/09/2026 | **Cobrança protegida**: o webhook do Asaas passa a exigir token (`ASAAS_WEBHOOK_TOKEN`) e a responder 500 quando o banco recusa; migração 07 tira a `process_asaas_webhook` da chave anon e congela as colunas de cobrança de `business_info` para o navegador. `GEMINI.md` na raiz e regras para agentes em paralelo. |

@@ -47,7 +47,12 @@ crediário são travados apenas na tela. Ver *Riscos*.
 - **Deploy automático**: webhook do GitHub → Coolify. Todo push na `main` vai
   ao ar em cerca de 1 minuto.
 - **Variáveis de ambiente no Coolify** (não estão no repositório):
-  `SUPABASE_URL`, `SUPABASE_SERVICE_ROLE_KEY`, `ASAAS_API_KEY`, `ASAAS_ENV`.
+  `SUPABASE_URL`, `SUPABASE_SERVICE_ROLE_KEY`, `ASAAS_API_KEY`, `ASAAS_ENV`,
+  `ASAAS_WEBHOOK_TOKEN` (o mesmo valor do "Token de autenticação" da tela do
+  webhook no painel do Asaas; sem ele o webhook recusa tudo).
+- **Conferir a configuração sem abrir o Coolify**: `GET /api/health` diz
+  `webhookProtegido` (token configurado?) e `chaveSupabase` (tem que ser
+  `service_role`). Nunca mostra o valor de segredo nenhum.
 - **Asaas em produção** (conferido em 21/09/2026 por `GET /api/health` →
   `"asaasEnv":"production"`). Cobrança real.
 
@@ -74,16 +79,28 @@ crediário são travados apenas na tela. Ver *Riscos*.
   webhook → salão `active`).
 - Se o `SUPABASE_SERVICE_ROLE_KEY` está configurado no Coolify. Sem ele o
   `server.js` cai na chave anon, e o cadastro de salão pela Admin API falha.
+  Conferir pelo campo `chaveSupabase` do `/api/health`.
 
 ## Riscos abertos (prioridade)
 
-1. **Webhook do Asaas sem autenticação.** `POST /api/asaas/webhook`
-   (`server.js`) aceita qualquer requisição e repassa o evento para a RPC
-   `process_asaas_webhook`. Quem conhecer a URL pode forjar um
-   `PAYMENT_CONFIRMED` e ativar um salão sem pagar. Correção: conferir o
-   cabeçalho `asaas-access-token` contra um segredo em variável de ambiente
-   (o token é configurado no painel do Asaas, na tela do webhook).
-2. **Duas RPCs que o front chama não estão no schema do SaaS** (suspeita,
+1. **Cobrança burlável — corrigido no código em 21/09/2026, falta aplicar.**
+   Eram três portas para um salão ficar ativo ou mudar de plano sem pagar:
+   webhook sem token, `process_asaas_webhook` executável pela chave anon, e o
+   dono podendo editar `status`/`plan_id`/`trial_ends_at` da própria linha.
+   O `server.js` agora exige o token; a migração
+   `07_protege_cobranca.sql` fecha as outras duas. **Só vale depois de:**
+   `ASAAS_WEBHOOK_TOKEN` no Coolify e no Asaas, deploy, e a 07 rodada no
+   Studio com `chaveSupabase: service_role` confirmado antes.
+2. **A chave anon lê e grava tabelas direto.** As políticas
+   "Agendamento: ..." da migração 01 dão à chave pública (que está no
+   `config.js`) leitura de **todos** os `business_info`, `appointments` e
+   `professional_blocks` de todos os salões, e INSERT livre em
+   `appointments`. Conferido em 21/09/2026: a anon enxerga a linha de
+   `business_info` do salão existente. O link público já usa só RPCs
+   (migração 06), então essas políticas provavelmente sobraram — mas
+   removê-las mexe no agendamento público e precisa de teste ponta a ponta
+   antes.
+3. **Duas RPCs que o front chama não estão no schema do SaaS** (suspeita,
    levantada em 21/09/2026). `pagar_comissoes` (baixa de comissões) e
    `registrar_movimento_estoque` (toda entrada/saída de estoque) existem só nos
    scripts antigos (`docs/legacy_sql/21_comissoes.sql` e
@@ -91,25 +108,26 @@ crediário são travados apenas na tela. Ver *Riscos*.
    criam. É o mesmo buraco que derrubou o link público e foi fechado pela 06.
    **Não dá para confirmar pela chave anon** — conferir no SQL Editor:
    `select proname from pg_proc where proname in ('pagar_comissoes','registrar_movimento_estoque');`
-   Se vier vazio, falta uma migração `07` portando as duas para o schema atual.
-3. **Limites de plano de estoque, fidelidade e crediário só no front-end.** Um
+   Se vier vazio, falta uma migração nova portando as duas para o schema atual.
+4. **Limites de plano de estoque, fidelidade e crediário só no front-end.** Um
    usuário técnico contorna a trava do `saas-plan.js` pelo console. O limite de
    profissionais já é garantido por gatilho no banco.
-4. **Sem testes automáticos no repositório.** A Alabama tinha 28
+5. **Sem testes automáticos no repositório.** A Alabama tinha 28
    (`lx_salao_alabama/testes/`); nenhum veio para o SaaS. Só existem as
    ferramentas de [ferramentas/](ferramentas/).
-5. **Fotos em base64 no banco** (logo, profissionais, produtos). Pesam em cada
+6. **Fotos em base64 no banco** (logo, profissionais, produtos). Pesam em cada
    carga. O bucket do Storage já existe no Coolify, mas não está ligado.
 
 ## O que vem a seguir
 
 Da lista do dono do projeto, em ordem sugerida:
 
-1. Fechar o risco 1 (token do webhook do Asaas).
-2. Conferir o risco 2 no SQL Editor e, se faltar, escrever a migração `07`.
-3. Validar um pagamento real de assinatura ponta a ponta.
-4. **Painel Super Admin** da Lexion: todos os salões, faturamento, churn.
-5. **WhatsApp automático** (Evolution API ou Z-API): lembrete 2h antes,
+1. Terminar de aplicar o risco 1 (token no Coolify e no Asaas, migração 07).
+2. Fechar o risco 2 (políticas anon), com teste do link público.
+3. Conferir o risco 3 no SQL Editor e, se faltar, escrever a migração.
+4. Validar um pagamento real de assinatura ponta a ponta.
+5. **Painel Super Admin** da Lexion: todos os salões, faturamento, churn.
+6. **WhatsApp automático** (Evolution API ou Z-API): lembrete 2h antes,
    pós-venda e aniversário.
-6. **Upload de imagens no Supabase Storage** no lugar do base64.
-7. Trazer os testes da Alabama para `instrucoes-ia/ferramentas/` ou `tests/`.
+7. **Upload de imagens no Supabase Storage** no lugar do base64.
+8. Trazer os testes da Alabama para `instrucoes-ia/ferramentas/` ou `tests/`.

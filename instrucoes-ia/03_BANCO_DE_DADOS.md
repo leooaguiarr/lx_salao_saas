@@ -23,6 +23,13 @@
 | `04_rpcs_finalizar_venda_e_fidelidade.sql` | `finalizar_venda`, `receber_crediario`, `resgatar_fidelidade`, `venda_em_json` |
 | `05_tema_do_painel.sql` | coluna `theme` em `business_info` |
 | `06_rpcs_publicas.sql` | RPCs do link público, freio por IP, colunas que faltavam |
+| `07_protege_cobranca.sql` | `process_asaas_webhook` só para a service_role; gatilho que impede o navegador de mudar `status`, `plan_id`, `trial_ends_at` e ids do Asaas |
+
+**Colunas de cobrança de `business_info` são do servidor.** O gatilho
+`trg_protege_colunas_de_cobranca` descarta, sem erro, qualquer mudança nelas
+vinda de `anon` ou `authenticated`. Para mudar plano ou status, é pelo
+servidor (service_role), pela `process_asaas_webhook` ou pelo SQL Editor —
+nunca pelo `saveData`.
 
 `docs/legacy_sql/` guarda os 38 scripts da era Alabama. **São histórico:
 não rode.** Servem para consultar como uma função era, e muitos comentários do

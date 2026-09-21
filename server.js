@@ -9,6 +9,7 @@
  * - Agendamento público dinâmico por slug: /<slug-do-salao>
  * - Endpoints de autenticação, onboarding e webhook Asaas: /api/*
  */
+const crypto = require('crypto');
 const http = require('http');
 const fs = require('fs');
 const path = require('path');
@@ -36,6 +37,36 @@ const asaasService = require('./asaas-service');
 
 const SUPABASE_URL = process.env.SUPABASE_URL || 'https://apisalao.lexionconsultoria.tech';
 const SUPABASE_KEY = process.env.SUPABASE_SERVICE_ROLE_KEY || process.env.SUPABASE_ANON_KEY || 'eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpc3MiOiJzdXBhYmFzZSIsImlhdCI6MTc4OTg0NjIwMCwiZXhwIjo0OTQ1NTE5ODAwLCJyb2xlIjoiYW5vbiJ9.E9S2LlOKz5rNOPgg-gqwb__Mt0P4KS65xqBRCc70tYE';
+
+// Token que o Asaas manda no cabeçalho `asaas-access-token` de cada webhook.
+// É o "Token de autenticação" cadastrado na tela do webhook, no painel do
+// Asaas, e o mesmo valor vai nesta variável no Coolify.
+//
+// Sem ele, qualquer um que soubesse a URL podia mandar um PAYMENT_CONFIRMED
+// inventado e ativar a assinatura de um salão sem pagar. Por isso a regra é
+// fechada: variável vazia = webhook recusa tudo, nunca aceita tudo.
+const ASAAS_WEBHOOK_TOKEN = process.env.ASAAS_WEBHOOK_TOKEN || '';
+
+// Compara em tempo constante: com `===`, o tempo de resposta cresce a cada
+// caractere certo, e dá para descobrir o token por tentativa. O hash antes
+// iguala o tamanho, que o timingSafeEqual exige.
+function tokenDoWebhookConfere(recebido) {
+    if (!ASAAS_WEBHOOK_TOKEN || typeof recebido !== 'string' || !recebido) return false;
+    const resumo = valor => crypto.createHash('sha256').update(valor).digest();
+    return crypto.timingSafeEqual(resumo(recebido), resumo(ASAAS_WEBHOOK_TOKEN));
+}
+
+// Papel da chave do Supabase em uso, lido do próprio JWT (sem validar a
+// assinatura: é só para diagnóstico). O webhook e o cadastro de salão
+// precisam da service_role; com a anon, o banco recusa as duas coisas.
+function papelDaChaveSupabase() {
+    try {
+        const carga = JSON.parse(Buffer.from(SUPABASE_KEY.split('.')[1], 'base64url').toString('utf8'));
+        return carga.role || 'desconhecido';
+    } catch {
+        return 'invalida';
+    }
+}
 
 // Helper para ler corpo JSON de requisições POST
 function parseJsonBody(req) {
@@ -72,9 +103,14 @@ const server = http.createServer(async (req, res) => {
         // Rota de Health Check
         if (req.url === '/api/health' && req.method === 'GET') {
             res.writeHead(200);
-            res.end(JSON.stringify({ 
-                status: 'healthy', 
+            // Os dois campos de configuração respondem sim/não e o papel da
+            // chave — nunca o valor de segredo nenhum. Servem para conferir o
+            // Coolify sem abrir o painel dele.
+            res.end(JSON.stringify({
+                status: 'healthy',
                 asaasEnv: asaasService.ASAAS_ENV,
+                webhookProtegido: !!ASAAS_WEBHOOK_TOKEN,
+                chaveSupabase: papelDaChaveSupabase(),
                 timestamp: new Date().toISOString()
             }));
             return;
@@ -367,6 +403,19 @@ const server = http.createServer(async (req, res) => {
 
         // Rota: Receber Webhook do Asaas
         if (req.url === '/api/asaas/webhook' && req.method === 'POST') {
+            // Confere o token ANTES de ler o corpo: requisição sem autorização
+            // não chega nem perto do banco. 401 faz o Asaas marcar a entrega
+            // como falha no painel dele, que é onde um token errado aparece.
+            if (!tokenDoWebhookConfere(req.headers['asaas-access-token'])) {
+                console.warn(ASAAS_WEBHOOK_TOKEN
+                    ? '[Asaas Webhook] Recusado: token ausente ou diferente.'
+                    : '[Asaas Webhook] Recusado: ASAAS_WEBHOOK_TOKEN não configurado no servidor.');
+                req.resume();
+                res.writeHead(401);
+                res.end(JSON.stringify({ received: false, error: 'Não autorizado' }));
+                return;
+            }
+
             try {
                 const webhookData = await parseJsonBody(req);
                 console.log(`[Asaas Webhook] Evento recebido: ${webhookData.event}`);
@@ -386,8 +435,20 @@ const server = http.createServer(async (req, res) => {
                         })
                     });
 
-                    const rpcResult = await rpcResponse.json();
+                    const rpcResult = await rpcResponse.json().catch(() => null);
                     console.log('[Asaas Webhook] RPC Resultado:', rpcResult);
+
+                    // Antes o webhook respondia 200 mesmo com o banco recusando a
+                    // chamada — o Asaas dava o evento por entregue e o pagamento
+                    // sumia sem rastro. Com 500 ele tenta de novo e a falha
+                    // aparece no painel. (Salão não localizado não é falha: a
+                    // RPC responde 200 com ok: false, e isso segue como antes.)
+                    if (!rpcResponse.ok) {
+                        console.error(`[Asaas Webhook] Banco recusou (HTTP ${rpcResponse.status}). Chave em uso: ${papelDaChaveSupabase()}.`);
+                        res.writeHead(500);
+                        res.end(JSON.stringify({ received: false, error: 'Falha ao registrar o evento' }));
+                        return;
+                    }
                 }
 
                 res.writeHead(200);

@@ -191,6 +191,15 @@ function formatDateDisplay(date) {
     return formatted.charAt(0).toUpperCase() + formatted.slice(1);
 }
 
+// Versão curta, para o cabeçalho. Por extenso ("Domingo, 20 de setembro de
+// 2026") a data disputava espaço com as ações e o chip do plano e acabava
+// cortada na borda. Quem precisa da data inteira a tem no título da Agenda.
+function formatDateShort(date) {
+    const texto = date.toLocaleDateString('pt-BR', { weekday: 'short', day: '2-digit', month: 'short' })
+        .replace(/\./g, '');
+    return texto.charAt(0).toUpperCase() + texto.slice(1);
+}
+
 function getLocalDateString(date) {
     // Returns YYYY-MM-DD
     const y = date.getFullYear();
@@ -5571,7 +5580,10 @@ window.addEventListener('DOMContentLoaded', async () => {
     aplicarNivelDeAcesso();
 
     // Set display header date
-    document.getElementById('current-date-display').querySelector('span').innerText = formatDateDisplay(currentSelectedDate);
+    const campoData = document.getElementById('current-date-display');
+    campoData.querySelector('span').innerText = formatDateShort(currentSelectedDate);
+    // A data inteira fica no title, para quem passar o mouse conferir o ano.
+    campoData.title = formatDateDisplay(currentSelectedDate);
 
     // Set document initial render
     renderDashboard();

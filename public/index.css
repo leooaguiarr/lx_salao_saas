@@ -223,7 +223,10 @@ h1, h2, h3, h4, h5, h6 {
 
 /* Sidebar Styling */
 .sidebar {
-    width: 280px;
+    /* 248px acomoda o item mais longo ("Kanban de Leads") sem sobra: a barra é
+       um índice, e cada pixel aqui sai da agenda, que é onde se trabalha. */
+    width: 248px;
+    flex-shrink: 0;
     background-color: var(--bg-secondary);
     border-right: 1px solid var(--border-color);
     display: flex;
@@ -241,7 +244,7 @@ h1, h2, h3, h4, h5, h6 {
 }
 
 .sidebar-header {
-    padding: 24px;
+    padding: 18px 16px 12px;
     display: flex;
     align-items: center;
     justify-content: space-between;
@@ -250,8 +253,8 @@ h1, h2, h3, h4, h5, h6 {
 .logo {
     display: flex;
     align-items: center;
-    gap: 12px;
-    font-size: 22px;
+    gap: 10px;
+    font-size: 18px;
     font-weight: 800;
     letter-spacing: -0.5px;
 }
@@ -264,8 +267,8 @@ h1, h2, h3, h4, h5, h6 {
    comportamento normal de avatar. O anel dourado sustenta a forma mesmo quando a
    imagem tem fundo transparente. */
 .logo-mark {
-    width: 42px;
-    height: 42px;
+    width: 34px;
+    height: 34px;
     object-fit: cover;
     border-radius: 50%;
     border: 1px solid var(--primary-edge);
@@ -301,10 +304,10 @@ h1, h2, h3, h4, h5, h6 {
 
 .sidebar-menu {
     flex: 1;
-    padding: 12px 16px;
+    padding: 4px 12px 12px;
     display: flex;
     flex-direction: column;
-    gap: 6px;
+    gap: 2px;
     overflow-y: auto;
 }
 
@@ -313,16 +316,16 @@ h1, h2, h3, h4, h5, h6 {
 .menu-group {
     display: flex;
     flex-direction: column;
-    gap: 4px;
+    gap: 2px;
 }
 
 .menu-group + .menu-group {
-    margin-top: 18px;
+    margin-top: 12px;
 }
 
 .menu-group-label {
-    padding: 0 16px 6px;
-    font-size: 11px;
+    padding: 6px 12px 3px;
+    font-size: 10px;
     font-weight: 700;
     letter-spacing: 0.08em;
     text-transform: uppercase;
@@ -339,20 +342,20 @@ h1, h2, h3, h4, h5, h6 {
 .menu-item {
     display: flex;
     align-items: center;
-    gap: 14px;
-    padding: 12px 16px;
+    gap: 12px;
+    padding: 9px 12px;
     color: var(--text-muted);
     text-decoration: none;
     border-radius: var(--radius-md);
     font-weight: 500;
-    font-size: 15px;
+    font-size: 14px;
     transition: var(--transition);
     border: 1px solid transparent;
 }
 
 .menu-item i {
-    font-size: 18px;
-    width: 20px;
+    font-size: 16px;
+    width: 18px;
     text-align: center;
 }
 
@@ -420,7 +423,7 @@ h1, h2, h3, h4, h5, h6 {
 }
 
 .sidebar-footer {
-    padding: 20px;
+    padding: 12px 16px;
     border-top: 1px solid var(--border-color);
 }
 
@@ -466,6 +469,10 @@ h1, h2, h3, h4, h5, h6 {
 /* Main Content Area */
 .main-content {
     flex: 1;
+    /* Um item flex não encolhe abaixo do próprio conteúdo sem isto. Era o que
+       fazia o cabeçalho empurrar a página para fora da tela — a data ficava
+       cortada na borda direita — em vez de as regras de encolher agirem. */
+    min-width: 0;
     display: flex;
     flex-direction: column;
     height: 100vh;
@@ -2937,7 +2944,9 @@ h1, h2, h3, h4, h5, h6 {
     
     .sidebar {
         position: fixed;
-        left: -280px;
+        /* Acompanha a largura da barra: um valor maior a deixaria escondida
+           longe demais e a animação de abrir começaria fora da tela. */
+        left: -248px;
         top: 0;
         bottom: 0;
         z-index: 1100;
@@ -2945,6 +2954,19 @@ h1, h2, h3, h4, h5, h6 {
     }
     .sidebar.show {
         left: 0;
+    }
+
+    /* Aqui a barra é um painel que abre por cima da tela inteira, e o ponteiro
+       é o dedo: os itens voltam à altura de alvo de toque. O aperto do
+       desktop existe para caber a lista sem rolagem, problema que não há
+       quando o painel ocupa a tela toda. */
+    .menu-item {
+        padding: 12px 14px;
+        font-size: 15px;
+    }
+    .menu-item i {
+        font-size: 18px;
+        width: 20px;
     }
     .sidebar-close {
         display: block;

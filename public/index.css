@@ -4080,6 +4080,11 @@ body.acesso-barbeiro #page-configuracoes {
 .sidebar-instalar:hover {
     background: var(--primary-light);
 }
+/* O display: flex acima vence o [hidden] do navegador; sem isto o botão
+   aparecia mesmo com o app já instalado. */
+.sidebar-instalar[hidden] {
+    display: none;
+}
 
 /* Modal com o passo a passo do iPhone. */
 .instalar-app {

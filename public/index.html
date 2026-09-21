@@ -28,17 +28,17 @@
     <!-- Font Awesome Icons -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <!-- CSS Customizado -->
-    <link rel="stylesheet" href="/index.css?v=60">
-    <link rel="stylesheet" href="/estoque.css?v=60">
-    <link rel="stylesheet" href="/ajuda.css?v=60">
-    <link rel="stylesheet" href="/auth.css?v=60">
+    <link rel="stylesheet" href="/index.css?v=61">
+    <link rel="stylesheet" href="/estoque.css?v=61">
+    <link rel="stylesheet" href="/ajuda.css?v=61">
+    <link rel="stylesheet" href="/auth.css?v=61">
     <!-- Evolução de Vendas. Depois dos anteriores de propósito: estes só
          acrescentam as telas novas e não redefinem nada do index.css. -->
-    <link rel="stylesheet" href="/vendas.css?v=60">
-    <link rel="stylesheet" href="/checkout.css?v=60">
-    <link rel="stylesheet" href="/comissoes.css?v=60">
-    <link rel="stylesheet" href="/crediario.css?v=60">
-    <link rel="stylesheet" href="/fidelidade.css?v=60">
+    <link rel="stylesheet" href="/vendas.css?v=61">
+    <link rel="stylesheet" href="/checkout.css?v=61">
+    <link rel="stylesheet" href="/comissoes.css?v=61">
+    <link rel="stylesheet" href="/crediario.css?v=61">
+    <link rel="stylesheet" href="/fidelidade.css?v=61">
 </head>
 <body class="dark-theme">
     <!--
@@ -311,16 +311,10 @@
                     <h1 class="header-title" id="page-title">Dashboard</h1>
                 </div>
 
-                <!-- Busca global: acha um cliente por nome ou WhatsApp de
-                     qualquer aba, sem obrigar a passar pela tela de Clientes.
-                     Fica escondida no celular, onde não há largura para ela e a
-                     própria aba de Clientes já tem o campo de busca. -->
-                <div class="header-search" id="header-search">
-                    <i class="fa-solid fa-magnifying-glass"></i>
-                    <input type="search" id="busca-global" autocomplete="off"
-                           placeholder="Buscar clientes, telefone ou WhatsApp...">
-                    <div class="busca-global-resultados" id="busca-global-resultados" hidden></div>
-                </div>
+                <!-- Não há campo de busca aqui: o cabeçalho já carrega as duas
+                     ações do dia, o sino e o plano, e a busca só cabia às custas
+                     de algo encostar na borda. Quem procura cliente usa o campo
+                     da própria aba Clientes. -->
 
                 <div class="header-right">
                     <div class="quick-actions">
@@ -3013,35 +3007,35 @@
     <!-- Estes três também levam versão: o servidor manda cache de um dia para
          arquivos estáticos, e sem o ?v= uma correção aqui só chegaria ao
          navegador de quem já usou o sistema no dia seguinte. -->
-    <script src="/config.js?v=60"></script>
-    <script src="/theme.js?v=60"></script>
-    <script src="/saas-plan.js?v=60"></script>
-    <script src="/api.js?v=60"></script>
+    <script src="/config.js?v=61"></script>
+    <script src="/theme.js?v=61"></script>
+    <script src="/saas-plan.js?v=61"></script>
+    <script src="/api.js?v=61"></script>
 
     <!-- JavaScript Principal -->
-    <script src="/app.js?v=60"></script>
+    <script src="/app.js?v=61"></script>
 
     <!-- Funcionalidades acrescentadas depois. A ordem importa: elas leem o
          estado global e as funções de cálculo que app.js define. -->
-    <script src="/estoque.js?v=60"></script>
-    <script src="/encaixe.js?v=60"></script>
-    <script src="/ajuda.js?v=60"></script>
+    <script src="/estoque.js?v=61"></script>
+    <script src="/encaixe.js?v=61"></script>
+    <script src="/ajuda.js?v=61"></script>
 
     <!-- Evolução de Vendas (banco: docs/14 a 28). A ordem entre eles TAMBÉM
          importa, e não é a mesma coisa que a ordem acima: `venda-calculo`
          precisa das constantes de `vendas-base`, `checkout` precisa do cálculo,
          e `recibo` é chamado no fim do checkout. Portados do projeto de origem
          (`lexion_salao`), onde nasceram como 22- a 28- e foram testados. -->
-    <script src="/vendas-base.js?v=60"></script>
-    <script src="/venda-calculo.js?v=60"></script>
-    <script src="/checkout.js?v=60"></script>
-    <script src="/comissoes.js?v=60"></script>
-    <script src="/crediario.js?v=60"></script>
-    <script src="/fidelidade.js?v=60"></script>
-    <script src="/recibo.js?v=60"></script>
+    <script src="/vendas-base.js?v=61"></script>
+    <script src="/venda-calculo.js?v=61"></script>
+    <script src="/checkout.js?v=61"></script>
+    <script src="/comissoes.js?v=61"></script>
+    <script src="/crediario.js?v=61"></script>
+    <script src="/fidelidade.js?v=61"></script>
+    <script src="/recibo.js?v=61"></script>
 
     <!-- Barra superior: lê o estado e os cálculos de todos os anteriores
          (clientes, estoque mínimo, crediário atrasado), por isso vem por último. -->
-    <script src="/topbar.js?v=60"></script>
+    <script src="/topbar.js?v=61"></script>
 </body>
 </html>

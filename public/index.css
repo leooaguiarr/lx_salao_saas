@@ -498,9 +498,11 @@ h1, h2, h3, h4, h5, h6 {
     display: flex;
     align-items: center;
     gap: 16px;
-    /* Sem isto o título e os botões disputam largura com a busca, e quem perde
-       é sempre a busca: ela encolhe até virar um círculo com a lupa dentro. */
-    flex-shrink: 0;
+    /* Se faltar largura, quem cede é este lado: o nome da tela é a informação
+       mais dispensável do cabeçalho — a pessoa acabou de clicar no item do
+       menu e sabe onde está. As ações e os avisos, à direita, não encolhem. */
+    flex-shrink: 1;
+    min-width: 0;
 }
 
 .sidebar-toggle {
@@ -516,6 +518,10 @@ h1, h2, h3, h4, h5, h6 {
     font-size: 24px;
     font-weight: 800;
     letter-spacing: -0.5px;
+    /* Reticências em vez de empurrar o resto do cabeçalho para fora da tela. */
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
 }
 
 .header-right {
@@ -523,121 +529,6 @@ h1, h2, h3, h4, h5, h6 {
     align-items: center;
     gap: 20px;
     flex-shrink: 0;
-}
-
-/* --- Busca global do cabeçalho ------------------------------------------- */
-.header-search {
-    position: relative;
-    /* Ocupa a sobra entre o título e as ações, e nunca abaixo de um tamanho em
-       que ainda dá para ler o que se digita. */
-    flex: 1 1 220px;
-    min-width: 200px;
-    max-width: 460px;
-    margin: 0 24px;
-}
-
-.header-search > i {
-    position: absolute;
-    left: 16px;
-    top: 50%;
-    transform: translateY(-50%);
-    color: var(--text-muted);
-    font-size: 14px;
-    pointer-events: none;
-}
-
-.header-search input {
-    width: 100%;
-    padding: 11px 16px 11px 42px;
-    border-radius: var(--radius-full);
-    border: 1px solid var(--border-color);
-    background-color: var(--bg-secondary);
-    color: var(--text-main);
-    font-family: inherit;
-    font-size: 14px;
-    transition: var(--transition);
-}
-
-.header-search input::placeholder {
-    color: var(--text-muted);
-}
-
-.header-search input:focus {
-    outline: none;
-    border-color: var(--border-color-active);
-    background-color: var(--bg-tertiary);
-}
-
-/* O X nativo do type=search aparece em cinza-claro do sistema e destoa;
-   o campo já fecha no Esc e ao clicar fora. */
-.header-search input::-webkit-search-cancel-button {
-    -webkit-appearance: none;
-}
-
-.busca-global-resultados {
-    position: absolute;
-    top: calc(100% + 8px);
-    left: 0;
-    right: 0;
-    background-color: var(--bg-tertiary);
-    border: 1px solid var(--border-color);
-    border-radius: var(--radius-md);
-    box-shadow: var(--shadow-main);
-    overflow: hidden;
-    max-height: 380px;
-    overflow-y: auto;
-    z-index: 60;
-}
-
-.busca-global-item {
-    display: flex;
-    align-items: center;
-    gap: 12px;
-    width: 100%;
-    padding: 12px 16px;
-    background: none;
-    border: none;
-    border-bottom: 1px solid var(--border-color);
-    color: var(--text-main);
-    font-family: inherit;
-    font-size: 14px;
-    text-align: left;
-    cursor: pointer;
-    transition: var(--transition);
-}
-
-.busca-global-item:last-child {
-    border-bottom: none;
-}
-
-.busca-global-item:hover,
-.busca-global-item:focus-visible {
-    background-color: var(--primary-light);
-    outline: none;
-}
-
-.busca-global-item i {
-    color: var(--text-muted);
-    width: 16px;
-    text-align: center;
-}
-
-.busca-global-item .bg-nome {
-    font-weight: 600;
-}
-
-.busca-global-item .bg-detalhe {
-    display: block;
-    font-size: 12px;
-    color: var(--text-muted);
-    font-weight: 400;
-}
-
-.busca-global-vazio {
-    padding: 16px;
-    color: var(--text-muted);
-    font-size: 13px;
-    text-align: center;
 }
 
 /* --- Sino de avisos ------------------------------------------------------ */
@@ -775,35 +666,6 @@ h1, h2, h3, h4, h5, h6 {
     color: var(--danger);
 }
 
-/* Sem largura para tudo, a ordem de sacrifício é: primeiro a data (está no
-   relógio do aparelho), depois a busca (a aba Clientes tem a sua), depois o
-   chip do plano. As ações rápidas e o sino ficam até o fim — são operação do
-   dia e aviso, não enfeite. */
-@media (max-width: 1500px) {
-    .header-date {
-        display: none;
-    }
-}
-
-@media (max-width: 1280px) {
-    .header-search {
-        max-width: 280px;
-        margin: 0 16px;
-    }
-}
-
-@media (max-width: 1100px) {
-    .header-search {
-        display: none;
-    }
-}
-
-@media (max-width: 880px) {
-    .chip-plano {
-        display: none;
-    }
-}
-
 .header-date {
     display: flex;
     align-items: center;
@@ -814,6 +676,26 @@ h1, h2, h3, h4, h5, h6 {
     padding: 8px 16px;
     border-radius: var(--radius-md);
     border: 1px solid var(--border-color);
+    white-space: nowrap;
+}
+
+/* Estas regras vêm DEPOIS da definição acima de propósito: com a mesma
+   especificidade quem vence é a última, e enquanto o @media estava antes a
+   data simplesmente nunca sumia — continuava empurrando o cabeçalho.
+
+   Sem largura para tudo, a ordem de sacrifício é: primeiro a data (está no
+   relógio do aparelho), depois o chip do plano. As duas ações do dia e o sino
+   ficam até o fim: são trabalho e aviso, não enfeite. */
+@media (max-width: 1460px) {
+    .header-date {
+        display: none;
+    }
+}
+
+@media (max-width: 880px) {
+    .chip-plano {
+        display: none;
+    }
 }
 
 /* Pages Container */

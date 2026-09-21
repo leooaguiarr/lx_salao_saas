@@ -1,10 +1,15 @@
 /* ==========================================================================
-   BARRA SUPERIOR — BUSCA GLOBAL, AVISOS DO DIA E CHIP DO PLANO
+   BARRA SUPERIOR — AVISOS DO DIA E CHIP DO PLANO
 
    Arquivo separado de propósito: o app.js já passa de seis mil linhas, e nada
    daqui é chamado por ele. A comunicação é de mão única — a barra lê o `data`
    e as funções que os outros módulos já expõem, e navega clicando no próprio
    item do menu, o mesmo caminho de quem clica com o mouse.
+
+   Houve aqui uma busca global de clientes. Saiu porque o cabeçalho não tinha
+   largura para ela junto das duas ações do dia, do sino e do plano — alguma
+   coisa acabava cortada na borda. Quem procura cliente usa o campo da própria
+   aba Clientes.
    ========================================================================== */
 
 // Cada bloco depende de um módulo que pode não ter carregado (ou estar
@@ -27,118 +32,6 @@ function textoSeguro(valor) {
 function irParaAba(alvo) {
     const item = document.querySelector(`.menu-item[data-target="${alvo}"]`);
     if (item) item.click();
-}
-
-/* --- Busca global --------------------------------------------------------- */
-
-// Acentos e máscara de telefone são ruído para quem digita com pressa: quem
-// procura "jose" tem que achar "José", e quem digita "98765" tem que achar
-// "(11) 98765-4321".
-function normalizarBusca(valor) {
-    return String(valor || '')
-        .toLowerCase()
-        .normalize('NFD')
-        .replace(/[̀-ͯ]/g, '');
-}
-
-function somenteDigitos(valor) {
-    return String(valor || '').replace(/\D/g, '');
-}
-
-const LIMITE_DE_RESULTADOS = 6;
-
-function buscarClientes(termo) {
-    const lista = (typeof data !== 'undefined' && Array.isArray(data.clients)) ? data.clients : [];
-    const alvo = normalizarBusca(termo);
-    const digitos = somenteDigitos(termo);
-
-    return lista.filter(cli => {
-        if (normalizarBusca(cli.name).includes(alvo)) return true;
-        // Só procura por telefone quando o termo tem dígito suficiente para
-        // ser um: com um ou dois números, todo cliente casaria.
-        return digitos.length >= 3 && somenteDigitos(cli.phone).includes(digitos);
-    }).slice(0, LIMITE_DE_RESULTADOS);
-}
-
-function renderResultadosDaBusca(termo) {
-    const caixa = document.getElementById('busca-global-resultados');
-    if (!caixa) return;
-
-    if (termo.trim().length < 2) {
-        caixa.hidden = true;
-        caixa.innerHTML = '';
-        return;
-    }
-
-    const encontrados = buscarClientes(termo);
-    caixa.hidden = false;
-
-    if (!encontrados.length) {
-        caixa.innerHTML = `<p class="busca-global-vazio">Nenhum cliente com “${textoSeguro(termo)}”.</p>`;
-        return;
-    }
-
-    caixa.innerHTML = encontrados.map(cli => `
-        <button type="button" class="busca-global-item" data-cliente="${textoSeguro(cli.id)}">
-            <i class="fa-regular fa-user"></i>
-            <span>
-                <span class="bg-nome">${textoSeguro(cli.name)}</span>
-                <span class="bg-detalhe">${textoSeguro(cli.phone || 'sem WhatsApp cadastrado')}</span>
-            </span>
-        </button>
-    `).join('');
-}
-
-function fecharBuscaGlobal() {
-    const caixa = document.getElementById('busca-global-resultados');
-    if (caixa) {
-        caixa.hidden = true;
-        caixa.innerHTML = '';
-    }
-}
-
-function initBuscaGlobal() {
-    const campo = document.getElementById('busca-global');
-    const caixa = document.getElementById('busca-global-resultados');
-    if (!campo || !caixa) return;
-
-    campo.addEventListener('input', () => renderResultadosDaBusca(campo.value));
-
-    campo.addEventListener('focus', () => {
-        if (campo.value.trim().length >= 2) renderResultadosDaBusca(campo.value);
-    });
-
-    campo.addEventListener('keydown', (e) => {
-        if (e.key === 'Escape') {
-            campo.value = '';
-            fecharBuscaGlobal();
-            campo.blur();
-        }
-        // Enter abre o primeiro resultado: é o que a pessoa espera depois de
-        // digitar o nome inteiro de um cliente.
-        if (e.key === 'Enter') {
-            const primeiro = caixa.querySelector('.busca-global-item');
-            if (primeiro) primeiro.click();
-        }
-    });
-
-    caixa.addEventListener('click', (e) => {
-        const item = e.target.closest('.busca-global-item');
-        if (!item) return;
-
-        const id = item.getAttribute('data-cliente');
-        campo.value = '';
-        fecharBuscaGlobal();
-
-        // A ficha do cliente vive na aba Clientes: abre a aba primeiro para
-        // quem fechar o modal não cair numa tela sem relação com o que buscou.
-        irParaAba('clientes');
-        if (typeof openEditClient === 'function') openEditClient(id);
-    });
-
-    document.addEventListener('click', (e) => {
-        if (!e.target.closest('#header-search')) fecharBuscaGlobal();
-    });
 }
 
 /* --- Avisos do dia -------------------------------------------------------- */
@@ -308,7 +201,6 @@ function atualizarBarraSuperior() {
 window.atualizarBarraSuperior = atualizarBarraSuperior;
 
 window.addEventListener('DOMContentLoaded', () => {
-    initBuscaGlobal();
     initSinoDeAlertas();
     initChipDoPlano();
 });

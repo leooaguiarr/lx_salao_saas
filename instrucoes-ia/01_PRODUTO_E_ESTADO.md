@@ -83,14 +83,16 @@ crediário são travados apenas na tela. Ver *Riscos*.
 
 ## Riscos abertos (prioridade)
 
-1. **Cobrança burlável — corrigido no código em 21/09/2026, falta aplicar.**
-   Eram três portas para um salão ficar ativo ou mudar de plano sem pagar:
-   webhook sem token, `process_asaas_webhook` executável pela chave anon, e o
-   dono podendo editar `status`/`plan_id`/`trial_ends_at` da própria linha.
-   O `server.js` agora exige o token; a migração
-   `07_protege_cobranca.sql` fecha as outras duas. **Só vale depois de:**
-   `ASAAS_WEBHOOK_TOKEN` no Coolify e no Asaas, deploy, e a 07 rodada no
-   Studio com `chaveSupabase: service_role` confirmado antes.
+1. **Cobrança burlável — corrigido e aplicado em 21/09/2026.** Eram três
+   portas para um salão ficar ativo ou mudar de plano sem pagar: webhook sem
+   token, `process_asaas_webhook` executável pela chave anon, e o dono
+   podendo editar `status`/`plan_id`/`trial_ends_at` da própria linha. O
+   `server.js` exige o token (no ar, `webhookProtegido: true`,
+   `chaveSupabase: service_role`) e a migração `07_protege_cobranca.sql` foi
+   rodada no Studio com as 4 conferências `true`. **Pendente:** confirmar o
+   mesmo token no painel do Asaas e ver o próximo evento real chegar com 200
+   no log de webhooks dele. Se a fila do Asaas tiver sido pausada pelas
+   recusas, reativá-la lá.
 2. **A chave anon lê e grava tabelas direto.** As políticas
    "Agendamento: ..." da migração 01 dão à chave pública (que está no
    `config.js`) leitura de **todos** os `business_info`, `appointments` e
@@ -122,7 +124,7 @@ crediário são travados apenas na tela. Ver *Riscos*.
 
 Da lista do dono do projeto, em ordem sugerida:
 
-1. Terminar de aplicar o risco 1 (token no Coolify e no Asaas, migração 07).
+1. Confirmar o token do webhook no painel do Asaas (risco 1).
 2. Fechar o risco 2 (políticas anon), com teste do link público.
 3. Conferir o risco 3 no SQL Editor e, se faltar, escrever a migração.
 4. Validar um pagamento real de assinatura ponta a ponta.

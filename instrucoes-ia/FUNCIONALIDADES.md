@@ -2,7 +2,7 @@
 
 ## Documento completo de funcionalidades
 
-**Versão documentada:** 2.0.0  
+**Versão documentada:** 2.1.0  
 **Tipo de sistema:** aplicação web responsiva multi-tenant para salões de beleza, barbearias e clínicas de estética  
 **Acesso público:** [salao.lexionconsultoria.tech](https://salao.lexionconsultoria.tech)  
 **Desenvolvimento:** Lexion Consultoria Tecnológica
@@ -605,6 +605,11 @@ O sistema possui um guia de ajuda integrado, aberto pelo botão de interrogaçã
 
 ## 20. Experiência em celular
 
+- **Instalação como aplicativo** no celular (Android pelo Chrome, iPhone pelo Safari) e no computador, pelo botão "Instalar aplicativo" do menu lateral.
+- O aplicativo instalado abre em tela cheia, direto no painel, com atalhos para Agenda, Vendas e Clientes ao segurar o ícone.
+- A interface abre mesmo sem sinal de internet; os dados dependem da conexão.
+- Barra de navegação inferior no celular com Início, Agenda, Vendas, Clientes e Menu.
+- Respeito ao entalhe (notch) e à barra de gestos dos aparelhos.
 - Interface responsiva para computador e smartphone.
 - Menu lateral adaptado para telas pequenas.
 - Agenda com troca de profissional própria para celular.
@@ -617,7 +622,7 @@ O sistema possui um guia de ajuda integrado, aberto pelo botão de interrogaçã
 
 ## 21. Funcionamento técnico resumido
 
-- Aplicação web sem necessidade de instalação.
+- Aplicação web que também instala como aplicativo (PWA), com um só código para navegador e celular.
 - Front-end em HTML, CSS e JavaScript.
 - Banco de dados, autenticação e regras de segurança no Supabase.
 - Hospedagem em container Docker dedicado no Coolify (Hostinger VPS).

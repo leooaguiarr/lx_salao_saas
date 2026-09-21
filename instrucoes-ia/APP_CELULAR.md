@@ -49,3 +49,17 @@ respeitam o notch e a barra de gestos (`viewport-fit=cover` + `safe-area`).
   SW pega a versão nova e descarta a anterior sozinho.
 - **Ao mudar a lógica do `sw.js`**, suba a constante `VERSAO` dentro dele.
 - A instalação exige HTTPS (produção já tem); em `localhost` funciona para teste.
+- O botão "Instalar aplicativo" depende da regra `.sidebar-instalar[hidden]`
+  no `index.css`: sem ela o `display: flex` vence o atributo e o botão nunca
+  some.
+
+## Testar
+
+```powershell
+node instrucoes-ia/ferramentas/pwa-test.js http://localhost:8000
+node instrucoes-ia/ferramentas/pwa-test.js https://salao.lexionconsultoria.tech
+```
+
+Confere manifest, instalabilidade, service worker, barra inferior, abertura
+offline (com o cache HTTP do navegador desligado, para provar que é o service
+worker quem serve) e a ausência do manifest no link público.

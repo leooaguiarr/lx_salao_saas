@@ -131,6 +131,36 @@ crediário são travados apenas na tela. Ver *Riscos*.
 6. **Fotos em base64 no banco** (logo, profissionais, produtos). Pesam em cada
    carga. O bucket do Storage já existe no Coolify, mas não está ligado.
 
+## Onde paramos (21/09/2026) — retomar por aqui
+
+O código da cobrança está pronto e no ar (webhook com token, checkout com
+login, plano só na confirmação). Falta **testar na sandbox**, nesta ordem:
+
+1. **Rodar a migração `08_plano_so_apos_pagamento.sql`** no SQL Editor (3
+   linhas `ok = true`). Ainda não foi rodada.
+2. **Trocar o Asaas para sandbox no Coolify** (aplicação `lx_salao_saas`,
+   variáveis Production): `ASAAS_ENV=sandbox`, `ASAAS_API_KEY` da sandbox
+   (`$aact_hmlg_...`), **Redeploy**. Em 21/09 o `/api/health` ainda dizia
+   `asaasEnv: production` — **testar assim gera cobrança real**. Conferir
+   `asaasEnv: sandbox` antes do passo 3.
+3. O teste: entrar no painel como **dono** de um salão de teste →
+   Ctrl+Shift+R → clicar no **selo do plano, no rodapé do menu lateral**
+   ("Ver planos e assinar") → escolher um plano diferente do atual → gerar
+   o Pix (a sandbox exige CPF válido; se o QR não aparecer, cadastrar uma
+   chave Pix aleatória na conta sandbox). **Até aqui o plano não pode ter
+   mudado.**
+4. No painel da sandbox, abrir a cobrança e **confirmar o recebimento**.
+5. Conferir: evento com **200** no log de webhooks da sandbox (401 = token
+   diferente do Coolify; 500 = banco recusou); plano novo no selo; e
+   `select name, status, plan_id from public.business_info;` com
+   `status = active` e o plano escolhido. Se o salão não ativar, anotar o
+   **nome do evento** que o Asaas mandou: a função só ativa com
+   `PAYMENT_CONFIRMED`, `PAYMENT_RECEIVED` ou `PAYMENT_AUTHORIZED`.
+
+Pendências menores do mesmo assunto: apagar o log falso do teste de
+21/09 (`delete from public.asaas_webhooks where payment_id = 'pay_falso';`)
+e, depois do teste, o risco 2 (políticas da chave anon).
+
 ## Checklist de lançamento
 
 **Antes de abrir para clientes pagantes, tudo isto precisa estar feito.** Se

@@ -803,6 +803,10 @@ const DataService = {
                             'whatsappRecallMessage','whatsappBookingMessage','whatsappBirthdayMessage',
                             // Cobrança de parcela do crediário (docs/26_mensagens_editaveis.sql).
                             'whatsappChargeMessage',
+                            // Tema claro/escuro do painel (migrations/05_tema_do_painel.sql).
+                            // Precisa vir ao banco: a escolha é do salão e vale
+                            // para a equipe toda, não só para quem clicou.
+                            'theme',
                             'created_at','avatarUrl'];
                         const biz = { user_id: userId };
                         for (const col of allowedCols) {
@@ -810,6 +814,27 @@ const DataService = {
                         }
                         if (!biz.id) biz.id = undefined; // let DB generate UUID
                         ({ error } = await supabaseClient.from('business_info').upsert(biz, { onConflict: 'user_id' }));
+
+                        // Mesmo caso já tratado em transactions e cash_registers: o
+                        // PostgREST recusa a linha INTEIRA quando UMA coluna não
+                        // existe. Sem isto, um banco sem a migration do tema perde o
+                        // cadastro todo — nome, slug, horário de funcionamento — por
+                        // causa de uma preferência visual. O tema é o campo mais
+                        // descartável do conjunto: vai embora primeiro.
+                        if (error && /column|PGRST204/i.test(error.message || '')) {
+                            const opcionais = ['theme', 'whatsappChargeMessage'];
+                            const presentes = opcionais.filter(col => biz[col] !== undefined);
+                            if (presentes.length) {
+                                console.warn(
+                                    `[business_info] Coluna ausente no banco (${error.message}). ` +
+                                    `Regravando sem: ${presentes.join(', ')}. ` +
+                                    `Rode supabase/migrations/05_tema_do_painel.sql para o tema valer para a equipe.`
+                                );
+                                const semOpcionais = { ...biz };
+                                for (const col of presentes) delete semOpcionais[col];
+                                ({ error } = await supabaseClient.from('business_info').upsert(semOpcionais, { onConflict: 'user_id' }));
+                            }
+                        }
                     } else if (Array.isArray(value)) {
                         // Injeta user_id em cada item antes de upsert
                         const withUserId = value.map(item => {
@@ -901,7 +926,7 @@ const DataService = {
             // faria a migração inicial perder texto que o dono já tinha escrito.
             const allowedCols = ['id','user_id','name','slug','phone','instagram','address','hours',
                 'whatsappRecallMessage','whatsappBookingMessage','whatsappBirthdayMessage',
-                'whatsappChargeMessage','created_at','avatarUrl'];
+                'whatsappChargeMessage','theme','created_at','avatarUrl'];
             const biz = { user_id: userId };
             for (const col of allowedCols) {
                 if (localData.businessInfo[col] !== undefined) biz[col] = localData.businessInfo[col];

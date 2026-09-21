@@ -5,6 +5,22 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="icon" href="/assets/favicon_lexion.png" type="image/png">
     <title>Lexion Salão & Barbearia | Sistema de Gestão e Agendamento</title>
+
+    <!-- O tema do salão precisa valer ANTES da primeira pintura. Fosse o
+         theme.js, que carrega no fim da página, um salão de tema claro veria a
+         tela nascer preta e clarear no meio do carregamento. Por isso esta
+         cópia curta e bloqueante: ela só repete a última escolha guardada, e o
+         valor oficial continua vindo do banco logo depois. -->
+    <script>
+        (function () {
+            try {
+                var modo = localStorage.getItem('lexion_theme_mode');
+                if (modo === 'claro') document.documentElement.setAttribute('data-theme', 'claro');
+            } catch (e) {
+                /* armazenamento bloqueado: segue no tema escuro */
+            }
+        })();
+    </script>
     <!-- Google Fonts: Plus Jakarta Sans -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -12,17 +28,17 @@
     <!-- Font Awesome Icons -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <!-- CSS Customizado -->
-    <link rel="stylesheet" href="/index.css?v=56">
-    <link rel="stylesheet" href="/estoque.css?v=56">
-    <link rel="stylesheet" href="/ajuda.css?v=56">
-    <link rel="stylesheet" href="/auth.css?v=56">
+    <link rel="stylesheet" href="/index.css?v=57">
+    <link rel="stylesheet" href="/estoque.css?v=57">
+    <link rel="stylesheet" href="/ajuda.css?v=57">
+    <link rel="stylesheet" href="/auth.css?v=57">
     <!-- Evolução de Vendas. Depois dos anteriores de propósito: estes só
          acrescentam as telas novas e não redefinem nada do index.css. -->
-    <link rel="stylesheet" href="/vendas.css?v=56">
-    <link rel="stylesheet" href="/checkout.css?v=56">
-    <link rel="stylesheet" href="/comissoes.css?v=56">
-    <link rel="stylesheet" href="/crediario.css?v=56">
-    <link rel="stylesheet" href="/fidelidade.css?v=56">
+    <link rel="stylesheet" href="/vendas.css?v=57">
+    <link rel="stylesheet" href="/checkout.css?v=57">
+    <link rel="stylesheet" href="/comissoes.css?v=57">
+    <link rel="stylesheet" href="/crediario.css?v=57">
+    <link rel="stylesheet" href="/fidelidade.css?v=57">
 </head>
 <body class="dark-theme">
     <!--
@@ -171,69 +187,92 @@
                 </button>
             </div>
             
+            <!-- O menu é agrupado por assunto: a lista corrida de doze itens
+                 obrigava a ler tudo para achar uma aba. Cada grupo é um
+                 .menu-group com um rótulo; quando todos os itens de um grupo
+                 somem (barbeiro logado, recurso pausado), sincronizarGruposDoMenu()
+                 esconde o rótulo junto para não sobrar um título órfão. -->
             <nav class="sidebar-menu">
-                <a href="#" class="menu-item active" data-target="dashboard">
-                    <i class="fa-solid fa-chart-pie"></i>
-                    <span>Dashboard</span>
-                </a>
-                <a href="#" class="menu-item" data-target="agenda">
-                    <i class="fa-solid fa-calendar-days"></i>
-                    <span>Agenda</span>
-                </a>
-                <a href="#" class="menu-item" data-target="vendas">
-                    <i class="fa-solid fa-bag-shopping"></i>
-                    <span>Vendas</span>
-                </a>
-                <a href="#" class="menu-item feature-paused" data-target="mensagens" aria-hidden="true" tabindex="-1">
-                    <i class="fa-solid fa-message"></i>
-                    <span>Mensagens</span>
-                    <span class="badge badge-info" id="badge-messages">0</span>
-                </a>
-                <a href="#" class="menu-item" data-target="clientes">
-                    <i class="fa-solid fa-users"></i>
-                    <span>Clientes</span>
-                    <span class="badge badge-alert" id="badge-recall" style="display:none;">0</span>
-                </a>
-                <a href="#" class="menu-item" data-target="fidelidade">
-                    <i class="fa-solid fa-star"></i>
-                    <span>Fidelidade</span>
-                </a>
-                <a href="#" class="menu-item feature-paused" data-target="leads" aria-hidden="true" tabindex="-1">
-                    <i class="fa-solid fa-rectangle-list"></i>
-                    <span>Kanban de Leads</span>
-                    <span class="badge badge-info" id="badge-leads" style="display:none;">0</span>
-                </a>
-                <a href="#" class="menu-item" data-target="estoque">
-                    <i class="fa-solid fa-boxes-stacked"></i>
-                    <span>Estoque</span>
-                    <span class="badge badge-alert" id="badge-estoque" style="display:none;">0</span>
-                </a>
-                <!-- Comissões é a única aba que o barbeiro vê além da própria
-                     agenda e dos próprios clientes. Quem recorta as linhas é a
-                     RLS (docs/21_comissoes.sql), não esta tela. -->
-                <a href="#" class="menu-item" data-target="comissoes">
-                    <i class="fa-solid fa-hand-holding-dollar"></i>
-                    <span>Comissões</span>
-                </a>
-                <a href="#" class="menu-item" data-target="crediario">
-                    <i class="fa-solid fa-file-invoice-dollar"></i>
-                    <span>Crediário</span>
-                    <span class="badge badge-alert" id="badge-crediario" style="display:none;">0</span>
-                </a>
-                <a href="#" class="menu-item" data-target="financeiro">
-                    <i class="fa-solid fa-wallet"></i>
-                    <span>Financeiro</span>
-                </a>
-                <!-- O Link de Agendamento saiu daqui e virou sub-aba de
-                     Configurações: ele é uma configuração do salão (o slug, a
-                     mensagem que acompanha o link), não uma tela de operação
-                     do dia. O mockup de celular que simulava a experiência do
-                     cliente foi removido junto — quem quer ver a página de
-                     verdade abre o próprio link. -->
-                <a href="#" class="menu-item" data-target="configuracoes">
-                    <i class="fa-solid fa-sliders"></i>
-                    <span>Configurações</span>
-                </a>
+                <div class="menu-group">
+                    <a href="#" class="menu-item active" data-target="dashboard">
+                        <i class="fa-solid fa-chart-pie"></i>
+                        <span>Dashboard</span>
+                    </a>
+                </div>
+
+                <div class="menu-group">
+                    <span class="menu-group-label">Operação</span>
+                    <a href="#" class="menu-item" data-target="agenda">
+                        <i class="fa-solid fa-calendar-days"></i>
+                        <span>Agenda</span>
+                    </a>
+                    <a href="#" class="menu-item" data-target="vendas">
+                        <i class="fa-solid fa-bag-shopping"></i>
+                        <span>Vendas</span>
+                    </a>
+                    <a href="#" class="menu-item feature-paused" data-target="mensagens" aria-hidden="true" tabindex="-1">
+                        <i class="fa-solid fa-message"></i>
+                        <span>Mensagens</span>
+                        <span class="badge badge-info" id="badge-messages">0</span>
+                    </a>
+                </div>
+
+                <div class="menu-group">
+                    <span class="menu-group-label">Gestão</span>
+                    <a href="#" class="menu-item" data-target="clientes">
+                        <i class="fa-solid fa-users"></i>
+                        <span>Clientes</span>
+                        <span class="badge badge-alert" id="badge-recall" style="display:none;">0</span>
+                    </a>
+                    <a href="#" class="menu-item" data-target="fidelidade">
+                        <i class="fa-solid fa-star"></i>
+                        <span>Fidelidade</span>
+                    </a>
+                    <a href="#" class="menu-item" data-target="estoque">
+                        <i class="fa-solid fa-boxes-stacked"></i>
+                        <span>Estoque</span>
+                        <span class="badge badge-alert" id="badge-estoque" style="display:none;">0</span>
+                    </a>
+                    <a href="#" class="menu-item feature-paused" data-target="leads" aria-hidden="true" tabindex="-1">
+                        <i class="fa-solid fa-rectangle-list"></i>
+                        <span>Kanban de Leads</span>
+                        <span class="badge badge-info" id="badge-leads" style="display:none;">0</span>
+                    </a>
+                </div>
+
+                <div class="menu-group">
+                    <span class="menu-group-label">Negócio</span>
+                    <a href="#" class="menu-item" data-target="financeiro">
+                        <i class="fa-solid fa-wallet"></i>
+                        <span>Financeiro</span>
+                    </a>
+                    <!-- Comissões é a única aba que o barbeiro vê além da própria
+                         agenda e dos próprios clientes. Quem recorta as linhas é a
+                         RLS (docs/21_comissoes.sql), não esta tela. -->
+                    <a href="#" class="menu-item" data-target="comissoes">
+                        <i class="fa-solid fa-hand-holding-dollar"></i>
+                        <span>Comissões</span>
+                    </a>
+                    <a href="#" class="menu-item" data-target="crediario">
+                        <i class="fa-solid fa-file-invoice-dollar"></i>
+                        <span>Crediário</span>
+                        <span class="badge badge-alert" id="badge-crediario" style="display:none;">0</span>
+                    </a>
+                </div>
+
+                <div class="menu-group">
+                    <span class="menu-group-label">Configuração</span>
+                    <!-- O Link de Agendamento saiu daqui e virou sub-aba de
+                         Configurações: ele é uma configuração do salão (o slug, a
+                         mensagem que acompanha o link), não uma tela de operação
+                         do dia. O mockup de celular que simulava a experiência do
+                         cliente foi removido junto — quem quer ver a página de
+                         verdade abre o próprio link. -->
+                    <a href="#" class="menu-item" data-target="configuracoes">
+                        <i class="fa-solid fa-sliders"></i>
+                        <span>Configurações</span>
+                    </a>
+                </div>
             </nav>
             
             <div class="sidebar-footer">
@@ -271,7 +310,18 @@
                     </button>
                     <h1 class="header-title" id="page-title">Dashboard</h1>
                 </div>
-                
+
+                <!-- Busca global: acha um cliente por nome ou WhatsApp de
+                     qualquer aba, sem obrigar a passar pela tela de Clientes.
+                     Fica escondida no celular, onde não há largura para ela e a
+                     própria aba de Clientes já tem o campo de busca. -->
+                <div class="header-search" id="header-search">
+                    <i class="fa-solid fa-magnifying-glass"></i>
+                    <input type="search" id="busca-global" autocomplete="off"
+                           placeholder="Buscar clientes, telefone ou WhatsApp...">
+                    <div class="busca-global-resultados" id="busca-global-resultados" hidden></div>
+                </div>
+
                 <div class="header-right">
                     <div class="quick-actions">
                         <button class="btn btn-encaixe" id="btn-encaixe-topo" onclick="abrirEncaixe()">
@@ -281,6 +331,21 @@
                             <i class="fa-solid fa-plus"></i> Novo Agendamento
                         </button>
                     </div>
+
+                    <!-- Sino: reúne os avisos que hoje só aparecem espalhados
+                         em badges do menu (retornos, estoque mínimo, crediário
+                         vencido). Não é notificação push, é um resumo do que já
+                         está calculado na tela. -->
+                    <button type="button" class="header-sino" id="btn-alertas" title="Avisos do dia">
+                        <i class="fa-regular fa-bell"></i>
+                        <span class="header-sino-ponto" id="header-sino-ponto" hidden></span>
+                    </button>
+                    <div class="painel-alertas" id="painel-alertas" hidden></div>
+
+                    <!-- Plano e dias restantes de teste. Some quando o salão já
+                         é assinante ativo: aí o dado não muda nada no dia a dia. -->
+                    <button type="button" class="chip-plano" id="chip-plano" hidden></button>
+
                     <div class="header-date" id="current-date-display">
                         <i class="fa-regular fa-calendar"></i>
                         <span></span>
@@ -1177,7 +1242,7 @@
                 <!-- 6. FINANCEIRO PAGE -->
                 <section class="page-section" id="page-financeiro">
                     <!-- Top Controls: Timeframe and Professional Filters -->
-                    <div class="dashboard-panel glass-effect finance-top-controls" style="margin-bottom: 20px; padding: 15px; border-left: 4px solid var(--secondary);">
+                    <div class="dashboard-panel glass-effect finance-top-controls" style="margin-bottom: 20px; padding: 15px; border-left: 4px solid var(--primary);">
                         <div class="finance-filter-group">
                             <span class="finance-filter-label"><i class="fa-regular fa-calendar"></i> Selecione o Período</span>
                             <div class="finance-period-filters" id="finance-period-filters" style="display: flex; gap: 10px;">
@@ -1240,7 +1305,7 @@
                                 </div>
                                 <div style="flex: 1; background: var(--bg-tertiary); border-radius: 10px; padding: 15px;">
                                     <p style="color: var(--text-muted); font-size: 0.8rem; margin-bottom: 5px;"><i class="fa-solid fa-sack-dollar text-purple"></i> Projeção Comissão Mês</p>
-                                    <h3 id="cash-prof-commission-month" style="font-size: 1.4rem; color: var(--purple);">R$ 0,00</h3>
+                                    <h3 id="cash-prof-commission-month" style="font-size: 1.4rem; color: var(--info);">R$ 0,00</h3>
                                 </div>
                             </div>
                         </div>
@@ -1386,6 +1451,18 @@
                                 <h4 class="panel-title">Dados do Estabelecimento</h4>
                                 <p class="panel-description">Esses dados serão exibidos na página pública de agendamento.</p>
                             </div>
+
+                            <!-- Escolha do tema. Aplica na hora, para a pessoa ver
+                                 o resultado antes de decidir; só o botão Salvar do
+                                 formulário abaixo grava a escolha para a equipe. -->
+                            <div class="tema-escolha" id="tema-escolha">
+                                <div class="tema-escolha-cabecalho">
+                                    <h5><i class="fa-solid fa-circle-half-stroke"></i> Tema do painel</h5>
+                                    <p>Vale para todos os aparelhos e para a equipe inteira. A página pública de agendamento não muda.</p>
+                                </div>
+                                <div class="tema-opcoes" id="tema-opcoes"></div>
+                            </div>
+
                             <form class="config-form" id="form-business-info">
                                 <div class="form-group">
                                     <label for="biz-avatar">Foto do Perfil / Logomarca</label>
@@ -1394,7 +1471,7 @@
                                 <div class="form-row">
                                     <div class="form-group">
                                         <label for="biz-type"><i class="fa-solid fa-shapes"></i> Tipo de Estabelecimento</label>
-                                        <select id="biz-type" class="form-control" style="background: rgba(255,255,255,0.05); color: #fff;">
+                                        <select id="biz-type" class="form-control" style="background: var(--surface-raised); color: var(--text-main);">
                                             <option value="barbearia">✂️ Barbearia</option>
                                             <option value="salao">💇 Salão de Beleza / Cabelo</option>
                                             <option value="estetica">✨ Clínica de Estética & Manicure</option>
@@ -1403,7 +1480,7 @@
                                     <div class="form-group">
                                         <label><i class="fa-solid fa-palette"></i> Identidade Visual (Cor Primária)</label>
                                         <div style="display: flex; gap: 8px; align-items: center;">
-                                            <input type="color" id="biz-primary-color" value="#d4af37" style="width: 44px; height: 38px; padding: 2px; border-radius: 8px; border: 1px solid rgba(255,255,255,0.2); background: transparent; cursor: pointer;">
+                                            <input type="color" id="biz-primary-color" value="#d4af37" style="width: 44px; height: 38px; padding: 2px; border-radius: 8px; border: 1px solid var(--border-strong); background: transparent; cursor: pointer;">
                                             <div id="theme-presets-bar" style="display: flex; gap: 6px; flex-wrap: wrap; align-items: center;">
                                                 <button type="button" class="btn btn-secondary btn-sm" onclick="document.getElementById('biz-primary-color').value='#d4af37'; window.ThemeManager.applyColors('#d4af37')" style="padding: 4px 8px; font-size: 0.75rem;">Ouro</button>
                                                 <button type="button" class="btn btn-secondary btn-sm" onclick="document.getElementById('biz-primary-color').value='#f43f5e'; window.ThemeManager.applyColors('#f43f5e')" style="padding: 4px 8px; font-size: 0.75rem;">Rose</button>
@@ -1640,8 +1717,8 @@
             <form id="form-appointment" novalidate>
                 <input type="hidden" id="appt-id">
                 <div class="modal-body">
-                    <div id="appt-readonly-summary" style="display:none; margin-bottom: 20px; padding: 15px; background: rgba(255,255,255,0.03); border-radius: 12px; border: 1px solid rgba(255,255,255,0.05);">
-                        <h4 id="summary-client-name" style="margin: 0 0 8px 0; font-size: 18px; color: var(--text);"></h4>
+                    <div id="appt-readonly-summary" style="display:none; margin-bottom: 20px; padding: 15px; background: var(--surface-hover); border-radius: 12px; border: 1px solid var(--surface-raised);">
+                        <h4 id="summary-client-name" style="margin: 0 0 8px 0; font-size: 18px; color: var(--text-main);"></h4>
                         <div style="display:flex; flex-direction:column; gap:4px;">
                             <div style="font-size: 13px; color: var(--text-muted); display:flex; align-items:center; gap:6px;"><i class="fa-solid fa-scissors"></i> <span id="summary-service-name"></span></div>
                             <div style="font-size: 13px; color: var(--text-muted); display:flex; align-items:center; gap:6px;"><i class="fa-solid fa-user-tie"></i> <span id="summary-prof-name"></span></div>
@@ -2362,7 +2439,7 @@
                     <div class="form-group">
                         <label for="prof-photo">Foto do Profissional</label>
                         <input type="file" id="prof-photo" class="form-control" accept="image/*">
-                        <img id="prof-photo-preview" src="" alt="Prévia da foto" style="display:none; width:64px; height:64px; border-radius:50%; object-fit:cover; margin-top:8px; border:2px solid var(--accent);">
+                        <img id="prof-photo-preview" src="" alt="Prévia da foto" style="display:none; width:64px; height:64px; border-radius:50%; object-fit:cover; margin-top:8px; border:2px solid var(--primary);">
                     </div>
                     <div class="form-group">
                         <label for="prof-commission">Comissão sobre Serviço (%)</label>
@@ -2498,7 +2575,7 @@
                         <i class="fa-solid fa-plus"></i> Adicionar
                     </button>
 
-                    <hr style="border:0; border-top:1px solid rgba(255,255,255,0.08); margin:18px 0 12px;">
+                    <hr style="border:0; border-top:1px solid var(--border-color); margin:18px 0 12px;">
                     <h5 class="panel-title" style="font-size:14px; margin-bottom:8px;">Marcadas</h5>
                     <div id="indisp-lista"></div>
                 </div>
@@ -2936,28 +3013,32 @@
     <script src="/config.js"></script>
     <script src="/theme.js"></script>
     <script src="/saas-plan.js"></script>
-    <script src="/api.js?v=56"></script>
+    <script src="/api.js?v=57"></script>
 
     <!-- JavaScript Principal -->
-    <script src="/app.js?v=56"></script>
+    <script src="/app.js?v=57"></script>
 
     <!-- Funcionalidades acrescentadas depois. A ordem importa: elas leem o
          estado global e as funções de cálculo que app.js define. -->
-    <script src="/estoque.js?v=56"></script>
-    <script src="/encaixe.js?v=56"></script>
-    <script src="/ajuda.js?v=56"></script>
+    <script src="/estoque.js?v=57"></script>
+    <script src="/encaixe.js?v=57"></script>
+    <script src="/ajuda.js?v=57"></script>
 
     <!-- Evolução de Vendas (banco: docs/14 a 28). A ordem entre eles TAMBÉM
          importa, e não é a mesma coisa que a ordem acima: `venda-calculo`
          precisa das constantes de `vendas-base`, `checkout` precisa do cálculo,
          e `recibo` é chamado no fim do checkout. Portados do projeto de origem
          (`lexion_salao`), onde nasceram como 22- a 28- e foram testados. -->
-    <script src="/vendas-base.js?v=56"></script>
-    <script src="/venda-calculo.js?v=56"></script>
-    <script src="/checkout.js?v=56"></script>
-    <script src="/comissoes.js?v=56"></script>
-    <script src="/crediario.js?v=56"></script>
-    <script src="/fidelidade.js?v=56"></script>
-    <script src="/recibo.js?v=56"></script>
+    <script src="/vendas-base.js?v=57"></script>
+    <script src="/venda-calculo.js?v=57"></script>
+    <script src="/checkout.js?v=57"></script>
+    <script src="/comissoes.js?v=57"></script>
+    <script src="/crediario.js?v=57"></script>
+    <script src="/fidelidade.js?v=57"></script>
+    <script src="/recibo.js?v=57"></script>
+
+    <!-- Barra superior: lê o estado e os cálculos de todos os anteriores
+         (clientes, estoque mínimo, crediário atrasado), por isso vem por último. -->
+    <script src="/topbar.js?v=57"></script>
 </body>
 </html>

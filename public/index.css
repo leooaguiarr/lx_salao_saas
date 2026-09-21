@@ -8,7 +8,26 @@
    - Preto Escuro (#050B08): texto com contraste perfeito sobre fundos dourados
    ========================================================================== */
 
-/* Design Tokens & Variables */
+/* ==========================================================================
+   TEMAS
+
+   O sistema tem dois temas, escolhidos pelo salão em Configurações:
+
+   - "escuro" (padrão): verde profundo e dourado latão, a identidade original.
+   - "claro": bege quente e dourado tostado, para salões de ambiente claro.
+
+   Como funciona: TODA cor de superfície, texto, borda e sombra sai de um token
+   abaixo. O tema escuro vive no :root e o claro apenas redefine os mesmos
+   nomes em [data-theme="claro"] — nenhuma regra do resto do arquivo precisa
+   saber qual tema está ativo.
+
+   Por isso, ao escrever CSS novo aqui: nada de #hex ou rgba() direto em cor de
+   fundo, texto ou borda. O que for literal continua escuro no tema claro e
+   aparece como texto invisível ou borda sumida. As exceções conscientes são as
+   cores de status (verde/vermelho/azul) e o simulador do WhatsApp, que imita
+   uma interface de terceiros e é escuro nos dois temas.
+   ========================================================================== */
+
 :root {
     /* Cores de Base */
     --background-primary: #07100B; /* Verde Profundo Escuro */
@@ -24,13 +43,37 @@
     --border-color: rgba(255, 255, 255, 0.08);
     --border-color-active: rgba(197, 160, 89, 0.45);
 
+    /* Camadas sobre o fundo: no tema escuro são véus de branco, no claro
+       viram véus de preto. Sempre estes, nunca rgba(255,255,255,…) solto. */
+    --surface-sunken: rgba(255, 255, 255, 0.015);
+    --surface-hover: rgba(255, 255, 255, 0.03);
+    --surface-raised: rgba(255, 255, 255, 0.05);
+    --surface-strong: rgba(255, 255, 255, 0.08);
+    --border-subtle: rgba(255, 255, 255, 0.04);
+    --border-strong: rgba(255, 255, 255, 0.16);
+
     /* Brand Colors */
     --primary: var(--accent-gold);
     --primary-hover: #D4AF67;
     --primary-dark: #8F7238;
     --primary-light: rgba(197, 160, 89, 0.14);
 
-    /* Action & Status Colors */
+    /* Degraus de transparência do dourado. Existem porque rgba() não aceita
+       uma variável de cor com alpha novo sem color-mix, que nem todo aparelho
+       de salão suporta. */
+    --primary-soft: rgba(197, 160, 89, 0.12);
+    --primary-medium: rgba(197, 160, 89, 0.18);
+    --primary-ring: rgba(197, 160, 89, 0.30);
+    --primary-edge: rgba(197, 160, 89, 0.35);
+    --primary-strong: rgba(197, 160, 89, 0.45);
+
+    /* Preenchimento dos botões e realces principais. É gradiente, então não dá
+       para resolver com --primary sozinho. */
+    --primary-gradient: linear-gradient(135deg, #D4AF67, #A88642);
+    --primary-gradient-hover: linear-gradient(135deg, #DFBE7A, #B5934E);
+
+    /* Action & Status Colors — iguais nos dois temas de propósito: verde é
+       recebido, vermelho é atrasado, e trocar isso por tema confundiria. */
     --success: #10b981; /* Emerald */
     --success-light: rgba(16, 185, 129, 0.12);
     --warning: #E67E22; /* Laranja - distinto do dourado da marca */
@@ -41,20 +84,88 @@
     --info-light: rgba(59, 130, 246, 0.12);
     --gray: #64748b;
     --gray-light: rgba(100, 116, 139, 0.12);
-    
+
     /* Typography Colors */
     --text-main: #F1F5F9;
     --text-muted: #94A3B8;
     --text-inverse: var(--text-accent-gold);
-    
+    --text-faint: #7c8a83;  /* Rodapés e legendas de apoio */
+
     /* Spacing & Borders */
     --radius-sm: 8px;
     --radius-md: 12px;
     --radius-lg: 18px;
     --radius-full: 9999px;
     --shadow-main: 0 10px 30px -10px rgba(0, 0, 0, 0.6);
+    --shadow-soft: 0 4px 12px rgba(0, 0, 0, 0.3);
+    --shadow-strong: 0 18px 40px -12px rgba(0, 0, 0, 0.7);
     --shadow-glow: 0 0 20px rgba(197, 160, 89, 0.25);
+    --overlay-backdrop: rgba(0, 0, 0, 0.7);
     --transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* --------------------------------------------------------------------------
+   TEMA CLARO — bege quente
+
+   O dourado precisa escurecer: #C5A059 sobre bege claro não alcança contraste
+   de leitura. Vira #8A6A3B, e o texto sobre ele passa a ser branco — o
+   contrário do tema escuro, onde o texto sobre dourado é quase preto.
+   -------------------------------------------------------------------------- */
+:root[data-theme="claro"] {
+    --background-primary: #F6F1E8; /* Bege quente de fundo */
+    --text-primary: #2A2520;       /* Marrom escuro para títulos */
+    --accent-gold: #8A6A3B;        /* Dourado tostado, legível sobre bege */
+    --text-accent-gold: #FFFFFF;   /* Texto claro sobre o dourado escuro */
+
+    --bg-secondary: #EFE7D9;       /* Barra lateral e cartões de apoio */
+    --bg-tertiary: #FBF7F0;        /* Superfície elevada (modais, listas) */
+    --bg-glass: rgba(251, 247, 240, 0.88);
+    --border-color: rgba(42, 37, 32, 0.12);
+    --border-color-active: rgba(138, 106, 59, 0.50);
+
+    --surface-sunken: rgba(42, 37, 32, 0.02);
+    --surface-hover: rgba(42, 37, 32, 0.05);
+    --surface-raised: rgba(42, 37, 32, 0.07);
+    --surface-strong: rgba(42, 37, 32, 0.11);
+    --border-subtle: rgba(42, 37, 32, 0.07);
+    --border-strong: rgba(42, 37, 32, 0.20);
+
+    --primary-hover: #6F5330;
+    --primary-dark: #5C4526;
+    --primary-light: rgba(138, 106, 59, 0.14);
+
+    --primary-soft: rgba(138, 106, 59, 0.10);
+    --primary-medium: rgba(138, 106, 59, 0.16);
+    --primary-ring: rgba(138, 106, 59, 0.28);
+    --primary-edge: rgba(138, 106, 59, 0.34);
+    --primary-strong: rgba(138, 106, 59, 0.45);
+
+    --primary-gradient: linear-gradient(135deg, #9C7A45, #6F5330);
+    --primary-gradient-hover: linear-gradient(135deg, #8A6A3B, #5C4526);
+
+    /* Os status escurecem: os tons pensados para fundo escuro somem no bege. */
+    --success: #0F7A54;
+    --success-light: rgba(15, 122, 84, 0.12);
+    --warning: #B35309;
+    --warning-light: rgba(179, 83, 9, 0.12);
+    --danger: #C02640;
+    --danger-light: rgba(192, 38, 64, 0.12);
+    --info: #1D4ED8;
+    --info-light: rgba(29, 78, 216, 0.10);
+    --gray: #6B6257;
+    --gray-light: rgba(107, 98, 87, 0.12);
+
+    --text-main: #2A2520;
+    --text-muted: #6E6459;
+    --text-faint: #8A8075;
+
+    /* Sombras de fundo claro são curtas e suaves; a sombra pesada do tema
+       escuro vira uma mancha cinza sobre bege. */
+    --shadow-main: 0 8px 24px -12px rgba(42, 37, 32, 0.28);
+    --shadow-soft: 0 2px 8px rgba(42, 37, 32, 0.10);
+    --shadow-strong: 0 16px 36px -14px rgba(42, 37, 32, 0.32);
+    --shadow-glow: 0 0 18px rgba(138, 106, 59, 0.22);
+    --overlay-backdrop: rgba(42, 37, 32, 0.45);
 }
 
 /* Base Styles */
@@ -151,8 +262,8 @@ h1, h2, h3, h4, h5, h6 {
     height: 42px;
     object-fit: cover;
     border-radius: 50%;
-    border: 1px solid rgba(197, 160, 89, 0.35);
-    background-color: rgba(255, 255, 255, 0.04);
+    border: 1px solid var(--primary-edge);
+    background-color: var(--border-subtle);
     flex-shrink: 0;
 }
 
@@ -191,6 +302,34 @@ h1, h2, h3, h4, h5, h6 {
     overflow-y: auto;
 }
 
+/* Blocos por assunto. O espaço entre grupos é maior que o espaço entre itens
+   do mesmo grupo — é o afastamento que agrupa, o rótulo só nomeia. */
+.menu-group {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+
+.menu-group + .menu-group {
+    margin-top: 18px;
+}
+
+.menu-group-label {
+    padding: 0 16px 6px;
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--text-muted);
+    opacity: 0.65;
+}
+
+/* Grupo sem nenhum item visível (barbeiro logado, recurso pausado): some
+   inteiro, senão sobra um rótulo anunciando uma lista vazia. */
+.menu-group.menu-group-vazio {
+    display: none;
+}
+
 .menu-item {
     display: flex;
     align-items: center;
@@ -213,13 +352,13 @@ h1, h2, h3, h4, h5, h6 {
 
 .menu-item:hover {
     color: var(--text-main);
-    background-color: rgba(255, 255, 255, 0.03);
+    background-color: var(--surface-hover);
 }
 
 .menu-item.active {
     color: var(--text-main);
     background: var(--primary-light);
-    border-color: rgba(197, 160, 89, 0.3);
+    border-color: var(--primary-ring);
     font-weight: 600;
 }
 
@@ -228,12 +367,12 @@ h1, h2, h3, h4, h5, h6 {
 }
 
 .menu-item-special {
-    background: linear-gradient(135deg, rgba(197, 160, 89, 0.12), rgba(59, 130, 246, 0.05));
-    border: 1px dashed rgba(197, 160, 89, 0.35);
+    background: linear-gradient(135deg, var(--primary-soft), rgba(59, 130, 246, 0.05));
+    border: 1px dashed var(--primary-edge);
 }
 
 .menu-item-special:hover {
-    background: linear-gradient(135deg, rgba(197, 160, 89, 0.18), rgba(59, 130, 246, 0.1));
+    background: linear-gradient(135deg, var(--primary-medium), rgba(59, 130, 246, 0.1));
     border-color: var(--primary);
 }
 
@@ -369,6 +508,274 @@ h1, h2, h3, h4, h5, h6 {
     gap: 20px;
 }
 
+/* --- Busca global do cabeçalho ------------------------------------------- */
+.header-search {
+    position: relative;
+    flex: 1;
+    max-width: 460px;
+    margin: 0 24px;
+}
+
+.header-search > i {
+    position: absolute;
+    left: 16px;
+    top: 50%;
+    transform: translateY(-50%);
+    color: var(--text-muted);
+    font-size: 14px;
+    pointer-events: none;
+}
+
+.header-search input {
+    width: 100%;
+    padding: 11px 16px 11px 42px;
+    border-radius: var(--radius-full);
+    border: 1px solid var(--border-color);
+    background-color: var(--bg-secondary);
+    color: var(--text-main);
+    font-family: inherit;
+    font-size: 14px;
+    transition: var(--transition);
+}
+
+.header-search input::placeholder {
+    color: var(--text-muted);
+}
+
+.header-search input:focus {
+    outline: none;
+    border-color: var(--border-color-active);
+    background-color: var(--bg-tertiary);
+}
+
+/* O X nativo do type=search aparece em cinza-claro do sistema e destoa;
+   o campo já fecha no Esc e ao clicar fora. */
+.header-search input::-webkit-search-cancel-button {
+    -webkit-appearance: none;
+}
+
+.busca-global-resultados {
+    position: absolute;
+    top: calc(100% + 8px);
+    left: 0;
+    right: 0;
+    background-color: var(--bg-tertiary);
+    border: 1px solid var(--border-color);
+    border-radius: var(--radius-md);
+    box-shadow: var(--shadow-main);
+    overflow: hidden;
+    max-height: 380px;
+    overflow-y: auto;
+    z-index: 60;
+}
+
+.busca-global-item {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    width: 100%;
+    padding: 12px 16px;
+    background: none;
+    border: none;
+    border-bottom: 1px solid var(--border-color);
+    color: var(--text-main);
+    font-family: inherit;
+    font-size: 14px;
+    text-align: left;
+    cursor: pointer;
+    transition: var(--transition);
+}
+
+.busca-global-item:last-child {
+    border-bottom: none;
+}
+
+.busca-global-item:hover,
+.busca-global-item:focus-visible {
+    background-color: var(--primary-light);
+    outline: none;
+}
+
+.busca-global-item i {
+    color: var(--text-muted);
+    width: 16px;
+    text-align: center;
+}
+
+.busca-global-item .bg-nome {
+    font-weight: 600;
+}
+
+.busca-global-item .bg-detalhe {
+    display: block;
+    font-size: 12px;
+    color: var(--text-muted);
+    font-weight: 400;
+}
+
+.busca-global-vazio {
+    padding: 16px;
+    color: var(--text-muted);
+    font-size: 13px;
+    text-align: center;
+}
+
+/* --- Sino de avisos ------------------------------------------------------ */
+.header-sino {
+    position: relative;
+    width: 40px;
+    height: 40px;
+    border-radius: var(--radius-full);
+    border: 1px solid var(--border-color);
+    background-color: var(--bg-secondary);
+    color: var(--text-muted);
+    font-size: 16px;
+    cursor: pointer;
+    transition: var(--transition);
+}
+
+.header-sino:hover {
+    color: var(--text-main);
+    border-color: var(--border-color-active);
+}
+
+.header-sino-ponto {
+    position: absolute;
+    top: 8px;
+    right: 9px;
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background-color: var(--danger);
+    border: 2px solid var(--bg-secondary);
+}
+
+.painel-alertas {
+    position: absolute;
+    top: calc(100% + 10px);
+    right: 30px;
+    width: 320px;
+    background-color: var(--bg-tertiary);
+    border: 1px solid var(--border-color);
+    border-radius: var(--radius-md);
+    box-shadow: var(--shadow-main);
+    overflow: hidden;
+    z-index: 60;
+}
+
+.painel-alertas-titulo {
+    padding: 14px 16px;
+    font-size: 12px;
+    font-weight: 700;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    color: var(--text-muted);
+    border-bottom: 1px solid var(--border-color);
+}
+
+.painel-alertas-item {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    width: 100%;
+    padding: 14px 16px;
+    background: none;
+    border: none;
+    border-bottom: 1px solid var(--border-color);
+    color: var(--text-main);
+    font-family: inherit;
+    font-size: 14px;
+    text-align: left;
+    cursor: pointer;
+    transition: var(--transition);
+}
+
+.painel-alertas-item:last-child {
+    border-bottom: none;
+}
+
+.painel-alertas-item:hover {
+    background-color: var(--primary-light);
+}
+
+.painel-alertas-item i {
+    width: 18px;
+    text-align: center;
+}
+
+.painel-alertas-vazio {
+    padding: 22px 16px;
+    text-align: center;
+    color: var(--text-muted);
+    font-size: 13px;
+}
+
+/* --- Chip do plano ------------------------------------------------------- */
+.chip-plano {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 8px 14px;
+    border-radius: var(--radius-full);
+    border: 1px solid var(--border-color-active);
+    background-color: var(--primary-light);
+    color: var(--text-main);
+    font-family: inherit;
+    font-size: 13px;
+    font-weight: 600;
+    white-space: nowrap;
+    cursor: pointer;
+    transition: var(--transition);
+}
+
+.chip-plano:hover {
+    background-color: var(--bg-tertiary);
+}
+
+.chip-plano i {
+    color: var(--primary);
+}
+
+.chip-plano .chip-plano-trial {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    padding-left: 10px;
+    border-left: 1px solid var(--border-color);
+    color: var(--text-muted);
+    font-weight: 500;
+}
+
+/* Últimos dias de teste: o aviso passa a valer mais que a discrição. */
+.chip-plano.chip-plano-urgente {
+    border-color: var(--danger);
+}
+
+.chip-plano.chip-plano-urgente .chip-plano-trial {
+    color: var(--danger);
+}
+
+/* Sem largura para tudo: a busca sai antes das ações rápidas, que são
+   operação do dia; o chip do plano sai depois, e o sino fica até o fim. */
+@media (max-width: 1280px) {
+    .header-search {
+        max-width: 280px;
+        margin: 0 16px;
+    }
+}
+
+@media (max-width: 1100px) {
+    .header-search {
+        display: none;
+    }
+}
+
+@media (max-width: 880px) {
+    .chip-plano {
+        display: none;
+    }
+}
+
 .header-date {
     display: flex;
     align-items: center;
@@ -432,20 +839,20 @@ h1, h2, h3, h4, h5, h6 {
 }
 
 .btn-primary {
-    background: linear-gradient(135deg, #D4AF67, #A88642);
+    background: var(--primary-gradient);
     background-color: var(--accent-gold);
     color: var(--text-accent-gold);
     font-weight: 700;
     border: none;
-    box-shadow: 0 4px 14px rgba(197, 160, 89, 0.3);
+    box-shadow: 0 4px 14px var(--primary-ring);
 }
 
 .btn-primary:hover {
-    background: linear-gradient(135deg, #DFBE7A, #B5934E);
+    background: var(--primary-gradient-hover);
     background-color: var(--primary-hover);
     color: var(--text-accent-gold);
     transform: translateY(-1px);
-    box-shadow: 0 6px 20px rgba(197, 160, 89, 0.45);
+    box-shadow: 0 6px 20px var(--primary-strong);
 }
 
 .btn-secondary {
@@ -455,13 +862,13 @@ h1, h2, h3, h4, h5, h6 {
 }
 
 .btn-secondary:hover {
-    background-color: rgba(255, 255, 255, 0.08);
+    background-color: var(--border-color);
 }
 
 .btn-secondary.btn-active {
     background-color: var(--primary-light);
     color: var(--primary);
-    border-color: rgba(197, 160, 89, 0.35);
+    border-color: var(--primary-edge);
 }
 
 .btn-danger {
@@ -900,7 +1307,7 @@ h1, h2, h3, h4, h5, h6 {
 }
 
 .data-table th {
-    background-color: rgba(255, 255, 255, 0.02);
+    background-color: var(--surface-sunken);
     font-weight: 700;
     color: var(--text-muted);
     font-size: 12px;
@@ -913,7 +1320,7 @@ h1, h2, h3, h4, h5, h6 {
 }
 
 .data-table tbody tr:hover {
-    background-color: rgba(255, 255, 255, 0.015);
+    background-color: var(--surface-sunken);
 }
 
 .data-table tbody tr:last-child td {
@@ -955,7 +1362,7 @@ h1, h2, h3, h4, h5, h6 {
 
 .search-box input:focus {
     border-color: var(--primary);
-    box-shadow: 0 0 10px rgba(197, 160, 89, 0.18);
+    box-shadow: 0 0 10px var(--primary-medium);
 }
 
 /* Agenda / Calendar Styles */
@@ -989,7 +1396,7 @@ h1, h2, h3, h4, h5, h6 {
     display: flex;
     padding-left: 60px; /* Aligns with hour axis */
     border-bottom: 1px solid var(--border-color);
-    background-color: rgba(255, 255, 255, 0.01);
+    background-color: var(--surface-sunken);
     overflow-y: scroll; /* Força o espaço do scrollbar para alinhar com o grid abaixo */
 }
 .calendar-header-cols::-webkit-scrollbar-thumb { background: transparent; }
@@ -1033,7 +1440,7 @@ h1, h2, h3, h4, h5, h6 {
     font-weight: 600;
     text-align: center;
     padding-top: 5px;
-    border-bottom: 1px dashed rgba(255, 255, 255, 0.03);
+    border-bottom: 1px dashed var(--surface-hover);
 }
 
 .calendar-columns-container {
@@ -1065,7 +1472,7 @@ h1, h2, h3, h4, h5, h6 {
 
 .grid-line {
     height: 60px;
-    border-bottom: 1px dashed rgba(255, 255, 255, 0.03);
+    border-bottom: 1px dashed var(--surface-hover);
 }
 
 .calendar-appt-event {
@@ -1082,20 +1489,20 @@ h1, h2, h3, h4, h5, h6 {
     display: flex;
     flex-direction: column;
     justify-content: space-between;
-    box-shadow: 0 4px 6px rgba(0,0,0,0.15);
+    box-shadow: var(--shadow-soft);
 }
 
 .calendar-appt-event:hover {
     transform: scale(1.02);
     z-index: 5;
-    box-shadow: 0 10px 15px rgba(0,0,0,0.3);
+    box-shadow: var(--shadow-soft);
 }
 
 .calendar-appt-event.scheduled { background-color: var(--info-light); border-left-color: var(--info); color: #93c5fd; }
 .calendar-appt-event.confirmed { background-color: var(--primary-light); border-left-color: var(--primary); color: var(--primary-hover); }
 .calendar-appt-event.done { background-color: var(--success-light); border-left-color: var(--success); color: #6ee7b7; }
 .calendar-appt-event.no_show { background-color: var(--danger-light); border-left-color: var(--danger); color: #fca5a5; }
-.calendar-appt-event.cancelled { background-color: var(--gray-light); border-left-color: var(--gray); color: #cbd5e1; }
+.calendar-appt-event.cancelled { background-color: var(--gray-light); border-left-color: var(--gray); color: var(--text-muted); }
 
 /* Destaque para clientes com 2+ agendamentos na mesma semana */
 .calendar-appt-event.duplicate-week-appt {
@@ -1228,7 +1635,7 @@ h1, h2, h3, h4, h5, h6 {
 .kanban-card:hover {
     transform: translateY(-2px);
     border-color: var(--border-color-active);
-    box-shadow: 0 4px 10px rgba(0,0,0,0.2);
+    box-shadow: var(--shadow-soft);
 }
 
 .lead-card-header {
@@ -1487,7 +1894,7 @@ h1, h2, h3, h4, h5, h6 {
     display: flex;
     flex-direction: column;
     gap: 12px;
-    background-color: rgba(255, 255, 255, 0.01);
+    background-color: var(--surface-sunken);
     padding: 16px;
     border-radius: var(--radius-md);
     border: 1px solid var(--border-color);
@@ -1603,7 +2010,7 @@ h1, h2, h3, h4, h5, h6 {
        embaixo o rodapé (com os botões) ficava atrás da barra do Safari. */
     height: 100dvh;
     padding: 24px;
-    background-color: rgba(0, 0, 0, 0.7);
+    background-color: var(--overlay-backdrop);
     backdrop-filter: blur(4px);
     z-index: 1200;
     display: flex;
@@ -1633,7 +2040,7 @@ h1, h2, h3, h4, h5, h6 {
     border-radius: var(--radius-lg);
     background-color: var(--bg-secondary);
     border: 1px solid var(--border-color);
-    box-shadow: 0 20px 40px -10px rgba(0,0,0,0.8);
+    box-shadow: var(--shadow-strong);
     display: flex;
     flex-direction: column;
     transform: scale(0.9);
@@ -1757,7 +2164,7 @@ h1, h2, h3, h4, h5, h6 {
 }
 
 .checkbox-container:hover input ~ .checkmark {
-    background-color: rgba(255, 255, 255, 0.08);
+    background-color: var(--border-color);
 }
 
 .checkbox-container input:checked ~ .checkmark {
@@ -1837,7 +2244,7 @@ h1, h2, h3, h4, h5, h6 {
 
 .btn-outline {
     background: transparent;
-    color: var(--text-secondary);
+    color: var(--text-muted);
     border: 1px dashed var(--border-color);
     padding: 6px 14px;
     border-radius: var(--radius-sm);
@@ -1992,8 +2399,8 @@ h1, h2, h3, h4, h5, h6 {
 .pub-header {
     padding: 20px 14px;
     text-align: center;
-    background: linear-gradient(180deg, rgba(197, 160, 89, 0.12) 0%, rgba(7, 16, 11, 0) 100%);
-    border-bottom: 1px solid rgba(255,255,255,0.04);
+    background: linear-gradient(180deg, var(--primary-soft) 0%, transparent 100%);
+    border-bottom: 1px solid var(--border-subtle);
 }
 
 .pub-logo {
@@ -2008,7 +2415,7 @@ h1, h2, h3, h4, h5, h6 {
     align-items: center;
     justify-content: center;
     font-size: 36px;
-    box-shadow: 0 4px 10px rgba(197, 160, 89, 0.3);
+    box-shadow: 0 4px 10px var(--primary-ring);
 }
 
 .pub-title {
@@ -2060,13 +2467,13 @@ h1, h2, h3, h4, h5, h6 {
 }
 
 .pub-service-card:hover {
-    border-color: rgba(197, 160, 89, 0.35);
-    background-color: rgba(19, 36, 29, 0.95);
+    border-color: var(--primary-edge);
+    background-color: var(--bg-tertiary);
 }
 
 .pub-service-card.selected {
     border-color: var(--primary);
-    background: rgba(197, 160, 89, 0.12);
+    background: var(--primary-soft);
 }
 
 .pub-service-name {
@@ -2107,13 +2514,13 @@ h1, h2, h3, h4, h5, h6 {
 }
 
 .pub-select-card:hover {
-    border-color: rgba(197, 160, 89, 0.35);
-    background-color: rgba(19, 36, 29, 0.95);
+    border-color: var(--primary-edge);
+    background-color: var(--bg-tertiary);
 }
 
 .pub-select-card.selected {
     border-color: var(--primary);
-    background: rgba(197, 160, 89, 0.12);
+    background: var(--primary-soft);
 }
 
 .pub-select-name {
@@ -2141,7 +2548,7 @@ h1, h2, h3, h4, h5, h6 {
 }
 
 .pub-slot-btn:hover {
-    background-color: rgba(19, 36, 29, 0.95);
+    background-color: var(--bg-tertiary);
     border-color: var(--primary-hover);
 }
 
@@ -2179,7 +2586,7 @@ h1, h2, h3, h4, h5, h6 {
 }
 
 .pub-btn-submit {
-    background: linear-gradient(135deg, #D4AF67, #A88642);
+    background: var(--primary-gradient);
     color: var(--text-accent-gold);
     border: none;
     border-radius: var(--radius-md);
@@ -2187,7 +2594,7 @@ h1, h2, h3, h4, h5, h6 {
     font-weight: 700;
     font-size: 13px;
     cursor: pointer;
-    box-shadow: 0 4px 12px rgba(197, 160, 89, 0.3);
+    box-shadow: 0 4px 12px var(--primary-ring);
     transition: var(--transition);
     text-align: center;
     width: 100%;
@@ -2200,7 +2607,7 @@ h1, h2, h3, h4, h5, h6 {
 
 .pub-btn-submit:hover {
     transform: translateY(-1px);
-    box-shadow: 0 6px 18px rgba(197, 160, 89, 0.45);
+    box-shadow: 0 6px 18px var(--primary-strong);
 }
 
 /* Falha ao confirmar o agendamento: fica logo acima do botão, onde o
@@ -2456,7 +2863,7 @@ h1, h2, h3, h4, h5, h6 {
     border-left: 4px solid var(--primary);
     border-radius: var(--radius-md);
     padding: 14px 18px;
-    box-shadow: 0 10px 25px rgba(0,0,0,0.5);
+    box-shadow: var(--shadow-main);
     display: flex;
     align-items: center;
     gap: 12px;
@@ -2513,7 +2920,7 @@ h1, h2, h3, h4, h5, h6 {
         top: 0;
         bottom: 0;
         z-index: 1100;
-        box-shadow: 10px 0 30px rgba(0,0,0,0.8);
+        box-shadow: var(--shadow-strong);
     }
     .sidebar.show {
         left: 0;
@@ -2670,7 +3077,7 @@ h1, h2, h3, h4, h5, h6 {
     .kanban-tab-btn.active {
         background-color: var(--primary-light);
         color: var(--primary);
-        border-color: rgba(197, 160, 89, 0.4);
+        border-color: var(--primary-strong);
     }
     .tab-badge {
         font-size: 10px;
@@ -2720,7 +3127,7 @@ h1, h2, h3, h4, h5, h6 {
     .data-table td {
         text-align: left !important;
         padding: 8px 0 !important;
-        border-bottom: 1px dashed rgba(255, 255, 255, 0.04);
+        border-bottom: 1px dashed var(--border-subtle);
         display: flex;
         justify-content: space-between;
         align-items: center;
@@ -2790,7 +3197,7 @@ h1, h2, h3, h4, h5, h6 {
 .client-avatar { display: grid; place-items: center; width: 38px; height: 38px; border-radius: 12px; color: white; font-weight: 800; background: linear-gradient(135deg, var(--primary), #4f46e5); }
 .client-avatar.large { width: 52px; height: 52px; border-radius: 16px; font-size: 20px; }
 .message-status { font-size: 10px; font-weight: 800; text-transform: uppercase; color: var(--text-muted); background: var(--bg-tertiary); border-radius: 20px; padding: 5px 8px; }
-.message-job-card p { color: var(--text-secondary); font-size: 13px; margin: 12px 0; }
+.message-job-card p { color: var(--text-muted); font-size: 13px; margin: 12px 0; }
 .message-job-actions { display: flex; justify-content: flex-end; gap: 8px; }
 .empty-state { padding: 40px; text-align: center; color: var(--text-muted); }
 .appointment-communication { margin-top: 18px; padding: 14px; background: var(--bg-secondary); border: 1px solid var(--border-color); border-radius: var(--radius-md); }
@@ -2827,7 +3234,7 @@ h1, h2, h3, h4, h5, h6 {
 .client-stat-grid > div { padding: 13px; background: var(--bg-secondary); border-radius: 12px; display: flex; flex-direction: column; }
 .client-stat-grid small { color: var(--text-muted); font-size: 10px; text-transform: uppercase; }
 .client-notes-card { padding: 14px; border: 1px solid var(--border-color); border-radius: 12px; }
-.client-notes-card p { margin: 6px 0 0; color: var(--text-secondary); font-size: 13px; }
+.client-notes-card p { margin: 6px 0 0; color: var(--text-muted); font-size: 13px; }
 .client-history { margin-top: 18px; }
 .history-item { display: grid; grid-template-columns: 10px 1fr auto; gap: 10px; align-items: center; padding: 11px 0; border-bottom: 1px solid var(--border-color); }
 .history-item > div { display: flex; flex-direction: column; }
@@ -3003,7 +3410,7 @@ body.public-booking-mode .mobile-tab-bar {
 .pub-fila-atalho {
     width: 100%;
     padding: 10px 12px;
-    border: 1px dashed rgba(255, 255, 255, 0.16);
+    border: 1px dashed var(--border-strong);
     border-radius: var(--radius-md);
     background: transparent;
     color: var(--text-muted);
@@ -3058,7 +3465,7 @@ body.public-booking-mode .mobile-tab-bar {
 
 .fila-linha.fila-eu {
     border-left-color: var(--primary);
-    background: rgba(197, 160, 89, 0.14);
+    background: var(--primary-light);
     font-weight: 700;
 }
 
@@ -3162,7 +3569,7 @@ body.public-booking-mode .mobile-tab-bar {
     margin-top: 4px;
     padding: 2px 8px;
     border-radius: 10px;
-    background: rgba(197, 160, 89, 0.14);
+    background: var(--primary-light);
     color: var(--primary);
     font-size: 11px;
 }
@@ -3173,14 +3580,14 @@ body.public-booking-mode .mobile-tab-bar {
 .pub-footer {
     margin-top: auto;
     padding: 22px 16px calc(18px + env(safe-area-inset-bottom, 0px));
-    border-top: 1px solid rgba(255, 255, 255, 0.06);
+    border-top: 1px solid var(--surface-raised);
     display: flex;
     flex-direction: column;
     align-items: center;
     gap: 4px;
     text-align: center;
     font-size: 11px;
-    color: #7c8a83;
+    color: var(--text-faint);
 }
 
 .pub-footer a {
@@ -3499,7 +3906,7 @@ body.acesso-barbeiro #page-configuracoes {
     width: 34px;
     height: 34px;
     border-radius: 50%;
-    border: 3px solid rgba(197, 160, 89, .18);
+    border: 3px solid var(--primary-medium);
     border-top-color: var(--primary);
     animation: boot-girando .8s linear infinite;
 }
@@ -3519,4 +3926,104 @@ body.acesso-barbeiro #page-configuracoes {
 @media (prefers-reduced-motion: reduce) {
     .boot-spinner { animation-duration: 2.4s; }
     #boot-overlay { transition: none; }
+}
+
+/* ==========================================================================
+   SELETOR DE TEMA (Configurações → Dados do Estabelecimento)
+   ========================================================================== */
+
+.tema-escolha {
+    margin-bottom: 26px;
+    padding-bottom: 24px;
+    border-bottom: 1px solid var(--border-color);
+}
+
+.tema-escolha-cabecalho h5 {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 15px;
+    font-weight: 700;
+    color: var(--text-primary);
+    margin-bottom: 4px;
+}
+
+.tema-escolha-cabecalho h5 i {
+    color: var(--primary);
+}
+
+.tema-escolha-cabecalho p {
+    font-size: 13px;
+    color: var(--text-muted);
+    margin-bottom: 16px;
+}
+
+.tema-opcoes {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+    gap: 14px;
+}
+
+.tema-opcao {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    padding: 14px;
+    border-radius: var(--radius-md);
+    border: 1px solid var(--border-color);
+    background-color: var(--surface-hover);
+    color: var(--text-main);
+    font-family: inherit;
+    text-align: left;
+    cursor: pointer;
+    transition: var(--transition);
+}
+
+.tema-opcao:hover {
+    border-color: var(--border-color-active);
+}
+
+.tema-opcao.tema-opcao-ativa {
+    border-color: var(--primary);
+    background-color: var(--primary-light);
+}
+
+/* Amostra da paleta: fundo, superfície e dourado do tema, na ordem em que
+   aparecem na tela. Mostra a cor de verdade, não uma ilustração dela. */
+.tema-amostra {
+    display: flex;
+    flex-shrink: 0;
+    width: 52px;
+    height: 52px;
+    border-radius: var(--radius-sm);
+    overflow: hidden;
+    border: 1px solid var(--border-strong);
+}
+
+.tema-amostra span {
+    flex: 1;
+}
+
+.tema-opcao-texto {
+    min-width: 0;
+}
+
+.tema-opcao-nome {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-weight: 700;
+    font-size: 14px;
+    margin-bottom: 2px;
+}
+
+.tema-opcao-nome i {
+    color: var(--primary);
+    font-size: 13px;
+}
+
+.tema-opcao-desc {
+    font-size: 12px;
+    color: var(--text-muted);
+    line-height: 1.4;
 }

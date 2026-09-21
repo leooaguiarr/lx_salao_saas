@@ -1,5 +1,18 @@
 @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap');
 
+/* ==========================================================================
+   TELA DE ENTRADA — escura nos dois temas, de propósito
+
+   O tema (claro ou escuro) é uma configuração DO SALÃO, guardada no banco. Na
+   tela de entrada ainda não se sabe quem está entrando, então não há tema a
+   aplicar: esta tela é a porta da Lexion, não do salão, e mantém a foto de
+   fundo e o dourado sobre preto da marca.
+
+   É por isso que este arquivo usa cores literais e nenhum token: ele não pode
+   acompanhar o tema, e escrever var(--bg-primary) aqui daria a impressão
+   errada de que acompanha. Depois do login, o painel assume o tema do salão.
+   ========================================================================== */
+
 /* ===== AUTH OVERLAY (tela inteira) ===== */
 .auth-overlay {
     position: fixed;

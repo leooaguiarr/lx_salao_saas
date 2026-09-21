@@ -21,19 +21,19 @@
    seguindo o modelo da Lexion adaptado para a identidade do Lexion Salão & Barbearia,
    sem competir com o botão principal sólido de "Novo Agendamento". */
 .btn-encaixe {
-    background-color: rgba(197, 160, 89, 0.12);
-    color: #D4AF67;
-    border: 1px solid rgba(197, 160, 89, 0.35);
+    background-color: var(--primary-soft);
+    color: var(--primary-hover);
+    border: 1px solid var(--primary-edge);
     box-shadow: none;
     font-weight: 600;
 }
 
 .btn-encaixe:hover {
-    background-color: rgba(197, 160, 89, 0.22);
-    border-color: rgba(197, 160, 89, 0.6);
-    color: #DFBE7A;
+    background-color: var(--primary-medium);
+    border-color: var(--primary-strong);
+    color: var(--primary-hover);
     transform: translateY(-1px);
-    box-shadow: 0 4px 14px rgba(197, 160, 89, 0.2);
+    box-shadow: 0 4px 14px var(--primary-medium);
 }
 
 .btn-encaixe:active {
@@ -99,7 +99,7 @@
     flex-wrap: wrap;
     gap: 8px;
     padding-top: 6px;
-    border-top: 1px dashed rgba(255, 255, 255, 0.1);
+    border-top: 1px dashed var(--surface-strong);
     width: 100%;
 }
 
@@ -277,7 +277,7 @@
     display: flex;
     align-items: center;
     justify-content: center;
-    background: rgba(255, 255, 255, 0.04);
+    background: var(--border-subtle);
     color: var(--text-muted);
 }
 
@@ -377,7 +377,7 @@
 .vitrine {
     margin-top: 22px;
     padding-top: 18px;
-    border-top: 1px solid rgba(255, 255, 255, 0.08);
+    border-top: 1px solid var(--border-color);
 }
 
 .vitrine-titulo {
@@ -409,7 +409,7 @@
     gap: 10px;
     padding: 8px 10px;
     border-radius: var(--radius-sm);
-    background: rgba(255, 255, 255, 0.03);
+    background: var(--surface-hover);
     margin-bottom: 4px;
 }
 
@@ -518,7 +518,7 @@
     align-items: center;
     gap: 10px;
     padding: 9px 0;
-    border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+    border-bottom: 1px solid var(--surface-raised);
 }
 
 .movimento-linha:last-child {
@@ -606,7 +606,7 @@
     padding: 7px 10px;
     margin-top: 6px;
     border-radius: var(--radius-sm);
-    background: rgba(255, 255, 255, 0.04);
+    background: var(--border-subtle);
     font-size: 13px;
 }
 
@@ -627,7 +627,7 @@
 .appt-produto-total {
     margin-top: 8px;
     padding-top: 8px;
-    border-top: 1px dashed rgba(255, 255, 255, 0.12);
+    border-top: 1px dashed var(--surface-strong);
     font-size: 12px;
     color: var(--text-muted);
     text-align: right;

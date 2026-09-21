@@ -165,6 +165,10 @@ async function loadData(escopo = 'completo') {
     if (escopo === 'completo') ultimaCargaCompleta = Date.now();
     data.automationRules = sanitizeForStorage(loaded.automationRules);
     data.messageJobs = sanitizeForStorage(loaded.messageJobs);
+
+    // Os avisos do sino e os dias restantes de teste saem destes mesmos dados;
+    // sem isto a barra continuaria mostrando o retrato da carga anterior.
+    if (typeof atualizarBarraSuperior === 'function') atualizarBarraSuperior();
 }
 
 function saveData(key, value) {
@@ -3244,6 +3248,7 @@ function renderConfig() {
     if (document.getElementById('biz-primary-color')) {
         document.getElementById('biz-primary-color').value = data.businessInfo.primary_color || data.businessInfo.primaryColor || '#d4af37';
     }
+    renderSeletorDeTema();
     const whatsappMsgElem = document.getElementById('biz-whatsapp-msg');
     if (whatsappMsgElem) {
         whatsappMsgElem.value = data.businessInfo.whatsappRecallMessage || 'Olá {nome}! Tudo bem? Vimos que faz um tempinho que você não nos visita...';
@@ -3278,6 +3283,49 @@ function renderConfig() {
     if (typeof renderConfigDaFidelidade === 'function') renderConfigDaFidelidade();
 }
 
+// Escolha do tema (claro ou escuro). Aplica no clique e só grava quando o
+// formulário do estabelecimento é salvo — quem experimentar e desistir sai da
+// tela sem ter mudado nada para a equipe.
+function renderSeletorDeTema() {
+    const caixa = document.getElementById('tema-opcoes');
+    if (!caixa || !window.ThemeManager) return;
+
+    const atual = window.ThemeManager.getMode();
+
+    caixa.innerHTML = Object.values(window.ThemeManager.MODES).map(modo => `
+        <button type="button" class="tema-opcao ${modo.id === atual ? 'tema-opcao-ativa' : ''}"
+                data-tema="${escapeHTML(modo.id)}">
+            <span class="tema-amostra" aria-hidden="true">
+                ${modo.swatch.map(cor => `<span style="background:${escapeHTML(cor)};"></span>`).join('')}
+            </span>
+            <span class="tema-opcao-texto">
+                <span class="tema-opcao-nome">
+                    ${escapeHTML(modo.name)}
+                    ${modo.id === atual ? '<i class="fa-solid fa-circle-check"></i>' : ''}
+                </span>
+                <span class="tema-opcao-desc">${escapeHTML(modo.description)}</span>
+            </span>
+        </button>
+    `).join('');
+
+    caixa.querySelectorAll('.tema-opcao').forEach(botao => {
+        botao.addEventListener('click', () => {
+            window.ThemeManager.applyMode(botao.getAttribute('data-tema'));
+
+            // A cor da marca precisa ser recalculada junto: no tema claro ela é
+            // escurecida para continuar legível sobre o bege, e voltar ao
+            // escuro tem de devolver o tom original.
+            const corEscolhida = document.getElementById('biz-primary-color')?.value
+                || data.businessInfo.primary_color
+                || data.businessInfo.primaryColor;
+            if (corEscolhida) window.ThemeManager.applyColors(corEscolhida);
+
+            renderSeletorDeTema();
+            showToast('Tema aplicado. Salve os dados do estabelecimento para valer para a equipe.', 'info');
+        });
+    });
+}
+
 // Extraída de renderConfig() para poder ser chamada sozinha por
 // carregarQuadroDeAcesso() — sem isso, cada resposta da Edge Function
 // chamaria renderConfig() inteiro, que chamaria carregarQuadroDeAcesso() de
@@ -3291,7 +3339,7 @@ function renderProfissionaisGrid() {
         const card = document.createElement('div');
         card.className = 'item-config-card';
         const profAvatar = prof.photoUrl
-            ? `<img src="${escapeHTML(prof.photoUrl)}" alt="${escapeHTML(prof.name)}" style="width:44px; height:44px; border-radius:50%; object-fit:cover; border:2px solid var(--accent); flex-shrink:0;">`
+            ? `<img src="${escapeHTML(prof.photoUrl)}" alt="${escapeHTML(prof.name)}" style="width:44px; height:44px; border-radius:50%; object-fit:cover; border:2px solid var(--primary); flex-shrink:0;">`
             : `<div style="width:44px; height:44px; border-radius:50%; background:#64748b; color:#fff; display:flex; align-items:center; justify-content:center; font-size:16px; flex-shrink:0;"><i class="fa-solid fa-user"></i></div>`;
         card.innerHTML = `
             <div class="item-config-header">
@@ -3471,13 +3519,17 @@ document.getElementById('form-business-info').addEventListener('submit', (e) => 
 
     const businessType = document.getElementById('biz-type')?.value || 'barbearia';
     const primaryColor = document.getElementById('biz-primary-color')?.value || '#d4af37';
+    // O tema já está aplicado na tela desde o clique; aqui ele entra no que
+    // será gravado, para valer nos outros aparelhos e para a equipe.
+    const theme = (window.ThemeManager && window.ThemeManager.getMode()) || 'escuro';
 
-    data.businessInfo = { 
-        ...data.businessInfo, 
-        name, slug, phone, instagram, address, 
+    data.businessInfo = {
+        ...data.businessInfo,
+        name, slug, phone, instagram, address,
         whatsappRecallMessage, whatsappBirthdayMessage,
         business_type: businessType,
-        primary_color: primaryColor
+        primary_color: primaryColor,
+        theme: theme
     };
 
     if (window.ThemeManager) {
@@ -4364,7 +4416,7 @@ function renderPhoneScreen() {
                     </div>
                     ${data.professionals.filter(p => p.active).map(prof => {
             const avatar = prof.photoUrl
-                ? `<img src="${escapeHTML(prof.photoUrl)}" alt="${escapeHTML(prof.name)}" style="width:48px; height:48px; border-radius:50%; object-fit:cover; margin-bottom:6px; border:2px solid var(--accent);">`
+                ? `<img src="${escapeHTML(prof.photoUrl)}" alt="${escapeHTML(prof.name)}" style="width:48px; height:48px; border-radius:50%; object-fit:cover; margin-bottom:6px; border:2px solid var(--primary);">`
                 : `<div class="pub-logo" style="width:48px; height:48px; font-size:16px; margin-bottom:6px; background: #64748b;"><i class="fa-solid fa-user"></i></div>`;
             return `
                         <div class="pub-select-card ${simSelection.profId === prof.id ? 'selected' : ''}" onclick="selectSimProf('${prof.id}')">
@@ -5586,6 +5638,19 @@ window.addEventListener('DOMContentLoaded', async () => {
 // O Financeiro é restrito ao dono. Comissões fica acessível na sua própria aba.
 const ABAS_SO_DO_DONO = ['leads', 'configuracoes', 'financeiro'];
 
+// O rótulo do grupo só faz sentido com algum item embaixo dele. Como as abas
+// somem por caminhos independentes (perfil de barbeiro esconde por style,
+// recurso pausado esconde por classe no CSS), a checagem lê o display já
+// calculado em vez de tentar repetir cada uma dessas regras aqui.
+function sincronizarGruposDoMenu() {
+    document.querySelectorAll('.sidebar-menu .menu-group').forEach(grupo => {
+        const temItemVisivel = [...grupo.querySelectorAll('.menu-item')]
+            .some(item => getComputedStyle(item).display !== 'none');
+        grupo.classList.toggle('menu-group-vazio', !temItemVisivel);
+    });
+}
+window.sincronizarGruposDoMenu = sincronizarGruposDoMenu;
+
 function aplicarNivelDeAcesso() {
     if (!DataService.isAuthenticated() || !DataService.ehBarbeiro()) {
         document.body.classList.remove('acesso-barbeiro');
@@ -5593,6 +5658,7 @@ function aplicarNivelDeAcesso() {
             document.querySelectorAll(`.menu-item[data-target="${alvo}"], .tab-item[data-target="${alvo}"]`)
                 .forEach(el => { el.style.display = ''; });
         });
+        sincronizarGruposDoMenu();
         return;
     }
 
@@ -5602,6 +5668,8 @@ function aplicarNivelDeAcesso() {
         document.querySelectorAll(`.menu-item[data-target="${alvo}"], .tab-item[data-target="${alvo}"]`)
             .forEach(el => { el.style.display = 'none'; });
     });
+
+    sincronizarGruposDoMenu();
 
     // Se o barbeiro estiver numa aba que sumiu (link antigo, F5), joga para a
     // agenda em vez de deixar a tela em branco.

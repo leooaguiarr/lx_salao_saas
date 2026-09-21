@@ -86,6 +86,13 @@ aqui (data, sintoma, causa, o que fazer).
   `cat <<'EOF'` sai corrompido. Use a ferramenta de escrita de arquivo.
 - **Push com 403**: conta errada no Git. Ver [04_COMO_TRABALHAR.md](04_COMO_TRABALHAR.md).
 - **Push com sucesso não é deploy com sucesso.** Confira o `?v=` em produção.
+- **Durante o deploy, o container antigo e o novo respondem juntos.** O
+  `/api/health` pode já vir do novo enquanto a requisição seguinte cai no
+  antigo. Em 21/09/2026, um teste do webhook feito nesse intervalo caiu no
+  código sem token e gravou um log falso em `asaas_webhooks`. Espere algumas
+  respostas iguais seguidas antes de concluir, e **nunca teste em produção
+  com um corpo que chegue ao banco** — para provar que uma rota recusa, mande
+  corpo vazio (`{}`).
 - **Os avisos "LF will be replaced by CRLF"** do Git no Windows são inofensivos.
 - **Servidor fantasma**: um `node server.js` antigo continua servindo código
   velho na porta. Mate os processos `node` antes de concluir que "não mudou".

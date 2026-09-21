@@ -300,17 +300,23 @@ const SaaSPlanManager = {
             btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Gerando Cobrança Asaas...';
             errBox.style.display = 'none';
 
-            const email = (window.DataService && DataService.getUserEmail()) || 'cliente@lexion.com';
-            const salonId = (window.DataService && DataService.getTenantId()) || 'local';
+            // O servidor descobre o salão pelo token do login. Mandar o id do
+            // salão no corpo deixava qualquer um assinar (e trocar o plano)
+            // em nome de outro salão.
+            const token = window.DataService ? await DataService.getAccessToken() : null;
+            if (!token) {
+                throw new Error('Sua sessão expirou. Saia e entre de novo para assinar.');
+            }
 
             const response = await fetch('/api/asaas/create-subscription', {
                 method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${token}`
+                },
                 body: JSON.stringify({
-                    salonId: salonId,
                     planId: planId,
                     name: name,
-                    email: email,
                     cpfCnpj: cpf.replace(/\D/g, ''),
                     phone: phone.replace(/\D/g, ''),
                     billingType: 'PIX'

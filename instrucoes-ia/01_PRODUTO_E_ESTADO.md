@@ -98,6 +98,12 @@ crediário são travados apenas na tela. Ver *Riscos*.
    no log de webhooks dele. Se a fila do Asaas tiver sido pausada pelas
    recusas, reativá-la lá. (Por ora o token está na conta **sandbox**; na
    conta principal entra no checklist de lançamento.)
+   **Quarta porta, fechada no código em 21/09/2026:** o checkout
+   (`/api/asaas/create-subscription`) aceitava qualquer `salonId` no corpo e
+   gravava o plano no salão ao GERAR a cobrança, sem pagamento. Agora exige
+   o token de login e o plano só muda na confirmação. **Falta rodar a
+   migração `08_plano_so_apos_pagamento.sql`** no Studio — sem ela, o
+   pagamento confirmado ativa o salão mas não troca o plano.
 2. **A chave anon lê e grava tabelas direto.** As políticas
    "Agendamento: ..." da migração 01 dão à chave pública (que está no
    `config.js`) leitura de **todos** os `business_info`, `appointments` e

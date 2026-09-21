@@ -74,7 +74,7 @@ escopo é o mesmo, e o `app.js` já é grande demais.
 | `/`, `/home`, `/landing` | `landing.html` |
 | `/api/health` | status e ambiente do Asaas |
 | `POST /api/auth/register-salon` | cria usuário, salão, vínculo de dono, profissional e serviço iniciais; começa o teste de 7 dias |
-| `POST /api/asaas/create-subscription` | cria cliente + assinatura no Asaas e devolve o QR Code Pix |
+| `POST /api/asaas/create-subscription` | cria cliente + assinatura no Asaas e devolve o QR Code Pix. Exige `Authorization: Bearer <token de login>`; o salão sai do token (via `salon_members`), nunca do corpo, e só dono/admin assina. **Não muda o plano**: grava o plano escolhido em `subscriptions`, e o webhook o aplica quando o pagamento é confirmado |
 | `POST /api/asaas/webhook` | eventos do Asaas → RPC `process_asaas_webhook`. Exige o cabeçalho `asaas-access-token` igual a `ASAAS_WEBHOOK_TOKEN` (401 se não); 500 se o banco recusar, para o Asaas reenviar |
 | arquivo com extensão | estático de `public/` |
 | qualquer outro caminho | `index.html` — o `app.js` decide se é painel ou link público |

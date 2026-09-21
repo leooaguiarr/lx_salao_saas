@@ -190,6 +190,15 @@ const DataService = {
         return authSession?.user?.email || null;
     },
 
+    // Token da sessão, para as rotas do nosso servidor (/api/*) saberem quem
+    // chama. Pelo getSession, e não pelo authSession guardado: ele renova o
+    // token vencido antes de devolver.
+    async getAccessToken() {
+        if (!supabaseClient) return null;
+        const { data } = await supabaseClient.auth.getSession();
+        return data?.session?.access_token || null;
+    },
+
     // -------------------------
     // SALÃO (vários logins, uma barbearia)
     // -------------------------

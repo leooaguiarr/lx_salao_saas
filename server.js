@@ -68,6 +68,40 @@ function papelDaChaveSupabase() {
     }
 }
 
+// Quem está chamando, pelo token de login que o painel manda em
+// `Authorization: Bearer`. Quem valida o token é o próprio Supabase Auth; o
+// servidor não confia em id de usuário ou de salão vindo no corpo.
+async function usuarioDoToken(req) {
+    const cabecalho = req.headers['authorization'] || '';
+    const token = cabecalho.startsWith('Bearer ') ? cabecalho.slice(7).trim() : '';
+    if (!token) return null;
+    try {
+        const resposta = await fetch(`${SUPABASE_URL}/auth/v1/user`, {
+            headers: { 'apikey': SUPABASE_KEY, 'Authorization': `Bearer ${token}` }
+        });
+        if (!resposta.ok) return null;
+        const usuario = await resposta.json();
+        return usuario && usuario.id ? { id: usuario.id, email: usuario.email || '' } : null;
+    } catch {
+        return null;
+    }
+}
+
+// Salão do login e o papel dele. O vínculo vem de salon_members; a conta
+// criada antes do multi-login não tem vínculo, e aí o salão é o próprio id
+// (desde que exista um business_info dela).
+async function salaoDoUsuario(userId) {
+    const cabecalhos = { 'apikey': SUPABASE_KEY, 'Authorization': `Bearer ${SUPABASE_KEY}` };
+    const id = encodeURIComponent(userId);
+    const vinculo = await fetch(`${SUPABASE_URL}/rest/v1/salon_members?user_id=eq.${id}&select=salon_id,role&limit=1`, { headers: cabecalhos });
+    const linhas = vinculo.ok ? await vinculo.json() : [];
+    if (linhas.length) return { salonId: linhas[0].salon_id, papel: linhas[0].role };
+
+    const proprio = await fetch(`${SUPABASE_URL}/rest/v1/business_info?user_id=eq.${id}&select=user_id&limit=1`, { headers: cabecalhos });
+    const salao = proprio.ok ? await proprio.json() : [];
+    return salao.length ? { salonId: userId, papel: 'owner' } : null;
+}
+
 // Helper para ler corpo JSON de requisições POST
 function parseJsonBody(req) {
     return new Promise((resolve, reject) => {
@@ -298,12 +332,30 @@ const server = http.createServer(async (req, res) => {
         // Rota: Criar Assinatura no Asaas (Checkout)
         if (req.url === '/api/asaas/create-subscription' && req.method === 'POST') {
             try {
-                const data = await parseJsonBody(req);
-                const { salonId, planId, name, email, cpfCnpj, phone, billingType, creditCard, creditCardHolderInfo } = data;
+                // O salão sai do token, nunca do corpo. Antes a rota aceitava
+                // um `salonId` qualquer e, com a chave de serviço, gravava
+                // plano e ids do Asaas no salão que o chamador escolhesse.
+                const usuario = await usuarioDoToken(req);
+                if (!usuario) {
+                    res.writeHead(401);
+                    res.end(JSON.stringify({ ok: false, error: 'Sessão inválida. Saia e entre de novo.' }));
+                    return;
+                }
+                const vinculo = await salaoDoUsuario(usuario.id);
+                if (!vinculo || !['owner', 'admin'].includes(vinculo.papel)) {
+                    res.writeHead(403);
+                    res.end(JSON.stringify({ ok: false, error: 'Só o dono do estabelecimento pode assinar um plano.' }));
+                    return;
+                }
+                const salonId = vinculo.salonId;
+                const email = usuario.email;
 
-                if (!salonId || !planId || !name || !email) {
+                const data = await parseJsonBody(req);
+                const { planId, name, cpfCnpj, phone, billingType, creditCard, creditCardHolderInfo } = data;
+
+                if (!planId || !name || !email) {
                     res.writeHead(400);
-                    res.end(JSON.stringify({ ok: false, error: 'Campos obrigatórios ausentes (salonId, planId, name, email).' }));
+                    res.end(JSON.stringify({ ok: false, error: 'Campos obrigatórios ausentes (plano e nome).' }));
                     return;
                 }
 
@@ -347,8 +399,18 @@ const server = http.createServer(async (req, res) => {
                 }
 
                 // 4. Salva no Supabase (business_info e subscriptions)
+                //
+                // O plan_id do salão NÃO muda aqui: gerar a cobrança não é
+                // pagar. O plano escolhido fica em subscriptions.plan_id, e a
+                // process_asaas_webhook o aplica ao salão quando o pagamento é
+                // confirmado (migração 08). Antes, abrir o checkout do
+                // Ilimitado já liberava o Ilimitado.
+                //
+                // As respostas são conferidas: um erro aqui deixava a assinatura
+                // criada no Asaas sem vínculo no banco, e o pagamento dela
+                // nunca ativaria o salão — sem aviso para ninguém.
                 try {
-                    await fetch(`${SUPABASE_URL}/rest/v1/business_info?user_id=eq.${salonId}`, {
+                    const vinculoAsaas = await fetch(`${SUPABASE_URL}/rest/v1/business_info?user_id=eq.${encodeURIComponent(salonId)}`, {
                         method: 'PATCH',
                         headers: {
                             'apikey': SUPABASE_KEY,
@@ -358,12 +420,12 @@ const server = http.createServer(async (req, res) => {
                         },
                         body: JSON.stringify({
                             asaas_customer_id: customer.id,
-                            asaas_subscription_id: subscription.id,
-                            plan_id: planId
+                            asaas_subscription_id: subscription.id
                         })
                     });
+                    if (!vinculoAsaas.ok) throw new Error(`business_info HTTP ${vinculoAsaas.status}: ${await vinculoAsaas.text()}`);
 
-                    await fetch(`${SUPABASE_URL}/rest/v1/subscriptions`, {
+                    const registroAssinatura = await fetch(`${SUPABASE_URL}/rest/v1/subscriptions?on_conflict=asaas_subscription_id`, {
                         method: 'POST',
                         headers: {
                             'apikey': SUPABASE_KEY,
@@ -381,8 +443,15 @@ const server = http.createServer(async (req, res) => {
                             cycle: 'MONTHLY'
                         })
                     });
+                    if (!registroAssinatura.ok) throw new Error(`subscriptions HTTP ${registroAssinatura.status}: ${await registroAssinatura.text()}`);
                 } catch (dbErr) {
-                    console.error('Erro ao sincronizar assinatura com Supabase:', dbErr);
+                    console.error(`[Checkout] Assinatura ${subscription.id} criada no Asaas, mas não gravada no banco:`, dbErr.message);
+                    res.writeHead(500);
+                    res.end(JSON.stringify({
+                        ok: false,
+                        error: 'A cobrança foi criada, mas não conseguimos registrá-la. Não pague ainda: fale com o suporte da Lexion.'
+                    }));
+                    return;
                 }
 
                 res.writeHead(200);

@@ -194,7 +194,7 @@
                         <li><i class="fa-solid fa-check"></i> Link público de agendamento personalizado</li>
                     </ul>
 
-                    <button onclick="abrirModalTrial('equipe_4')" class="btn-qutter-gold">
+                    <button id="niche-btn" onclick="abrirModalTrial('equipe_4', 'barbearia')" class="btn-qutter-gold">
                         Criar Minha Barbearia Grátis <i class="fa-solid fa-arrow-right"></i>
                     </button>
                 </div>
@@ -660,6 +660,12 @@
                 const featuresList = document.getElementById('niche-features');
                 featuresList.innerHTML = dados.features.map(f => `<li><i class="fa-solid fa-check"></i> ${f}</li>`).join('');
 
+                const btn = document.getElementById('niche-btn');
+                if (btn) {
+                    btn.innerHTML = `${dados.btnText} <i class="fa-solid fa-arrow-right"></i>`;
+                    btn.setAttribute('onclick', `abrirModalTrial('equipe_4', '${nicho}')`);
+                }
+
                 showcase.style.opacity = '1';
             }, 180);
         }
@@ -671,9 +677,12 @@
         }
 
         // Modal de Trial
-        function abrirModalTrial(plano) {
+        function abrirModalTrial(plano, tipo) {
             if (plano) {
                 document.getElementById('trial-plan').value = plano;
+            }
+            if (tipo) {
+                document.getElementById('trial-business-type').value = tipo;
             }
             const err = document.getElementById('trial-error');
             if (err) err.style.display = 'none';

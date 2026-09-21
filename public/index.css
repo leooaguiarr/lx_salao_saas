@@ -485,6 +485,9 @@ h1, h2, h3, h4, h5, h6 {
     display: flex;
     align-items: center;
     gap: 16px;
+    /* Sem isto o título e os botões disputam largura com a busca, e quem perde
+       é sempre a busca: ela encolhe até virar um círculo com a lupa dentro. */
+    flex-shrink: 0;
 }
 
 .sidebar-toggle {
@@ -506,12 +509,16 @@ h1, h2, h3, h4, h5, h6 {
     display: flex;
     align-items: center;
     gap: 20px;
+    flex-shrink: 0;
 }
 
 /* --- Busca global do cabeçalho ------------------------------------------- */
 .header-search {
     position: relative;
-    flex: 1;
+    /* Ocupa a sobra entre o título e as ações, e nunca abaixo de um tamanho em
+       que ainda dá para ler o que se digita. */
+    flex: 1 1 220px;
+    min-width: 200px;
     max-width: 460px;
     margin: 0 24px;
 }
@@ -755,8 +762,16 @@ h1, h2, h3, h4, h5, h6 {
     color: var(--danger);
 }
 
-/* Sem largura para tudo: a busca sai antes das ações rápidas, que são
-   operação do dia; o chip do plano sai depois, e o sino fica até o fim. */
+/* Sem largura para tudo, a ordem de sacrifício é: primeiro a data (está no
+   relógio do aparelho), depois a busca (a aba Clientes tem a sua), depois o
+   chip do plano. As ações rápidas e o sino ficam até o fim — são operação do
+   dia e aviso, não enfeite. */
+@media (max-width: 1500px) {
+    .header-date {
+        display: none;
+    }
+}
+
 @media (max-width: 1280px) {
     .header-search {
         max-width: 280px;

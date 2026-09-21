@@ -5384,7 +5384,16 @@ function updateUserProfileUI() {
     const salonNameEl = document.getElementById('sidebar-salon-name');
     const logoIconEl = document.getElementById('sidebar-logo-icon');
 
-    const salonName = (data.businessInfo && data.businessInfo.name) || localStorage.getItem('lexion_biz_name') || '';
+    // Uma gravação antiga podia deixar a PALAVRA "undefined" no cadastro ou no
+    // localStorage, e ela passava direto por um teste de vazio — era o que
+    // aparecia escrito no topo da barra lateral, no lugar do nome do salão.
+    const nomeUtil = (valor) => {
+        const texto = String(valor ?? '').trim();
+        return (texto && texto !== 'undefined' && texto !== 'null') ? texto : '';
+    };
+
+    const salonName = nomeUtil(data.businessInfo && data.businessInfo.name)
+        || nomeUtil(localStorage.getItem('lexion_biz_name'));
     const savedAvatar = (data.businessInfo && data.businessInfo.avatarUrl) || localStorage.getItem('lexion_biz_avatar') || '';
 
     if (salonNameEl) {

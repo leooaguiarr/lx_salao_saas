@@ -363,40 +363,40 @@ const SaaSPlanManager = {
     /**
      * Exibe banner informativo de período de testes ou pagamento pendente
      */
+    // O banner é uma FAIXA acima do cabeçalho, nunca um item dentro dele: o
+    // .top-header é flex, e inserir o banner como filho o espremia numa coluna
+    // estreita em cima dos botões — era o que aparecia na tela.
+    posicionarBanner(banner) {
+        const header = document.querySelector('.top-header');
+        if (header && header.parentNode) {
+            header.parentNode.insertBefore(banner, header);
+        } else {
+            document.body.insertBefore(banner, document.body.firstChild);
+        }
+    },
+
     renderSubscriptionBanner() {
         const existing = document.getElementById('saas-status-banner');
         if (existing) existing.remove();
 
-        if (this.subscriptionStatus === 'trial') {
+        // Em teste, quem avisa é o chip do cabeçalho, que ainda mostra quantos
+        // dias faltam e leva ao mesmo checkout. Repetir o recado numa faixa
+        // rouba uma linha de tela todo dia para dizer o que já está dito ao
+        // lado. Fatura pendente é outra conversa: aí a faixa se justifica.
+        if (this.subscriptionStatus === 'past_due') {
             const banner = document.createElement('div');
             banner.id = 'saas-status-banner';
-            banner.style.cssText = 'background: linear-gradient(90deg, #18181b, #27272a); border-bottom: 1px solid rgba(212, 175, 55, 0.3); padding: 8px 16px; font-size: 0.82rem; color: #d4af37; display: flex; align-items: center; justify-content: space-between; z-index: 99;';
-            banner.innerHTML = `
-                <div style="display: flex; align-items: center; gap: 8px;">
-                    <i class="fa-solid fa-clock"></i>
-                    <span>Você está no <strong>Período de Testes Grátis</strong> (${this.getPlan().name}).</span>
-                </div>
-                <button onclick="SaaSPlanManager.redirectToCheckout()" style="background: #d4af37; color: #000; border: none; font-size: 0.75rem; font-weight: 700; padding: 4px 10px; border-radius: 4px; cursor: pointer;">
-                    Ativar Assinatura
-                </button>
-            `;
-            const header = document.querySelector('header') || document.body;
-            header.insertBefore(banner, header.firstChild);
-        } else if (this.subscriptionStatus === 'past_due') {
-            const banner = document.createElement('div');
-            banner.id = 'saas-status-banner';
-            banner.style.cssText = 'background: #7f1d1d; border-bottom: 1px solid #ef4444; padding: 10px 16px; font-size: 0.85rem; color: #fecaca; display: flex; align-items: center; justify-content: space-between; z-index: 99;';
+            banner.style.cssText = 'background: var(--danger-light); border-bottom: 1px solid var(--danger); padding: 10px 30px; font-size: 0.85rem; color: var(--danger); display: flex; align-items: center; justify-content: space-between; gap: 16px; z-index: 99;';
             banner.innerHTML = `
                 <div style="display: flex; align-items: center; gap: 8px;">
                     <i class="fa-solid fa-triangle-exclamation"></i>
                     <span>Sua assinatura está com <strong>fatura pendente</strong>. Regularize para evitar bloqueio da agenda.</span>
                 </div>
-                <button onclick="SaaSPlanManager.redirectToCheckout()" style="background: #ef4444; color: #fff; border: none; font-size: 0.75rem; font-weight: 700; padding: 5px 12px; border-radius: 4px; cursor: pointer;">
+                <button onclick="SaaSPlanManager.redirectToCheckout()" style="background: var(--danger); color: #fff; border: none; font-size: 0.75rem; font-weight: 700; padding: 5px 12px; border-radius: 4px; cursor: pointer; white-space: nowrap;">
                     Pagar Fatura
                 </button>
             `;
-            const header = document.querySelector('header') || document.body;
-            header.insertBefore(banner, header.firstChild);
+            this.posicionarBanner(banner);
         }
     }
 };

@@ -10,7 +10,7 @@ várias conversas; tudo que não dá para deduzir lendo o código está aqui.
 
 | Arquivo | Quando ler |
 | --- | --- |
-| [01_PRODUTO_E_ESTADO.md](01_PRODUTO_E_ESTADO.md) | Sempre. O que é o sistema, o que está no ar, o que falta e os riscos abertos. |
+| [01_PRODUTO_E_ESTADO.md](01_PRODUTO_E_ESTADO.md) | Sempre. O que é o sistema, o que está no ar, o que falta, os riscos abertos e o **checklist de lançamento** (Asaas de volta para produção e limpeza do banco). |
 | [02_ARQUITETURA.md](02_ARQUITETURA.md) | Sempre, antes de editar código. Arquivos, fluxo de dados, rotas, papéis e planos. |
 | [03_BANCO_DE_DADOS.md](03_BANCO_DE_DADOS.md) | Antes de tocar em tabela, coluna, RLS, RPC ou em qualquer `save`/`upsert`. |
 | [04_COMO_TRABALHAR.md](04_COMO_TRABALHAR.md) | Sempre. Rodar, testar, publicar, commit e estilo de código. |

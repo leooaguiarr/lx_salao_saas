@@ -53,8 +53,12 @@ crediário são travados apenas na tela. Ver *Riscos*.
 - **Conferir a configuração sem abrir o Coolify**: `GET /api/health` diz
   `webhookProtegido` (token configurado?) e `chaveSupabase` (tem que ser
   `service_role`). Nunca mostra o valor de segredo nenhum.
-- **Asaas em produção** (conferido em 21/09/2026 por `GET /api/health` →
-  `"asaasEnv":"production"`). Cobrança real.
+- **Asaas em SANDBOX, de propósito** (decidido em 21/09/2026). O sistema
+  ainda está em fase de testes da API de cobrança: `ASAAS_ENV=sandbox` e chave
+  `$aact_hmlg_` no Coolify, webhook com token cadastrado na conta sandbox.
+  Nenhuma cobrança é real. Confira o ambiente em vigor pelo campo `asaasEnv`
+  do `/api/health`. **A volta para produção faz parte do *Checklist de
+  lançamento*, mais abaixo neste arquivo.**
 
 ## Estado atual (21/09/2026)
 
@@ -92,7 +96,8 @@ crediário são travados apenas na tela. Ver *Riscos*.
    rodada no Studio com as 4 conferências `true`. **Pendente:** confirmar o
    mesmo token no painel do Asaas e ver o próximo evento real chegar com 200
    no log de webhooks dele. Se a fila do Asaas tiver sido pausada pelas
-   recusas, reativá-la lá.
+   recusas, reativá-la lá. (Por ora o token está na conta **sandbox**; na
+   conta principal entra no checklist de lançamento.)
 2. **A chave anon lê e grava tabelas direto.** As políticas
    "Agendamento: ..." da migração 01 dão à chave pública (que está no
    `config.js`) leitura de **todos** os `business_info`, `appointments` e
@@ -120,11 +125,55 @@ crediário são travados apenas na tela. Ver *Riscos*.
 6. **Fotos em base64 no banco** (logo, profissionais, produtos). Pesam em cada
    carga. O bucket do Storage já existe no Coolify, mas não está ligado.
 
+## Checklist de lançamento
+
+**Antes de abrir para clientes pagantes, tudo isto precisa estar feito.** Se
+o Leonardo falar em "colocar em produção", "lançar" ou "começar a cobrar",
+é esta lista — confira item por item com ele, não presuma que algo já foi
+feito.
+
+1. **Limpar o banco de dados.** Hoje ele tem salões, clientes, agendamentos,
+   vendas e cobranças de teste. O Leonardo vai pedir o comando: escreva o SQL
+   de limpeza nessa hora, olhando o schema do momento (não um script
+   guardado, que fica velho). Regras:
+   - **Mostre antes de apagar**: primeiro um `SELECT` com a contagem por
+     tabela do que vai sair, e só depois o `DELETE`, com o aval dele.
+   - **Preserve** a tabela `plans` (os três planos) e toda a estrutura:
+     tabelas, funções, gatilhos, políticas.
+   - Apague também os usuários de teste em `auth.users`. As tabelas da
+     migração 01 têm `user_id ... ON DELETE CASCADE`, mas **confira no schema
+     do momento se todas têm** — tabela sem cascade deixa linha órfã ou
+     bloqueia o delete. Apague também os logs
+     `asaas_webhooks`, `asaas_invoices` e `subscriptions` do período sandbox —
+     são ids da sandbox, que não existem na conta de produção.
+   - Pergunte se algum salão ou login deve ficar (ex.: uma conta de
+     demonstração da Lexion).
+2. **Asaas de volta para produção**, no Coolify (aplicação
+   `lx_salao_saas`, variáveis do tipo Production) e depois **Redeploy**:
+   - `ASAAS_ENV=production`
+   - `ASAAS_API_KEY` com a chave da **conta principal** (`$aact_prod_...`).
+     Ambiente e chave mudam juntos: a chave de um com o endereço do outro faz
+     o Asaas recusar tudo.
+3. **Webhook na conta principal do Asaas** (Integrações → Webhooks):
+   URL `https://salao.lexionconsultoria.tech/api/asaas/webhook`, "Token de
+   autenticação" igual ao `ASAAS_WEBHOOK_TOKEN` do Coolify, eventos de
+   cobrança (criada, confirmada, recebida, vencida, estornada, removida),
+   ativo.
+4. **Desativar o webhook da sandbox** (ou trocar o token dele). Se ficar
+   ativo com o token certo, pagamentos de teste chegam ao servidor de
+   produção e são aceitos.
+5. **Conferir** no `/api/health`: `asaasEnv: production`,
+   `webhookProtegido: true`, `chaveSupabase: service_role`.
+6. **Um pagamento real de ponta a ponta**, de valor baixo: assinatura pelo
+   checkout Pix → pagar → webhook com 200 no log do Asaas → salão `active`.
+   Depois, estornar pelo painel do Asaas.
+
 ## O que vem a seguir
 
 Da lista do dono do projeto, em ordem sugerida:
 
-1. Confirmar o token do webhook no painel do Asaas (risco 1).
+1. Testar a cobrança na sandbox de ponta a ponta: checkout Pix → "confirmar
+   recebimento" no painel da sandbox → webhook com 200 → salão ativo.
 2. Fechar o risco 2 (políticas anon), com teste do link público.
 3. Conferir o risco 3 no SQL Editor e, se faltar, escrever a migração.
 4. Validar um pagamento real de assinatura ponta a ponta.

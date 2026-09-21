@@ -57,17 +57,17 @@
     <!-- Font Awesome Icons -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <!-- CSS Customizado -->
-    <link rel="stylesheet" href="/index.css?v=64">
-    <link rel="stylesheet" href="/estoque.css?v=64">
-    <link rel="stylesheet" href="/ajuda.css?v=64">
-    <link rel="stylesheet" href="/auth.css?v=64">
+    <link rel="stylesheet" href="/index.css?v=65">
+    <link rel="stylesheet" href="/estoque.css?v=65">
+    <link rel="stylesheet" href="/ajuda.css?v=65">
+    <link rel="stylesheet" href="/auth.css?v=65">
     <!-- Evolução de Vendas. Depois dos anteriores de propósito: estes só
          acrescentam as telas novas e não redefinem nada do index.css. -->
-    <link rel="stylesheet" href="/vendas.css?v=64">
-    <link rel="stylesheet" href="/checkout.css?v=64">
-    <link rel="stylesheet" href="/comissoes.css?v=64">
-    <link rel="stylesheet" href="/crediario.css?v=64">
-    <link rel="stylesheet" href="/fidelidade.css?v=64">
+    <link rel="stylesheet" href="/vendas.css?v=65">
+    <link rel="stylesheet" href="/checkout.css?v=65">
+    <link rel="stylesheet" href="/comissoes.css?v=65">
+    <link rel="stylesheet" href="/crediario.css?v=65">
+    <link rel="stylesheet" href="/fidelidade.css?v=65">
 </head>
 <body class="dark-theme">
     <!--
@@ -3117,36 +3117,36 @@
     <!-- Estes três também levam versão: o servidor manda cache de um dia para
          arquivos estáticos, e sem o ?v= uma correção aqui só chegaria ao
          navegador de quem já usou o sistema no dia seguinte. -->
-    <script src="/config.js?v=64"></script>
-    <script src="/theme.js?v=64"></script>
-    <script src="/saas-plan.js?v=64"></script>
-    <script src="/api.js?v=64"></script>
+    <script src="/config.js?v=65"></script>
+    <script src="/theme.js?v=65"></script>
+    <script src="/saas-plan.js?v=65"></script>
+    <script src="/api.js?v=65"></script>
 
     <!-- JavaScript Principal -->
-    <script src="/app.js?v=64"></script>
+    <script src="/app.js?v=65"></script>
 
     <!-- Funcionalidades acrescentadas depois. A ordem importa: elas leem o
          estado global e as funções de cálculo que app.js define. -->
-    <script src="/estoque.js?v=64"></script>
-    <script src="/encaixe.js?v=64"></script>
-    <script src="/ajuda.js?v=64"></script>
+    <script src="/estoque.js?v=65"></script>
+    <script src="/encaixe.js?v=65"></script>
+    <script src="/ajuda.js?v=65"></script>
 
     <!-- Evolução de Vendas (banco: docs/14 a 28). A ordem entre eles TAMBÉM
          importa, e não é a mesma coisa que a ordem acima: `venda-calculo`
          precisa das constantes de `vendas-base`, `checkout` precisa do cálculo,
          e `recibo` é chamado no fim do checkout. Portados do projeto de origem
          (`lexion_salao`), onde nasceram como 22- a 28- e foram testados. -->
-    <script src="/vendas-base.js?v=64"></script>
-    <script src="/venda-calculo.js?v=64"></script>
-    <script src="/checkout.js?v=64"></script>
-    <script src="/comissoes.js?v=64"></script>
-    <script src="/crediario.js?v=64"></script>
-    <script src="/fidelidade.js?v=64"></script>
-    <script src="/recibo.js?v=64"></script>
+    <script src="/vendas-base.js?v=65"></script>
+    <script src="/venda-calculo.js?v=65"></script>
+    <script src="/checkout.js?v=65"></script>
+    <script src="/comissoes.js?v=65"></script>
+    <script src="/crediario.js?v=65"></script>
+    <script src="/fidelidade.js?v=65"></script>
+    <script src="/recibo.js?v=65"></script>
 
     <!-- Barra superior: lê o estado e os cálculos de todos os anteriores
          (clientes, estoque mínimo, crediário atrasado), por isso vem por último. -->
-    <script src="/topbar.js?v=64"></script>
-    <script src="/pwa.js?v=64"></script>
+    <script src="/topbar.js?v=65"></script>
+    <script src="/pwa.js?v=65"></script>
 </body>
 </html>

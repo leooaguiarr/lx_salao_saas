@@ -171,8 +171,10 @@ function renderChipDoPlano() {
     chip.hidden = false;
     chip.classList.toggle('chip-plano-urgente', dias !== null && dias <= 2);
     chip.innerHTML = `
-        <i class="fa-solid fa-crown"></i>
-        <span>${textoSeguro(plano.name)}</span>
+        <div style="display: flex; align-items: center; gap: 7px; min-width: 0;">
+            <i class="fa-solid fa-crown" style="color: var(--primary); font-size: 12px;"></i>
+            <span style="font-weight: 600; font-size: 12px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">${textoSeguro(plano.name)}</span>
+        </div>
         <span class="chip-plano-trial">${textoSeguro(trechoDoTeste)}</span>`;
     chip.title = 'Ver planos e assinar';
 }

@@ -37,7 +37,7 @@ const STATE_KEYS = {
 const LOGO_PADRAO = '/assets/logo_lexion.png';
 
 // Versão exibida no rodapé do login.
-const VERSAO_DO_SISTEMA = '2.1.0';
+const VERSAO_DO_SISTEMA = '2.2.0';
 
 let currentSelectedDate = new Date();
 
@@ -522,13 +522,40 @@ function initNavigation() {
         }
     });
 
-    // Mobile Sidebar Toggles
+    // Controle da Barra Lateral (Recolher com seta no Desktop e Drawer no Mobile)
+    const appContainer = document.getElementById('app-container');
     const toggleBtn = document.getElementById('sidebar-toggle-btn');
+    const collapseBtn = document.getElementById('sidebar-collapse-btn');
     const closeBtn = document.getElementById('sidebar-close-btn');
     const sidebar = document.getElementById('sidebar');
 
+    // Restaura preferência salva no Desktop
+    if (window.innerWidth > 768 && localStorage.getItem('lexion_sidebar_collapsed') === 'true') {
+        if (appContainer) appContainer.classList.add('sidebar-collapsed');
+    }
+
+    // Botão de seta na barra lateral para recolher (Desktop)
+    if (collapseBtn) {
+        collapseBtn.addEventListener('click', () => {
+            if (appContainer) {
+                appContainer.classList.add('sidebar-collapsed');
+                localStorage.setItem('lexion_sidebar_collapsed', 'true');
+            }
+        });
+    }
+
+    // Botão de seta no topo para reabrir (Desktop) ou abrir drawer (Mobile)
     if (toggleBtn) {
-        toggleBtn.addEventListener('click', () => sidebar.classList.add('show'));
+        toggleBtn.addEventListener('click', () => {
+            if (window.innerWidth > 768) {
+                if (appContainer) {
+                    appContainer.classList.remove('sidebar-collapsed');
+                    localStorage.setItem('lexion_sidebar_collapsed', 'false');
+                }
+            } else {
+                sidebar.classList.add('show');
+            }
+        });
     }
     if (closeBtn) {
         closeBtn.addEventListener('click', () => sidebar.classList.remove('show'));
@@ -3294,6 +3321,130 @@ function renderConfig() {
     // Sub-aba "Fidelidade" (Fase F) — definida em fidelidade.js, carregado
     // depois deste arquivo, mas só é chamada aqui em tempo de execução.
     if (typeof renderConfigDaFidelidade === 'function') renderConfigDaFidelidade();
+
+    // Sub-aba "Meu Plano" (Assinatura e Planos)
+    renderConfigPlano();
+}
+
+function renderConfigPlano() {
+    const container = document.getElementById('config-plano-detalhes');
+    if (!container || typeof SaaSPlanManager === 'undefined') return;
+
+    const plano = SaaSPlanManager.getPlan();
+    if (!plano) return;
+
+    const status = SaaSPlanManager.subscriptionStatus || 'trial';
+    const emTeste = status === 'trial';
+    const fimTeste = SaaSPlanManager.trialEndsAt;
+    const diasRestantes = emTeste && fimTeste ? Math.max(0, Math.ceil((new Date(fimTeste) - Date.now()) / 86400000)) : null;
+
+    let statusHtml = '';
+    if (emTeste) {
+        let textoTeste = 'Teste grátis ativo';
+        if (diasRestantes === 0) textoTeste = 'Último dia de teste';
+        else if (diasRestantes === 1) textoTeste = '1 dia restante de teste';
+        else if (diasRestantes !== null) textoTeste = `${diasRestantes} dias restantes de teste`;
+        statusHtml = `<span class="config-plano-status-badge status-trial"><i class="fa-solid fa-clock"></i> ${escapeHTML(textoTeste)}</span>`;
+    } else if (status === 'active') {
+        statusHtml = `<span class="config-plano-status-badge status-active"><i class="fa-solid fa-circle-check"></i> Assinatura Ativa</span>`;
+    } else if (status === 'past_due') {
+        statusHtml = `<span class="config-plano-status-badge status-past_due"><i class="fa-solid fa-triangle-exclamation"></i> Fatura Pendente</span>`;
+    } else {
+        statusHtml = `<span class="config-plano-status-badge status-trial">${escapeHTML(status)}</span>`;
+    }
+
+    const plans = (window.APP_CONFIG && window.APP_CONFIG.PLANS) || {};
+    const maxProf = plano.maxProfessionals >= 999 ? 'Profissionais ilimitados' : `Até ${plano.maxProfessionals} profissional(is)`;
+
+    const featEstoque = plano.features && plano.features.inventory;
+    const featFidelidade = plano.features && plano.features.loyalty;
+    const featCrediario = plano.features && plano.features.credit;
+
+    container.innerHTML = `
+        <div class="config-plano-current-card">
+            <div class="config-plano-header">
+                <div class="config-plano-title-group">
+                    <div class="config-plano-icon">
+                        <i class="fa-solid fa-crown"></i>
+                    </div>
+                    <div>
+                        <h3 class="config-plano-name">${escapeHTML(plano.name)}</h3>
+                        <span class="config-plano-price">R$ ${Number(plano.price).toFixed(2).replace('.', ',')}/mês</span>
+                    </div>
+                </div>
+                <div>
+                    ${statusHtml}
+                </div>
+            </div>
+
+            <div class="config-plano-features">
+                <div class="config-plano-feat-item">
+                    <i class="fa-solid fa-check"></i>
+                    <span>${escapeHTML(maxProf)}</span>
+                </div>
+                <div class="config-plano-feat-item">
+                    <i class="fa-solid fa-check"></i>
+                    <span>Agenda & Link Público de Agendamento</span>
+                </div>
+                <div class="config-plano-feat-item">
+                    <i class="fa-solid fa-check"></i>
+                    <span>Cadastro Ilimitado de Clientes</span>
+                </div>
+                <div class="config-plano-feat-item">
+                    <i class="fa-solid fa-check"></i>
+                    <span>Atendimentos, Caixa & Financeiro</span>
+                </div>
+                <div class="config-plano-feat-item ${featEstoque ? '' : 'feat-disabled'}">
+                    <i class="fa-solid ${featEstoque ? 'fa-check' : 'fa-lock'}"></i>
+                    <span>Controle de Estoque & Produtos ${featEstoque ? '' : '(a partir do Plano Equipe)'}</span>
+                </div>
+                <div class="config-plano-feat-item ${featFidelidade ? '' : 'feat-disabled'}">
+                    <i class="fa-solid ${featFidelidade ? 'fa-check' : 'fa-lock'}"></i>
+                    <span>Clube de Benefícios & Fidelidade ${featFidelidade ? '' : '(Plano Ilimitado)'}</span>
+                </div>
+                <div class="config-plano-feat-item ${featCrediario ? '' : 'feat-disabled'}">
+                    <i class="fa-solid ${featCrediario ? 'fa-check' : 'fa-lock'}"></i>
+                    <span>Gestão de Crediário ${featCrediario ? '' : '(Plano Ilimitado)'}</span>
+                </div>
+            </div>
+
+            <div class="config-plano-actions">
+                <button type="button" class="btn btn-primary" onclick="SaaSPlanManager.redirectToCheckout()">
+                    <i class="fa-solid fa-arrow-up-right-from-square"></i> ${emTeste ? 'Assinar Agora (Pix Automático)' : 'Trocar de Plano / Regularizar'}
+                </button>
+            </div>
+        </div>
+
+        <div style="margin-top: 10px;">
+            <h4 style="font-size: 1.05rem; font-weight: 700; margin-bottom: 6px;">Planos Disponíveis</h4>
+            <p style="color: var(--text-muted); font-size: 0.85rem; margin-bottom: 14px;">Você pode alterar seu plano a qualquer momento sem perder dados.</p>
+            <div class="config-planos-grid">
+                ${Object.values(plans).map(p => `
+                    <div class="config-plano-option-card ${p.id === plano.id ? 'card-destaque' : ''}">
+                        <div>
+                            <div style="display: flex; justify-content: space-between; align-items: start; margin-bottom: 8px;">
+                                <h5 style="font-size: 1rem; font-weight: 700; margin: 0;">${escapeHTML(p.name)}</h5>
+                                ${p.id === plano.id ? '<span style="font-size: 0.72rem; background: var(--primary); color: #000; font-weight: 700; padding: 2px 8px; border-radius: 4px;">Atual</span>' : ''}
+                            </div>
+                            <div style="font-size: 1.25rem; font-weight: 800; color: var(--primary); margin-bottom: 12px;">
+                                R$ ${Number(p.price).toFixed(2).replace('.', ',')}<span style="font-size: 0.8rem; font-weight: 500; color: var(--text-muted);">/mês</span>
+                            </div>
+                            <ul style="list-style: none; padding: 0; margin: 0 0 16px 0; font-size: 0.82rem; color: var(--text-muted); display: flex; flex-direction: column; gap: 6px;">
+                                <li><i class="fa-solid fa-check" style="color: var(--success); margin-right: 6px;"></i> ${p.maxProfessionals >= 999 ? 'Profissionais ilimitados' : 'Até ' + p.maxProfessionals + ' profissional(is)'}</li>
+                                <li><i class="fa-solid fa-check" style="color: var(--success); margin-right: 6px;"></i> Agenda, Clientes e Atendimentos</li>
+                                <li><i class="fa-solid ${p.features && p.features.inventory ? 'fa-check' : 'fa-xmark'}" style="color: ${p.features && p.features.inventory ? 'var(--success)' : 'var(--text-muted)'}; margin-right: 6px;"></i> Controle de Estoque</li>
+                                <li><i class="fa-solid ${p.features && p.features.loyalty ? 'fa-check' : 'fa-xmark'}" style="color: ${p.features && p.features.loyalty ? 'var(--success)' : 'var(--text-muted)'}; margin-right: 6px;"></i> Clube de Fidelidade</li>
+                                <li><i class="fa-solid ${p.features && p.features.credit ? 'fa-check' : 'fa-xmark'}" style="color: ${p.features && p.features.credit ? 'var(--success)' : 'var(--text-muted)'}; margin-right: 6px;"></i> Gestão de Crediário</li>
+                            </ul>
+                        </div>
+                        <button type="button" class="btn ${p.id === plano.id ? 'btn-secondary' : 'btn-primary'} btn-sm" onclick="SaaSPlanManager.redirectToCheckout('${p.id}')">
+                            ${p.id === plano.id ? 'Plano Atual' : 'Escolher este plano'}
+                        </button>
+                    </div>
+                `).join('')}
+            </div>
+        </div>
+    `;
 }
 
 // Escolha do tema (claro ou escuro). Aplica no clique e só grava quando o

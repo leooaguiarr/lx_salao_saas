@@ -106,6 +106,9 @@ const RELATORIO = `JSON.stringify({
   if (flags.includes('--claro')) await rodar(`ThemeManager.applyMode('claro')`);
   if (flags.includes('--painel')) await rodar(MOSTRAR_PAINEL);
   if (aba) await rodar(`document.querySelector('.menu-item[data-target="${aba}"]')?.click()`);
+  const subaba = (flags.find(f => f.startsWith('--subaba=')) || '').slice(9);
+  if (subaba) await rodar(`document.querySelector('[data-config-tab="${subaba}"]')?.click()`);
+  if (flags.includes('--recolher-menu')) await rodar(`document.getElementById('sidebar-collapse-btn')?.click()`);
   await esperar(800);
 
   console.log((await rodar(RELATORIO)).result.result.value);

@@ -13,6 +13,20 @@ na `main` publica sozinho. Por isso:
    que ele já tenha pedido para publicar.
 5. Commit, push e **conferir em produção** que o deploy pegou.
 
+## Mais de um agente ao mesmo tempo
+
+Às vezes dois agentes (Claude, Gemini...) trabalham no repositório em
+paralelo, cada um numa conversa. Para não pisar um no outro:
+
+- **`git pull` antes de começar e de novo antes do push** (`git pull
+  --rebase`). O outro pode ter publicado nesse meio-tempo.
+- **Conflito no `?v=` do `index.html` é o mais comum.** Resolva ficando com o
+  número mais alto dos dois lados **mais um**, em todas as tags.
+- Commits pequenos e só com os arquivos da sua tarefa (`git add <arquivos>`,
+  nunca `git add .`).
+- Se a tarefa encostar em arquivo que o outro está mexendo, avise o Leonardo
+  antes de seguir.
+
 ## Rodar
 
 ```powershell

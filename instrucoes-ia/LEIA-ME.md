@@ -23,6 +23,10 @@ várias conversas; tudo que não dá para deduzir lendo o código está aqui.
 Ferramentas de verificação (Chrome headless, sem dependências) estão em
 [ferramentas/](ferramentas/).
 
+Os arquivos `CLAUDE.md`, `AGENTS.md` e `GEMINI.md` da raiz só apontam para
+cá — cada ferramenta de IA procura um nome diferente. Não coloque conteúdo
+neles; escreva nesta pasta.
+
 ## As cinco regras de ouro
 
 1. **Push na `main` é deploy em produção.** O Coolify publica sozinho a cada

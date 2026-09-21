@@ -68,7 +68,7 @@
         </div>
     </header>
 
-    <!-- HERO SECTION: DUAL SPLIT INTEGRADO (SALÃO FEMININO & BARBEARIA) -->
+    <!-- HERO SECTION: DUAL SPLIT INTEGRADO (SALÃO & BARBEARIA) -->
     <section class="hero-section" id="inicio">
         <div class="hero-bg"></div>
         <div class="hero-split-overlay">
@@ -160,7 +160,7 @@
                 <span class="section-tag">Flexibilidade Absoluta</span>
                 <h2 class="section-title">UMA PLATAFORMA, <span class="text-gold">TODOS OS NICHOS</span></h2>
                 <p class="section-desc">
-                    Seja uma barbearia clássica, um elegante salão de beleza feminino ou uma clínica de estética e spa, o Lexion adapta vocabulário, cores e regras para o seu estabelecimento.
+                    Seja uma barbearia clássica, um elegante salão de beleza ou uma clínica de estética e spa, o Lexion adapta vocabulário, cores e regras para o seu estabelecimento.
                 </p>
             </div>
 
@@ -170,7 +170,7 @@
                     <i class="fa-solid fa-scissors"></i> Barbearias & Studios
                 </button>
                 <button class="niche-tab-btn" id="tab-salao" onclick="selecionarNicho('salao')">
-                    <i class="fa-solid fa-wand-magic-sparkles"></i> Salões de Beleza Femininos
+                    <i class="fa-solid fa-wand-magic-sparkles"></i> Salões de Beleza
                 </button>
                 <button class="niche-tab-btn" id="tab-estetica" onclick="selecionarNicho('estetica')">
                     <i class="fa-solid fa-spa"></i> Clínicas de Estética & Spas
@@ -181,8 +181,8 @@
             <div class="niche-showcase-box" id="niche-showcase">
                 <img src="assets/niche_barbearia.jpg?v=2" alt="Barbearia" class="niche-showcase-img" id="niche-img">
                 <div class="niche-showcase-info">
-                    <span class="section-tag" id="niche-badge">✂️ Especialistas em Estilo Masculino</span>
-                    <h3 id="niche-title">BARBEARIAS & STUDIOS MASCULINOS</h3>
+                    <span class="section-tag" id="niche-badge">✂️ Especialistas em Corte & Barba</span>
+                    <h3 id="niche-title">BARBEARIAS & STUDIOS</h3>
                     <p id="niche-desc">
                         Organize filas de encaixe, balcão rápido com venda de pomadas e cervejas, comissões automáticas para cada barbeiro e agendamento instantâneo pelo WhatsApp.
                     </p>
@@ -554,7 +554,7 @@
                 <div class="form-group">
                     <label>Tipo de Estabelecimento</label>
                     <select id="trial-business-type" class="form-control" onchange="sincronizarCorTipo(this.value)">
-                        <option value="barbearia">✂️ Barbearia ou Studio Masculino</option>
+                        <option value="barbearia">✂️ Barbearia ou Studio</option>
                         <option value="salao">💇 Salão de Beleza / Cabeleireiro(a)</option>
                         <option value="estetica">✨ Clínica de Estética, Manicure & Spa</option>
                     </select>
@@ -600,8 +600,8 @@
         // Dados dos 3 Nichos Unisex
         const DADOS_NICHOS = {
             barbearia: {
-                badge: '✂️ Especialistas em Estilo Masculino',
-                title: 'BARBEARIAS & STUDIOS MASCULINOS',
+                badge: '✂️ Especialistas em Corte & Barba',
+                title: 'BARBEARIAS & STUDIOS',
                 desc: 'Organize filas de encaixe, balcão rápido com venda de pomadas e cervejas, comissões automáticas para cada barbeiro e agendamento instantâneo pelo WhatsApp.',
                 img: 'assets/niche_barbearia.jpg?v=2',
                 features: [
@@ -613,7 +613,7 @@
                 btnText: 'Criar Minha Barbearia Grátis'
             },
             salao: {
-                badge: '💇 Beleza Feminina & Cuidados Especiais',
+                badge: '💇 Cabelo, Coloração & Cuidados Especiais',
                 title: 'SALÕES DE BELEZA & CABELEIREIROS(AS)',
                 desc: 'Agenda visual por profissional (mechas, coloração, escova e química), divisão de comissões com dedução de taxa de produto e fidelização com pontuação automática.',
                 img: 'assets/niche_salao_feminino.jpg',

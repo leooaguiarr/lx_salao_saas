@@ -14,8 +14,8 @@ const ThemeManager = {
         escuro: {
             id: 'escuro',
             name: 'Escuro Nobre',
-            description: 'Verde profundo e dourado latão. O visual original da Lexion.',
-            swatch: ['#07100B', '#0D1A14', '#C5A059']
+            description: 'Preto neutro e dourado latão. O visual padrão da Lexion.',
+            swatch: ['#0A0A0B', '#131316', '#C89547']
         },
         claro: {
             id: 'claro',

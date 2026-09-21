@@ -29,19 +29,25 @@
    ========================================================================== */
 
 :root {
-    /* Cores de Base */
-    --background-primary: #07100B; /* Verde Profundo Escuro */
+    /* Cores de Base
+       O escuro é PRETO NEUTRO, não verde. O verde profundo que havia aqui
+       tingia tudo de um tom oliva que brigava com o dourado; num preto neutro
+       o dourado é a única cor da tela e é ele que guia o olho. */
+    --background-primary: #0A0A0B; /* Preto neutro do fundo */
     --text-primary: #F8FAFC;       /* Títulos e Contraste Nítido */
-    --accent-gold: #C5A059;        /* Dourado Latão Nobre */
-    --text-accent-gold: #050B08;   /* Texto escuro sobre dourado */
+    --accent-gold: #C89547;        /* Dourado Latão Nobre */
+    --text-accent-gold: #0A0A0B;   /* Texto escuro sobre dourado */
 
-    /* Superfícies & Layout */
+    /* Superfícies & Layout
+       Três degraus de cinza-quase-preto: fundo, barra lateral e superfície
+       elevada (cartões, modais). A separação é sutil de propósito — quem
+       organiza a tela são as bordas, não blocos de cinza claro. */
     --bg-primary: var(--background-primary);
-    --bg-secondary: #0D1A14;
-    --bg-tertiary: #13241D;
-    --bg-glass: rgba(13, 26, 20, 0.85);
+    --bg-secondary: #131316;
+    --bg-tertiary: #1A1A1E;
+    --bg-glass: rgba(19, 19, 22, 0.85);
     --border-color: rgba(255, 255, 255, 0.08);
-    --border-color-active: rgba(197, 160, 89, 0.45);
+    --border-color-active: rgba(200, 149, 71, 0.45);
 
     /* Camadas sobre o fundo: no tema escuro são véus de branco, no claro
        viram véus de preto. Sempre estes, nunca rgba(255,255,255,…) solto. */
@@ -54,23 +60,23 @@
 
     /* Brand Colors */
     --primary: var(--accent-gold);
-    --primary-hover: #D4AF67;
-    --primary-dark: #8F7238;
-    --primary-light: rgba(197, 160, 89, 0.14);
+    --primary-hover: #D9A95E;
+    --primary-dark: #8F6A32;
+    --primary-light: rgba(200, 149, 71, 0.14);
 
     /* Degraus de transparência do dourado. Existem porque rgba() não aceita
        uma variável de cor com alpha novo sem color-mix, que nem todo aparelho
        de salão suporta. */
-    --primary-soft: rgba(197, 160, 89, 0.12);
-    --primary-medium: rgba(197, 160, 89, 0.18);
-    --primary-ring: rgba(197, 160, 89, 0.30);
-    --primary-edge: rgba(197, 160, 89, 0.35);
-    --primary-strong: rgba(197, 160, 89, 0.45);
+    --primary-soft: rgba(200, 149, 71, 0.12);
+    --primary-medium: rgba(200, 149, 71, 0.18);
+    --primary-ring: rgba(200, 149, 71, 0.30);
+    --primary-edge: rgba(200, 149, 71, 0.35);
+    --primary-strong: rgba(200, 149, 71, 0.45);
 
     /* Preenchimento dos botões e realces principais. É gradiente, então não dá
        para resolver com --primary sozinho. */
-    --primary-gradient: linear-gradient(135deg, #D4AF67, #A88642);
-    --primary-gradient-hover: linear-gradient(135deg, #DFBE7A, #B5934E);
+    --primary-gradient: linear-gradient(135deg, #D9A95E, #A87B34);
+    --primary-gradient-hover: linear-gradient(135deg, #E3B972, #BE8C3E);
 
     /* Action & Status Colors — iguais nos dois temas de propósito: verde é
        recebido, vermelho é atrasado, e trocar isso por tema confundiria. */
@@ -87,9 +93,9 @@
 
     /* Typography Colors */
     --text-main: #F1F5F9;
-    --text-muted: #94A3B8;
+    --text-muted: #9A9AA7;
     --text-inverse: var(--text-accent-gold);
-    --text-faint: #7c8a83;  /* Rodapés e legendas de apoio */
+    --text-faint: #7B7B87;  /* Rodapés e legendas de apoio */
 
     /* Spacing & Borders */
     --radius-sm: 8px;
@@ -99,7 +105,7 @@
     --shadow-main: 0 10px 30px -10px rgba(0, 0, 0, 0.6);
     --shadow-soft: 0 4px 12px rgba(0, 0, 0, 0.3);
     --shadow-strong: 0 18px 40px -12px rgba(0, 0, 0, 0.7);
-    --shadow-glow: 0 0 20px rgba(197, 160, 89, 0.25);
+    --shadow-glow: 0 0 20px rgba(200, 149, 71, 0.25);
     --overlay-backdrop: rgba(0, 0, 0, 0.7);
     --transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
 }
@@ -107,7 +113,7 @@
 /* --------------------------------------------------------------------------
    TEMA CLARO — bege quente
 
-   O dourado precisa escurecer: #C5A059 sobre bege claro não alcança contraste
+   O dourado precisa escurecer: #C89547 sobre bege claro não alcança contraste
    de leitura. Vira #8A6A3B, e o texto sobre ele passa a ser branco — o
    contrário do tema escuro, onde o texto sobre dourado é quase preto.
    -------------------------------------------------------------------------- */
@@ -3345,7 +3351,7 @@ h1, h2, h3, h4, h5, h6 {
     z-index: 900;
     display: flex;
     justify-content: center;
-    background-color: #0F1512;
+    background-color: var(--bg-primary);
 }
 
 body.public-booking-mode .mobile-tab-bar {

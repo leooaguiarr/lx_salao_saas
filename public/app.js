@@ -415,7 +415,9 @@ function showToast(message, type = 'info') {
 // --- APP NAVIGATION ---
 function initNavigation() {
     const menuItems = document.querySelectorAll('.menu-item');
-    const tabItems = document.querySelectorAll('.tab-item');
+    // Só as abas de verdade: o botão "Menu" da barra também é .tab-item, mas
+    // abre a lateral em vez de trocar de tela.
+    const tabItems = document.querySelectorAll('.tab-item[data-target]');
     const sections = document.querySelectorAll('.page-section');
     const pageTitle = document.getElementById('page-title');
 
@@ -531,6 +533,8 @@ function initNavigation() {
     if (closeBtn) {
         closeBtn.addEventListener('click', () => sidebar.classList.remove('show'));
     }
+    document.getElementById('tab-abrir-menu')?.addEventListener('click', () => sidebar.classList.add('show'));
+    document.getElementById('sidebar-backdrop')?.addEventListener('click', () => sidebar.classList.remove('show'));
 }
 
 function renderPageData(pageId) {

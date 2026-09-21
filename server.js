@@ -20,6 +20,7 @@ const MIME_TYPES = {
     '.css': 'text/css; charset=utf-8',
     '.js': 'text/javascript; charset=utf-8',
     '.json': 'application/json; charset=utf-8',
+    '.webmanifest': 'application/manifest+json; charset=utf-8',
     '.png': 'image/png',
     '.jpg': 'image/jpeg',
     '.jpeg': 'image/jpeg',
@@ -447,11 +448,13 @@ function serveStaticFile(res, filePath) {
 
         const ext = path.extname(filePath).toLowerCase();
         const contentType = MIME_TYPES[ext] || 'application/octet-stream';
-        const isHtml = ext === '.html';
+        // O sw.js e o manifest seguem a regra do HTML: com cache de um dia, um
+        // deploy só chegaria ao aplicativo instalado no dia seguinte.
+        const semCache = ext === '.html' || ext === '.webmanifest' || path.basename(filePath) === 'sw.js';
 
         res.writeHead(200, {
             'Content-Type': contentType,
-            'Cache-Control': isHtml ? 'no-cache, no-store, must-revalidate' : 'public, max-age=86400'
+            'Cache-Control': semCache ?'no-cache, no-store, must-revalidate' : 'public, max-age=86400'
         });
 
         const stream = fs.createReadStream(filePath);

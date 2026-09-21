@@ -2,9 +2,38 @@
 <html lang="pt-BR">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <!-- viewport-fit=cover: no app instalado a tela vai até o notch e a barra
+         de gestos; as margens de segurança são tratadas no CSS (safe-area).
+         minimum-scale=1: durante o carregamento, algo passa um instante da
+         largura da tela, e o Chrome do celular reduzia o zoom para caber e não
+         voltava mais — a página ficava ~9px mais larga e "solta" para o lado.
+         Não impede ampliar com os dedos, só reduzir abaixo de 100%. -->
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, minimum-scale=1, viewport-fit=cover">
+    <meta name="theme-color" content="#0A0A0B">
     <link rel="icon" href="/assets/favicon_lexion.png" type="image/png">
+    <link rel="apple-touch-icon" href="/assets/apple-touch-icon.png">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="Lexion Salão">
     <title>Lexion Salão & Barbearia | Sistema de Gestão e Agendamento</title>
+
+    <!-- O manifest é o que torna o painel instalável. Ele só entra nas rotas
+         do painel: este mesmo HTML serve o link público de agendamento
+         (/<slug>), e o cliente do salão não deve ver "Instalar Lexion Salão"
+         e acabar com o painel na tela do celular. A lista repete a
+         ROTAS_INTERNAS do app.js, que carrega tarde demais para decidir isso. -->
+    <script>
+        (function () {
+            var primeiro = decodeURIComponent(location.pathname).replace(/^\/+|\/+$/g, '').split('/')[0].toLowerCase();
+            var painel = ['', 'index.html', 'app', 'painel', 'login', 'admin', 'dashboard', 'home', 'landing', 'checkout'];
+            if (painel.indexOf(primeiro) === -1) return;
+            var link = document.createElement('link');
+            link.rel = 'manifest';
+            link.href = '/manifest.webmanifest';
+            document.head.appendChild(link);
+        })();
+    </script>
 
     <!-- O tema do salão precisa valer ANTES da primeira pintura. Fosse o
          theme.js, que carrega no fim da página, um salão de tema claro veria a
@@ -28,17 +57,17 @@
     <!-- Font Awesome Icons -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <!-- CSS Customizado -->
-    <link rel="stylesheet" href="/index.css?v=61">
-    <link rel="stylesheet" href="/estoque.css?v=61">
-    <link rel="stylesheet" href="/ajuda.css?v=61">
-    <link rel="stylesheet" href="/auth.css?v=61">
+    <link rel="stylesheet" href="/index.css?v=62">
+    <link rel="stylesheet" href="/estoque.css?v=62">
+    <link rel="stylesheet" href="/ajuda.css?v=62">
+    <link rel="stylesheet" href="/auth.css?v=62">
     <!-- Evolução de Vendas. Depois dos anteriores de propósito: estes só
          acrescentam as telas novas e não redefinem nada do index.css. -->
-    <link rel="stylesheet" href="/vendas.css?v=61">
-    <link rel="stylesheet" href="/checkout.css?v=61">
-    <link rel="stylesheet" href="/comissoes.css?v=61">
-    <link rel="stylesheet" href="/crediario.css?v=61">
-    <link rel="stylesheet" href="/fidelidade.css?v=61">
+    <link rel="stylesheet" href="/vendas.css?v=62">
+    <link rel="stylesheet" href="/checkout.css?v=62">
+    <link rel="stylesheet" href="/comissoes.css?v=62">
+    <link rel="stylesheet" href="/crediario.css?v=62">
+    <link rel="stylesheet" href="/fidelidade.css?v=62">
 </head>
 <body class="dark-theme">
     <!--
@@ -276,6 +305,14 @@
             </nav>
             
             <div class="sidebar-footer">
+                <!-- Aparece só quando o aparelho pode instalar e o painel ainda
+                     não está instalado (pwa.js). Fica no menu, e não em
+                     Configurações, porque o barbeiro não vê Configurações e é
+                     quem mais usa o painel pelo celular. -->
+                <button type="button" class="sidebar-instalar" id="btn-instalar-app" hidden>
+                    <i class="fa-solid fa-mobile-screen-button"></i>
+                    <span>Instalar aplicativo</span>
+                </button>
                 <div class="user-profile" style="display: flex; justify-content: space-between; align-items: center; width: 100%;">
                     <div style="display: flex; align-items: center; gap: 10px; min-width: 0; flex: 1;">
                         <div class="profile-info">
@@ -299,6 +336,9 @@
                 </div>
             </div>
         </aside>
+
+        <!-- Fundo escuro atrás do menu aberto no celular: tocar fora fecha. -->
+        <div class="sidebar-backdrop" id="sidebar-backdrop"></div>
 
         <!-- MAIN CONTENT AREA -->
         <main class="main-content">
@@ -1699,6 +1739,60 @@
 
             </div>
         </main>
+
+        <!-- BARRA DE ABAS DO CELULAR
+             Só aparece até 768px (index.css). As quatro telas do dia a dia
+             ficam no alcance do polegar; o resto continua no menu lateral, que
+             o último botão abre. O switchTab() do app.js mantém a aba ativa
+             sincronizada com o menu. -->
+        <nav class="mobile-tab-bar" id="mobile-tab-bar" aria-label="Navegação principal">
+            <a href="#dashboard" class="tab-item active" data-target="dashboard">
+                <i class="fa-solid fa-chart-pie"></i>
+                <span>Início</span>
+            </a>
+            <a href="#agenda" class="tab-item" data-target="agenda">
+                <i class="fa-solid fa-calendar-days"></i>
+                <span>Agenda</span>
+            </a>
+            <a href="#vendas" class="tab-item" data-target="vendas">
+                <i class="fa-solid fa-bag-shopping"></i>
+                <span>Vendas</span>
+            </a>
+            <a href="#clientes" class="tab-item" data-target="clientes">
+                <i class="fa-solid fa-users"></i>
+                <span>Clientes</span>
+            </a>
+            <button type="button" class="tab-item tab-item-menu" id="tab-abrir-menu" aria-label="Abrir o menu completo">
+                <i class="fa-solid fa-bars"></i>
+                <span>Menu</span>
+            </button>
+        </nav>
+    </div>
+
+    <!-- MODAL: INSTALAR NO IPHONE
+         O Safari não tem botão de instalar que a página possa acionar; o
+         caminho é o menu de compartilhar, e este modal mostra onde tocar. -->
+    <div class="modal-backdrop" id="modal-instalar-ios">
+        <div class="modal-dialog glass-effect">
+            <div class="modal-header">
+                <h4 class="modal-title">Instalar no iPhone</h4>
+                <button class="modal-close" data-close-modal="modal-instalar-ios">&times;</button>
+            </div>
+            <div class="modal-body">
+                <div class="instalar-app">
+                    <img src="/assets/apple-touch-icon.png" alt="" class="instalar-app-icone">
+                    <div class="instalar-app-texto">
+                        <strong>Lexion Salão na tela de início</strong>
+                        <p>Abre em tela cheia, como um aplicativo, sem a barra do navegador.</p>
+                    </div>
+                </div>
+                <ol class="instalar-app-passos">
+                    <li>Abra este endereço no <strong>Safari</strong>.</li>
+                    <li>Toque em <strong>Compartilhar</strong> <i class="fa-solid fa-arrow-up-from-bracket"></i> na barra de baixo.</li>
+                    <li>Escolha <strong>Adicionar à Tela de Início</strong> e confirme.</li>
+                </ol>
+            </div>
+        </div>
     </div>
 
     <!-- MODAL: ADD/EDIT APPOINTMENT -->
@@ -3007,35 +3101,36 @@
     <!-- Estes três também levam versão: o servidor manda cache de um dia para
          arquivos estáticos, e sem o ?v= uma correção aqui só chegaria ao
          navegador de quem já usou o sistema no dia seguinte. -->
-    <script src="/config.js?v=61"></script>
-    <script src="/theme.js?v=61"></script>
-    <script src="/saas-plan.js?v=61"></script>
-    <script src="/api.js?v=61"></script>
+    <script src="/config.js?v=62"></script>
+    <script src="/theme.js?v=62"></script>
+    <script src="/saas-plan.js?v=62"></script>
+    <script src="/api.js?v=62"></script>
 
     <!-- JavaScript Principal -->
-    <script src="/app.js?v=61"></script>
+    <script src="/app.js?v=62"></script>
 
     <!-- Funcionalidades acrescentadas depois. A ordem importa: elas leem o
          estado global e as funções de cálculo que app.js define. -->
-    <script src="/estoque.js?v=61"></script>
-    <script src="/encaixe.js?v=61"></script>
-    <script src="/ajuda.js?v=61"></script>
+    <script src="/estoque.js?v=62"></script>
+    <script src="/encaixe.js?v=62"></script>
+    <script src="/ajuda.js?v=62"></script>
 
     <!-- Evolução de Vendas (banco: docs/14 a 28). A ordem entre eles TAMBÉM
          importa, e não é a mesma coisa que a ordem acima: `venda-calculo`
          precisa das constantes de `vendas-base`, `checkout` precisa do cálculo,
          e `recibo` é chamado no fim do checkout. Portados do projeto de origem
          (`lexion_salao`), onde nasceram como 22- a 28- e foram testados. -->
-    <script src="/vendas-base.js?v=61"></script>
-    <script src="/venda-calculo.js?v=61"></script>
-    <script src="/checkout.js?v=61"></script>
-    <script src="/comissoes.js?v=61"></script>
-    <script src="/crediario.js?v=61"></script>
-    <script src="/fidelidade.js?v=61"></script>
-    <script src="/recibo.js?v=61"></script>
+    <script src="/vendas-base.js?v=62"></script>
+    <script src="/venda-calculo.js?v=62"></script>
+    <script src="/checkout.js?v=62"></script>
+    <script src="/comissoes.js?v=62"></script>
+    <script src="/crediario.js?v=62"></script>
+    <script src="/fidelidade.js?v=62"></script>
+    <script src="/recibo.js?v=62"></script>
 
     <!-- Barra superior: lê o estado e os cálculos de todos os anteriores
          (clientes, estoque mínimo, crediário atrasado), por isso vem por último. -->
-    <script src="/topbar.js?v=61"></script>
+    <script src="/topbar.js?v=62"></script>
+    <script src="/pwa.js?v=62"></script>
 </body>
 </html>

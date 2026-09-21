@@ -3952,3 +3952,166 @@ body.acesso-barbeiro #page-configuracoes {
     color: var(--text-muted);
     line-height: 1.4;
 }
+
+/* ==========================================================================
+   APLICATIVO NO CELULAR (PWA)
+   Barra de abas inferior, margens de segurança do notch e da barra de gestos
+   (viewport-fit=cover no index.html) e o botão "Instalar aplicativo".
+   Fica no fim do arquivo de propósito: sobrescreve as regras antigas da
+   .mobile-tab-bar espalhadas nos @media acima.
+   ========================================================================== */
+.sidebar-backdrop {
+    display: none;
+}
+
+@media (max-width: 768px) {
+    /* 100dvh é a área visível de verdade; 100vh ignora a barra do navegador
+       e o fim da página ficaria escondido atrás dela. */
+    .main-content {
+        height: 100dvh;
+        padding-bottom: calc(68px + env(safe-area-inset-bottom, 0px));
+    }
+
+    .top-header {
+        padding-top: calc(16px + env(safe-area-inset-top, 0px));
+        padding-left: calc(20px + env(safe-area-inset-left, 0px));
+        padding-right: calc(20px + env(safe-area-inset-right, 0px));
+    }
+
+    /* O "Menu" da barra inferior faz o papel do ☰; dois botões para a mesma
+       coisa só tiravam espaço do título. */
+    .top-header .sidebar-toggle {
+        display: none;
+    }
+
+    .sidebar {
+        padding-top: env(safe-area-inset-top, 0px);
+        padding-bottom: env(safe-area-inset-bottom, 0px);
+    }
+
+    .sidebar-backdrop {
+        display: block;
+        position: fixed;
+        inset: 0;
+        z-index: 1050;
+        background: rgba(0, 0, 0, 0.55);
+        opacity: 0;
+        pointer-events: none;
+        transition: opacity 0.2s ease;
+    }
+    .sidebar.show ~ .sidebar-backdrop {
+        opacity: 1;
+        pointer-events: auto;
+    }
+
+    .mobile-tab-bar {
+        display: flex;
+        position: fixed;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        z-index: 1000;
+        height: auto;
+        padding: 6px calc(4px + env(safe-area-inset-right, 0px))
+                 calc(6px + env(safe-area-inset-bottom, 0px))
+                 calc(4px + env(safe-area-inset-left, 0px));
+        background: var(--bg-glass);
+        -webkit-backdrop-filter: blur(16px);
+        backdrop-filter: blur(16px);
+        border-top: 1px solid var(--border-color);
+    }
+
+    .tab-item {
+        flex: 1;
+        width: auto;
+        min-height: 52px;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        gap: 4px;
+        padding: 4px 0;
+        border: 0;
+        border-radius: 12px;
+        background: none;
+        color: var(--text-muted);
+        font-family: inherit;
+        font-size: 11px;
+        font-weight: 600;
+        text-decoration: none;
+        cursor: pointer;
+        -webkit-tap-highlight-color: transparent;
+    }
+    .tab-item i {
+        font-size: 19px;
+    }
+    .tab-item.active {
+        color: var(--primary);
+    }
+    .tab-item:active {
+        background: var(--primary-soft);
+    }
+
+    /* Toasts e botões flutuantes não podem nascer atrás da barra. */
+    .toast-container {
+        bottom: calc(80px + env(safe-area-inset-bottom, 0px));
+    }
+}
+
+/* Botão "Instalar aplicativo" no rodapé do menu. O pwa.js decide quando ele
+   aparece; aqui é só a aparência. */
+.sidebar-instalar {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    width: 100%;
+    margin-bottom: 12px;
+    padding: 10px 12px;
+    border: 1px solid var(--primary);
+    border-radius: 10px;
+    background: var(--primary-soft);
+    color: var(--primary);
+    font-family: inherit;
+    font-size: 13px;
+    font-weight: 700;
+    cursor: pointer;
+    transition: var(--transition);
+}
+.sidebar-instalar:hover {
+    background: var(--primary-light);
+}
+
+/* Modal com o passo a passo do iPhone. */
+.instalar-app {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    flex-wrap: wrap;
+}
+.instalar-app-icone {
+    width: 52px;
+    height: 52px;
+    border-radius: 14px;
+    flex-shrink: 0;
+}
+.instalar-app-texto {
+    flex: 1;
+    min-width: 200px;
+}
+.instalar-app-texto strong {
+    display: block;
+    margin-bottom: 4px;
+}
+.instalar-app-texto p {
+    margin: 0;
+    color: var(--text-muted);
+    font-size: 13px;
+    line-height: 1.5;
+}
+.instalar-app-passos {
+    margin: 8px 0 0;
+    padding-left: 18px;
+    color: var(--text-muted);
+    font-size: 13px;
+    line-height: 1.6;
+}

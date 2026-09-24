@@ -1,7 +1,7 @@
 # Produto e estado atual
 
 - Repositório: <https://github.com/leooaguiarr/lx_salao_saas> (público), branch `main`
-- Última atualização deste documento: 21/09/2026
+- Última atualização deste documento: 24/09/2026
 
 ## O que é
 
@@ -60,12 +60,15 @@ crediário são travados apenas na tela. Ver *Riscos*.
   do `/api/health`. **A volta para produção faz parte do *Checklist de
   lançamento*, mais abaixo neste arquivo.**
 
-## Estado atual (21/09/2026)
+## Estado atual (24/09/2026)
 
 **No ar e funcionando:**
 
-- Landing page (`public/landing.html`) com os três nichos e o cadastro do teste
-  grátis (`POST /api/auth/register-salon`).
+- Landing page (`public/landing.html`) com identidade clara em off-white,
+  verde profundo e caramelo; demonstrações visuais de agenda, clientes,
+  agendamento online e financeiro; planos e FAQ simplificados. Métricas e
+  depoimentos sem comprovação foram removidos. O cadastro do teste grátis
+  continua em `POST /api/auth/register-salon`.
 - Painel completo: tudo o que está em [FUNCIONALIDADES.md](FUNCIONALIDADES.md),
   menos os módulos pausados (Mensagens e Kanban de Leads, ocultos no menu).
 - Tema claro/escuro por salão.

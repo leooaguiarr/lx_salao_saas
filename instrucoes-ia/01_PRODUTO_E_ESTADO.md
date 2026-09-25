@@ -207,6 +207,28 @@ feito.
    checkout Pix → pagar → webhook com 200 no log do Asaas → salão `active`.
    Depois, estornar pelo painel do Asaas.
 
+## Trabalho combinado e ainda não começado (25/09/2026)
+
+**Redesenho do painel com temas por nicho.** O Leonardo não gostou das cores
+nem do layout do painel; a direção foi desenhada, revisada com ele e aprovada
+em 25/09. Ele pediu para retomar na noite de 25/09.
+
+A especificação completa — nove temas com os valores de cor exatos, as três
+personalidades tipográficas, o modelo de escolha do salão e as seis correções
+de layout — está em [DESIGN_E_TEMAS.md](DESIGN_E_TEMAS.md). O protótipo de oito
+telas está em <https://claude.ai/artifact/QUxn2Few2eZ7FjHF7M6ZxQ> (privado).
+
+Pontos que essa página não repete e valem lembrar aqui:
+
+- **A landing também será refeita** nessa linguagem. O Leonardo disse que a
+  landing atual é protótipo, então a identidade nasce no painel. Combinar com
+  o Gemini, que mexeu nela por último.
+- **Duas colunas que o painel nunca envia**: `business_type` e `primary_color`
+  existem em `business_info` mas ficaram fora da `allowedCols` do `api.js`, e
+  por isso o nicho e a cor configurados na tela não persistem. Entra junto.
+- Nada disso foi implementado: o código no ar continua com o tema claro/escuro
+  da migração 05.
+
 ## O que vem a seguir
 
 Da lista do dono do projeto, em ordem sugerida:

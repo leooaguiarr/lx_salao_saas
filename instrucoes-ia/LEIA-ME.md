@@ -17,6 +17,7 @@ várias conversas; tudo que não dá para deduzir lendo o código está aqui.
 | [05_ARMADILHAS.md](05_ARMADILHAS.md) | Sempre. Cada item já custou horas; leia antes de repetir. |
 | [06_HISTORICO.md](06_HISTORICO.md) | Para entender por que algo é do jeito que é. |
 | [FUNCIONALIDADES.md](FUNCIONALIDADES.md) | Referência de tudo que o sistema faz, na visão do usuário. |
+| [DESIGN_E_TEMAS.md](DESIGN_E_TEMAS.md) | **Antes de mexer em cor, fonte, espaçamento ou layout**, no painel ou na landing. Traz a direção aprovada em 25/09/2026, os nove temas com os valores exatos e o que muda no layout. Ainda não implementado. |
 | [APP_CELULAR.md](APP_CELULAR.md) | Ao mexer em PWA, service worker, manifest ou layout do celular. |
 | [legado/AGENT_HANDOFF_ALABAMA.md](legado/AGENT_HANDOFF_ALABAMA.md) | Consulta. O diário do sistema de origem, com o porquê de muitas regras de negócio. |
 

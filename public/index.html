@@ -72,17 +72,17 @@
     <!-- Font Awesome Icons -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <!-- CSS Customizado -->
-    <link rel="stylesheet" href="/index.css?v=69">
-    <link rel="stylesheet" href="/estoque.css?v=69">
-    <link rel="stylesheet" href="/ajuda.css?v=69">
-    <link rel="stylesheet" href="/auth.css?v=69">
+    <link rel="stylesheet" href="/index.css?v=74">
+    <link rel="stylesheet" href="/estoque.css?v=74">
+    <link rel="stylesheet" href="/ajuda.css?v=74">
+    <link rel="stylesheet" href="/auth.css?v=74">
     <!-- Evolução de Vendas. Depois dos anteriores de propósito: estes só
          acrescentam as telas novas e não redefinem nada do index.css. -->
-    <link rel="stylesheet" href="/vendas.css?v=69">
-    <link rel="stylesheet" href="/checkout.css?v=69">
-    <link rel="stylesheet" href="/comissoes.css?v=69">
-    <link rel="stylesheet" href="/crediario.css?v=69">
-    <link rel="stylesheet" href="/fidelidade.css?v=69">
+    <link rel="stylesheet" href="/vendas.css?v=74">
+    <link rel="stylesheet" href="/checkout.css?v=74">
+    <link rel="stylesheet" href="/comissoes.css?v=74">
+    <link rel="stylesheet" href="/crediario.css?v=74">
+    <link rel="stylesheet" href="/fidelidade.css?v=74">
 </head>
 <body class="dark-theme">
     <!--
@@ -661,7 +661,7 @@
                             <div class="metric-icon bg-red-soft"><i class="fa-solid fa-clock text-red"></i></div>
                             <div class="metric-details">
                                 <span class="metric-label">Pagamentos pendentes</span>
-                                <h3 class="metric-value text-red" id="sales-pending-count">0</h3>
+                                <h3 class="metric-value text-warning" id="sales-pending-count">0</h3>
                             </div>
                         </div>
                         </div>
@@ -674,7 +674,7 @@
                     <div class="sales-operacao-grid">
                         <!-- id usado por ELEMENTOS_SO_DO_DONO (13-inicializacao.js):
                              a aba Vendas é do profissional também, mas a gaveta não. -->
-                        <div class="dashboard-panel glass-effect" id="painel-caixa-do-dia" style="border-left: 4px solid var(--primary);">
+                        <div class="dashboard-panel glass-effect" id="painel-caixa-do-dia">
                             <div class="panel-header" style="justify-content: space-between; align-items: center; display: flex;">
                                 <h4 class="panel-title"><i class="fa-solid fa-cash-register"></i> Caixa do Dia</h4>
                                 <span id="cash-register-status-badge" class="status-badge inactive">Fechado</span>
@@ -1028,7 +1028,7 @@
                             <div class="metric-icon bg-green-soft"><i class="fa-solid fa-gift text-green"></i></div>
                             <div class="metric-details">
                                 <span class="metric-label">Benefícios disponíveis</span>
-                                <h3 class="metric-value text-green" id="fid-total-disponiveis">0</h3>
+                                <h3 class="metric-value" id="fid-total-disponiveis">0</h3>
                             </div>
                         </div>
                         <div class="metric-card glass-effect">
@@ -1293,7 +1293,7 @@
                 <!-- 6. FINANCEIRO PAGE -->
                 <section class="page-section" id="page-financeiro">
                     <!-- Top Controls: Timeframe and Professional Filters -->
-                    <div class="dashboard-panel glass-effect finance-top-controls" style="margin-bottom: 20px; padding: 15px; border-left: 4px solid var(--primary);">
+                    <div class="dashboard-panel glass-effect finance-top-controls" style="margin-bottom: 16px; padding: 15px;">
                         <div class="finance-filter-group">
                             <span class="finance-filter-label"><i class="fa-regular fa-calendar"></i> Selecione o Período</span>
                             <div class="finance-period-filters" id="finance-period-filters" style="display: flex; gap: 10px;">
@@ -1324,40 +1324,42 @@
                          LEITURA do dia: a projeção não é o mesmo número de "Total vendido hoje"
                          em Vendas, de propósito — uma é o que se espera receber pela agenda, a
                          outra é o que já foi realmente vendido. -->
-                    <div class="dashboard-panel glass-effect" style="margin-bottom: 20px; border-left: 4px solid var(--primary);">
+                    <!-- Resumo do dia no formato dos indicadores do Início: rótulo
+                         pequeno, número grande, sem ícone nem cor — projeção não é
+                         dinheiro recebido, e verde aqui mentiria. -->
+                    <div class="dashboard-panel glass-effect financeiro-resumo">
                         <div class="panel-header" style="justify-content: space-between; align-items: center; display: flex;">
-                            <h4 class="panel-title"><i class="fa-solid fa-chart-simple"></i> Resumo do Dia</h4>
+                            <h4 class="panel-title">Resumo do dia</h4>
                             <a href="#" class="click-tab finance-link-caixa" data-target="vendas">
-                                <i class="fa-solid fa-cash-register"></i> Abrir/fechar caixa em Vendas
+                                Abrir/fechar caixa em Atendimentos <i class="fa-solid fa-arrow-right-long"></i>
                             </a>
                         </div>
-                        <div class="panel-body" style="display: flex; gap: 20px; align-items: stretch; flex-wrap: wrap;">
-                            <!-- GERAL: Projeção Faturamento + Gastos do Dia -->
-                            <div id="cash-info-geral" style="display: flex; gap: 15px; flex: 2; min-width: 250px;">
-                                <div style="flex: 1; background: var(--bg-tertiary); border-radius: 10px; padding: 15px;">
-                                    <p style="color: var(--text-muted); font-size: 0.8rem; margin-bottom: 5px;"><i class="fa-solid fa-chart-line text-green"></i> Projeção Faturamento Hoje</p>
-                                    <h3 id="cash-proj-revenue" style="font-size: 1.4rem; color: var(--success);">R$ 0,00</h3>
-                                </div>
-                                <div style="flex: 1; background: var(--bg-tertiary); border-radius: 10px; padding: 15px;">
-                                    <p style="color: var(--text-muted); font-size: 0.8rem; margin-bottom: 5px;"><i class="fa-solid fa-arrow-down text-red"></i> Gastos do Dia</p>
-                                    <h3 id="cash-day-expenses" style="font-size: 1.4rem; color: var(--danger);">R$ 0,00</h3>
-                                </div>
+                        <!-- GERAL: Projeção Faturamento + Gastos do Dia -->
+                        <div id="cash-info-geral" class="financeiro-resumo-grade">
+                            <div class="indicador">
+                                <span class="indicador-rotulo">Projeção de hoje</span>
+                                <div class="indicador-linha"><span class="indicador-numero" id="cash-proj-revenue">R$ 0,00</span></div>
                             </div>
+                            <div class="indicador">
+                                <span class="indicador-rotulo">Gastos do dia</span>
+                                <div class="indicador-linha"><span class="indicador-numero" id="cash-day-expenses">R$ 0,00</span></div>
+                            </div>
+                        </div>
 
-                            <!-- PROFISSIONAL: Comissão Dia + Agendamentos + Comissão Mês -->
-                            <div id="cash-info-prof" style="display: none; gap: 15px; flex: 3; min-width: 300px;">
-                                <div style="flex: 1; background: var(--bg-tertiary); border-radius: 10px; padding: 15px;">
-                                    <p style="color: var(--text-muted); font-size: 0.8rem; margin-bottom: 5px;"><i class="fa-solid fa-coins text-warning"></i> Comissão Hoje</p>
-                                    <h3 id="cash-prof-commission-day" style="font-size: 1.4rem; color: var(--warning);">R$ 0,00</h3>
-                                </div>
-                                <div style="flex: 1; background: var(--bg-tertiary); border-radius: 10px; padding: 15px;">
-                                    <p style="color: var(--text-muted); font-size: 0.8rem; margin-bottom: 5px;"><i class="fa-solid fa-calendar-check text-blue"></i> Agendamentos Hoje</p>
-                                    <h3 id="cash-prof-appts-day" style="font-size: 1.4rem; color: var(--info);">0</h3>
-                                </div>
-                                <div style="flex: 1; background: var(--bg-tertiary); border-radius: 10px; padding: 15px;">
-                                    <p style="color: var(--text-muted); font-size: 0.8rem; margin-bottom: 5px;"><i class="fa-solid fa-sack-dollar text-purple"></i> Projeção Comissão Mês</p>
-                                    <h3 id="cash-prof-commission-month" style="font-size: 1.4rem; color: var(--info);">R$ 0,00</h3>
-                                </div>
+                        <!-- PROFISSIONAL: Comissão Dia + Agendamentos + Comissão Mês.
+                             O display é trocado pelo app.js (none/flex). -->
+                        <div id="cash-info-prof" class="financeiro-resumo-grade" style="display: none;">
+                            <div class="indicador">
+                                <span class="indicador-rotulo">Comissão hoje</span>
+                                <div class="indicador-linha"><span class="indicador-numero" id="cash-prof-commission-day">R$ 0,00</span></div>
+                            </div>
+                            <div class="indicador">
+                                <span class="indicador-rotulo">Agendamentos hoje</span>
+                                <div class="indicador-linha"><span class="indicador-numero" id="cash-prof-appts-day">0</span></div>
+                            </div>
+                            <div class="indicador">
+                                <span class="indicador-rotulo">Projeção de comissão no mês</span>
+                                <div class="indicador-linha"><span class="indicador-numero" id="cash-prof-commission-month">R$ 0,00</span></div>
                             </div>
                         </div>
                     </div>
@@ -1378,7 +1380,7 @@
                             </div>
                             <div class="metric-details">
                                 <span class="metric-label">Total Saídas</span>
-                                <h3 class="metric-value text-red" id="fin-total-expenses">R$ 0</h3>
+                                <h3 class="metric-value" id="fin-total-expenses">R$ 0</h3>
                             </div>
                         </div>
                         <div class="metric-card glass-effect">
@@ -1387,7 +1389,7 @@
                             </div>
                             <div class="metric-details">
                                 <span class="metric-label">Saldo / Lucro Líquido</span>
-                                <h3 class="metric-value text-purple" id="fin-net-profit">R$ 0</h3>
+                                <h3 class="metric-value" id="fin-net-profit">R$ 0</h3>
                             </div>
                         </div>
                     </div>
@@ -3122,36 +3124,36 @@
     <!-- Estes três também levam versão: o servidor manda cache de um dia para
          arquivos estáticos, e sem o ?v= uma correção aqui só chegaria ao
          navegador de quem já usou o sistema no dia seguinte. -->
-    <script src="/config.js?v=69"></script>
-    <script src="/theme.js?v=69"></script>
-    <script src="/saas-plan.js?v=69"></script>
-    <script src="/api.js?v=69"></script>
+    <script src="/config.js?v=74"></script>
+    <script src="/theme.js?v=74"></script>
+    <script src="/saas-plan.js?v=74"></script>
+    <script src="/api.js?v=74"></script>
 
     <!-- JavaScript Principal -->
-    <script src="/app.js?v=69"></script>
+    <script src="/app.js?v=74"></script>
 
     <!-- Funcionalidades acrescentadas depois. A ordem importa: elas leem o
          estado global e as funções de cálculo que app.js define. -->
-    <script src="/estoque.js?v=69"></script>
-    <script src="/encaixe.js?v=69"></script>
-    <script src="/ajuda.js?v=69"></script>
+    <script src="/estoque.js?v=74"></script>
+    <script src="/encaixe.js?v=74"></script>
+    <script src="/ajuda.js?v=74"></script>
 
     <!-- Evolução de Vendas (banco: docs/14 a 28). A ordem entre eles TAMBÉM
          importa, e não é a mesma coisa que a ordem acima: `venda-calculo`
          precisa das constantes de `vendas-base`, `checkout` precisa do cálculo,
          e `recibo` é chamado no fim do checkout. Portados do projeto de origem
          (`lexion_salao`), onde nasceram como 22- a 28- e foram testados. -->
-    <script src="/vendas-base.js?v=69"></script>
-    <script src="/venda-calculo.js?v=69"></script>
-    <script src="/checkout.js?v=69"></script>
-    <script src="/comissoes.js?v=69"></script>
-    <script src="/crediario.js?v=69"></script>
-    <script src="/fidelidade.js?v=69"></script>
-    <script src="/recibo.js?v=69"></script>
+    <script src="/vendas-base.js?v=74"></script>
+    <script src="/venda-calculo.js?v=74"></script>
+    <script src="/checkout.js?v=74"></script>
+    <script src="/comissoes.js?v=74"></script>
+    <script src="/crediario.js?v=74"></script>
+    <script src="/fidelidade.js?v=74"></script>
+    <script src="/recibo.js?v=74"></script>
 
     <!-- Barra superior: lê o estado e os cálculos de todos os anteriores
          (clientes, estoque mínimo, crediário atrasado), por isso vem por último. -->
-    <script src="/topbar.js?v=69"></script>
-    <script src="/pwa.js?v=69"></script>
+    <script src="/topbar.js?v=74"></script>
+    <script src="/pwa.js?v=74"></script>
 </body>
 </html>

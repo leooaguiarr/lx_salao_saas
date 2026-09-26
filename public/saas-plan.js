@@ -84,7 +84,8 @@ const SaaSPlanManager = {
             badge = document.createElement('span');
             badge.className = 'plan-lock-badge';
             badge.innerHTML = '<i class="fa-solid fa-lock"></i> PRO';
-            badge.style.cssText = 'font-size: 0.65rem; background: rgba(212, 175, 55, 0.2); color: #d4af37; padding: 2px 6px; border-radius: 4px; margin-left: auto; display: inline-flex; align-items: center; gap: 4px; border: 1px solid rgba(212, 175, 55, 0.4);';
+            // A aparência mora no index.css (.plan-lock-badge), com as cores
+            // do tema. O dourado fixo que havia aqui destoava de oito temas.
             tabElement.appendChild(badge);
         }
 
@@ -132,14 +133,14 @@ const SaaSPlanManager = {
             modal.className = 'modal-backdrop';
             modal.innerHTML = `
                 <div class="modal-dialog glass-effect" style="max-width: 480px; text-align: center; padding: 28px;">
-                    <div style="width: 60px; height: 60px; border-radius: 50%; background: rgba(212, 175, 55, 0.15); border: 1px solid rgba(212, 175, 55, 0.3); display: flex; align-items: center; justify-content: center; margin: 0 auto 16px; font-size: 1.6rem; color: #d4af37;">
+                    <div style="width: 60px; height: 60px; border-radius: 50%; background: var(--primary-light); border: 1px solid var(--primary-edge); display: flex; align-items: center; justify-content: center; margin: 0 auto 16px; font-size: 1.6rem; color: var(--primary);">
                         <i class="fa-solid fa-crown"></i>
                     </div>
                     <h3 id="upgrade-modal-title" style="margin-bottom: 8px; font-size: 1.3rem;">Recurso Exclusivo</h3>
-                    <p id="upgrade-modal-desc" style="color: #a1a1aa; font-size: 0.92rem; line-height: 1.5; margin-bottom: 24px;"></p>
-                    <div style="background: rgba(255, 255, 255, 0.03); border: 1px solid rgba(255, 255, 255, 0.08); border-radius: 12px; padding: 16px; margin-bottom: 24px; text-align: left;">
-                        <div style="font-weight: 600; font-size: 0.95rem; margin-bottom: 6px; color: #f4f4f5;" id="upgrade-modal-plan-name">Plano Recomendado</div>
-                        <div style="font-size: 0.85rem; color: #71717a;" id="upgrade-modal-plan-features">Libere este recurso e potencialize seu faturamento.</div>
+                    <p id="upgrade-modal-desc" style="color: var(--text-muted); font-size: 0.92rem; line-height: 1.5; margin-bottom: 24px;"></p>
+                    <div style="background: var(--surface-hover); border: 1px solid var(--border-color); border-radius: 12px; padding: 16px; margin-bottom: 24px; text-align: left;">
+                        <div style="font-weight: 600; font-size: 0.95rem; margin-bottom: 6px; color: var(--text-main);" id="upgrade-modal-plan-name">Plano Recomendado</div>
+                        <div style="font-size: 0.85rem; color: var(--text-muted);" id="upgrade-modal-plan-features">Libere este recurso e potencialize seu faturamento.</div>
                     </div>
                     <div style="display: flex; gap: 12px;">
                         <button type="button" class="btn btn-secondary" style="flex: 1;" onclick="const m = document.getElementById('modal-upgrade-saas'); if (m) { m.classList.remove('show'); m.classList.remove('active'); }">Voltar</button>
@@ -178,24 +179,24 @@ const SaaSPlanManager = {
             modal.id = 'modal-asaas-checkout';
             modal.className = 'modal-backdrop';
             modal.innerHTML = `
-                <div class="modal-dialog glass-effect" style="max-width: 520px; text-align: left; padding: 28px; position: relative; border: 1px solid rgba(200, 149, 71, 0.3); border-radius: 16px; background: #121217; color: #f4f4f5; z-index: 100001;">
-                    <button type="button" onclick="const m = document.getElementById('modal-asaas-checkout'); if (m) { m.classList.remove('show'); m.classList.remove('active'); }" style="position: absolute; top: 16px; right: 18px; background: none; border: none; font-size: 1.5rem; color: #71717a; cursor: pointer;">&times;</button>
+                <div class="modal-dialog glass-effect" style="max-width: 520px; text-align: left; padding: 28px; position: relative; border: 1px solid var(--primary-edge); border-radius: 16px; background: var(--bg-tertiary); color: var(--text-main); z-index: 100001;">
+                    <button type="button" onclick="const m = document.getElementById('modal-asaas-checkout'); if (m) { m.classList.remove('show'); m.classList.remove('active'); }" style="position: absolute; top: 16px; right: 18px; background: none; border: none; font-size: 1.5rem; color: var(--text-muted); cursor: pointer;">&times;</button>
                     
                     <div id="checkout-form-step">
                         <div style="display: flex; align-items: center; gap: 12px; margin-bottom: 20px;">
-                            <div style="width: 44px; height: 44px; border-radius: 10px; background: rgba(200, 149, 71, 0.15); color: #c89547; display: flex; align-items: center; justify-content: center; font-size: 1.2rem; border: 1px solid rgba(200, 149, 71, 0.3);">
+                            <div style="width: 44px; height: 44px; border-radius: 10px; background: var(--primary-light); color: var(--primary); display: flex; align-items: center; justify-content: center; font-size: 1.2rem; border: 1px solid var(--primary-edge);">
                                 <i class="fa-solid fa-shield-halved"></i>
                             </div>
                             <div>
-                                <h3 style="font-size: 1.25rem; font-weight: 700; margin: 0; color: #fff;">Assinatura do Salão</h3>
-                                <p style="font-size: 0.84rem; color: #a1a1aa; margin: 2px 0 0 0;">Gateway Oficial Asaas • Ativação Imediata</p>
+                                <h3 style="font-size: 1.25rem; font-weight: 700; margin: 0; color: var(--text-main);">Assinatura do Salão</h3>
+                                <p style="font-size: 0.84rem; color: var(--text-muted); margin: 2px 0 0 0;">Gateway Oficial Asaas • Ativação Imediata</p>
                             </div>
                         </div>
 
                         <form id="form-asaas-checkout" onsubmit="SaaSPlanManager.processCheckout(event)">
                             <div style="margin-bottom: 14px;">
-                                <label style="display: block; font-size: 0.82rem; font-weight: 600; margin-bottom: 6px; color: #d4af37;">Plano Selecionado</label>
-                                <select id="checkout-plan-select" style="width: 100%; padding: 10px 12px; background: #1c1c24; border: 1px solid rgba(255,255,255,0.12); border-radius: 8px; color: #fff; font-size: 0.9rem;">
+                                <label style="display: block; font-size: 0.82rem; font-weight: 600; margin-bottom: 6px; color: var(--primary);">Plano Selecionado</label>
+                                <select id="checkout-plan-select" style="width: 100%; padding: 10px 12px; background: var(--bg-primary); border: 1px solid var(--border-strong); border-radius: 8px; color: var(--text-main); font-size: 0.9rem;">
                                     <option value="individual">Plano Solo / Individual — R$ 59,90/mês</option>
                                     <option value="equipe_4">Plano Equipe (Até 4) — R$ 119,90/mês ⭐</option>
                                     <option value="ilimitado">Plano Ilimitado Premium — R$ 199,90/mês</option>
@@ -203,62 +204,62 @@ const SaaSPlanManager = {
                             </div>
 
                             <div style="margin-bottom: 14px;">
-                                <label style="display: block; font-size: 0.82rem; font-weight: 600; margin-bottom: 6px; color: #a1a1aa;">Nome Completo / Razão Social</label>
-                                <input type="text" id="checkout-name" required placeholder="Seu nome completo" style="width: 100%; padding: 10px 12px; background: #1c1c24; border: 1px solid rgba(255,255,255,0.12); border-radius: 8px; color: #fff; font-size: 0.9rem;" />
+                                <label style="display: block; font-size: 0.82rem; font-weight: 600; margin-bottom: 6px; color: var(--text-muted);">Nome Completo / Razão Social</label>
+                                <input type="text" id="checkout-name" required placeholder="Seu nome completo" style="width: 100%; padding: 10px 12px; background: var(--bg-primary); border: 1px solid var(--border-strong); border-radius: 8px; color: var(--text-main); font-size: 0.9rem;" />
                             </div>
 
                             <div style="display: grid; grid-template-columns: 1.2fr 1fr; gap: 12px; margin-bottom: 14px;">
                                 <div>
-                                    <label style="display: block; font-size: 0.82rem; font-weight: 600; margin-bottom: 6px; color: #a1a1aa;">CPF ou CNPJ</label>
-                                    <input type="text" id="checkout-cpf" required placeholder="000.000.000-00" style="width: 100%; padding: 10px 12px; background: #1c1c24; border: 1px solid rgba(255,255,255,0.12); border-radius: 8px; color: #fff; font-size: 0.9rem;" />
+                                    <label style="display: block; font-size: 0.82rem; font-weight: 600; margin-bottom: 6px; color: var(--text-muted);">CPF ou CNPJ</label>
+                                    <input type="text" id="checkout-cpf" required placeholder="000.000.000-00" style="width: 100%; padding: 10px 12px; background: var(--bg-primary); border: 1px solid var(--border-strong); border-radius: 8px; color: var(--text-main); font-size: 0.9rem;" />
                                 </div>
                                 <div>
-                                    <label style="display: block; font-size: 0.82rem; font-weight: 600; margin-bottom: 6px; color: #a1a1aa;">WhatsApp / Tel</label>
-                                    <input type="tel" id="checkout-phone" required placeholder="(11) 98888-7777" style="width: 100%; padding: 10px 12px; background: #1c1c24; border: 1px solid rgba(255,255,255,0.12); border-radius: 8px; color: #fff; font-size: 0.9rem;" />
+                                    <label style="display: block; font-size: 0.82rem; font-weight: 600; margin-bottom: 6px; color: var(--text-muted);">WhatsApp / Tel</label>
+                                    <input type="tel" id="checkout-phone" required placeholder="(11) 98888-7777" style="width: 100%; padding: 10px 12px; background: var(--bg-primary); border: 1px solid var(--border-strong); border-radius: 8px; color: var(--text-main); font-size: 0.9rem;" />
                                 </div>
                             </div>
 
-                            <div style="margin-bottom: 20px; background: rgba(200, 149, 71, 0.08); border: 1px solid rgba(200, 149, 71, 0.2); border-radius: 10px; padding: 12px;">
-                                <div style="display: flex; align-items: center; gap: 8px; font-weight: 600; font-size: 0.88rem; color: #c89547; margin-bottom: 4px;">
+                            <div style="margin-bottom: 20px; background: var(--primary-soft); border: 1px solid var(--primary-edge); border-radius: 10px; padding: 12px;">
+                                <div style="display: flex; align-items: center; gap: 8px; font-weight: 600; font-size: 0.88rem; color: var(--primary); margin-bottom: 4px;">
                                     <i class="fa-brands fa-pix"></i> Pagamento Recorrente via Pix
                                 </div>
-                                <div style="font-size: 0.8rem; color: #a1a1aa; line-height: 1.4;">
+                                <div style="font-size: 0.8rem; color: var(--text-muted); line-height: 1.4;">
                                     Será gerado um QR Code Pix instantâneo. A confirmação do Asaas ativa sua assinatura automaticamente sem intervenção manual.
                                 </div>
                             </div>
 
-                            <div id="checkout-error" style="display: none; background: rgba(239, 68, 68, 0.15); border: 1px solid #ef4444; color: #fecaca; padding: 10px 14px; border-radius: 8px; font-size: 0.85rem; margin-bottom: 14px;">
+                            <div id="checkout-error" style="display: none; background: var(--danger-light); border: 1px solid var(--danger); color: var(--danger); padding: 10px 14px; border-radius: 8px; font-size: 0.85rem; margin-bottom: 14px;">
                                 <span></span>
                             </div>
 
-                            <button type="submit" id="btn-submit-checkout" style="width: 100%; padding: 12px; background: linear-gradient(135deg, #c89547, #dfa858); color: #000; font-weight: 700; border: none; border-radius: 8px; font-size: 0.95rem; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 8px;">
+                            <button type="submit" id="btn-submit-checkout" style="width: 100%; padding: 12px; background: var(--primary-gradient); color: var(--text-accent-gold); font-weight: 700; border: none; border-radius: 8px; font-size: 0.95rem; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 8px;">
                                 <i class="fa-solid fa-lock"></i> Gerar Assinatura & Pix Asaas
                             </button>
                         </form>
                     </div>
 
                     <div id="checkout-pix-step" style="display: none; text-align: center;">
-                        <div style="width: 50px; height: 50px; border-radius: 50%; background: rgba(34, 197, 94, 0.15); color: #22c55e; display: flex; align-items: center; justify-content: center; font-size: 1.4rem; margin: 0 auto 12px;">
+                        <div style="width: 50px; height: 50px; border-radius: 50%; background: var(--success-light); color: var(--success); display: flex; align-items: center; justify-content: center; font-size: 1.4rem; margin: 0 auto 12px;">
                             <i class="fa-solid fa-check"></i>
                         </div>
                         <h4 style="font-size: 1.2rem; font-weight: 700; margin-bottom: 4px;">Cobrança Pix Gerada!</h4>
-                        <p style="font-size: 0.85rem; color: #a1a1aa; margin-bottom: 16px;">Abra o app do seu banco e escaneie o QR Code abaixo:</p>
+                        <p style="font-size: 0.85rem; color: var(--text-muted); margin-bottom: 16px;">Abra o app do seu banco e escaneie o QR Code abaixo:</p>
 
                         <div id="checkout-pix-qr-container" style="margin-bottom: 16px;"></div>
 
                         <div style="margin-bottom: 16px; text-align: left;">
-                            <label style="display: block; font-size: 0.78rem; font-weight: 600; color: #a1a1aa; margin-bottom: 4px;">Ou copie o código Pix Copia e Cola:</label>
+                            <label style="display: block; font-size: 0.78rem; font-weight: 600; color: var(--text-muted); margin-bottom: 4px;">Ou copie o código Pix Copia e Cola:</label>
                             <div style="display: flex; gap: 8px;">
-                                <input type="text" id="checkout-pix-code" readonly style="flex: 1; padding: 8px 10px; background: #1c1c24; border: 1px solid rgba(255,255,255,0.12); border-radius: 6px; color: #d4af37; font-size: 0.8rem; font-family: monospace;" />
-                                <button type="button" onclick="SaaSPlanManager.copyPixCode()" style="background: #27272a; border: 1px solid rgba(255,255,255,0.15); color: #fff; padding: 8px 12px; border-radius: 6px; cursor: pointer; font-size: 0.8rem; font-weight: 600;">Copiar</button>
+                                <input type="text" id="checkout-pix-code" readonly style="flex: 1; padding: 8px 10px; background: var(--bg-primary); border: 1px solid var(--border-strong); border-radius: 6px; color: var(--primary); font-size: 0.8rem; font-family: monospace;" />
+                                <button type="button" onclick="SaaSPlanManager.copyPixCode()" style="background: var(--surface-strong); border: 1px solid var(--border-strong); color: var(--text-main); padding: 8px 12px; border-radius: 6px; cursor: pointer; font-size: 0.8rem; font-weight: 600;">Copiar</button>
                             </div>
                         </div>
 
-                        <p style="font-size: 0.8rem; color: #71717a; margin-bottom: 16px;">
+                        <p style="font-size: 0.8rem; color: var(--text-muted); margin-bottom: 16px;">
                             Após o pagamento, o webhook do Asaas aprovará sua assinatura instantaneamente.
                         </p>
 
-                        <button type="button" onclick="const m = document.getElementById('modal-asaas-checkout'); if (m) { m.classList.remove('show'); m.classList.remove('active'); }" style="background: #27272a; border: 1px solid rgba(255,255,255,0.15); color: #fff; padding: 10px 20px; border-radius: 8px; cursor: pointer; font-size: 0.9rem; font-weight: 600;">
+                        <button type="button" onclick="const m = document.getElementById('modal-asaas-checkout'); if (m) { m.classList.remove('show'); m.classList.remove('active'); }" style="background: var(--surface-strong); border: 1px solid var(--border-strong); color: var(--text-main); padding: 10px 20px; border-radius: 8px; cursor: pointer; font-size: 0.9rem; font-weight: 600;">
                             Fechar e Continuar Usando
                         </button>
                     </div>
@@ -334,9 +335,9 @@ const SaaSPlanManager = {
 
             const qrContainer = document.getElementById('checkout-pix-qr-container');
             if (result.pix && result.pix.encodedImage) {
-                qrContainer.innerHTML = `<img src="data:image/png;base64,${result.pix.encodedImage}" style="max-width: 200px; border-radius: 10px; border: 1px solid #c89547; display: inline-block;" />`;
+                qrContainer.innerHTML = `<img src="data:image/png;base64,${result.pix.encodedImage}" style="max-width: 200px; border-radius: 10px; border: 1px solid var(--primary); display: inline-block;" />`;
             } else {
-                qrContainer.innerHTML = `<p style="font-size: 0.85rem; color: #a1a1aa;">QR Code em processamento no Asaas.</p>`;
+                qrContainer.innerHTML = `<p style="font-size: 0.85rem; color: var(--text-muted);">QR Code em processamento no Asaas.</p>`;
             }
 
             const pixCodeInput = document.getElementById('checkout-pix-code');
@@ -398,7 +399,7 @@ const SaaSPlanManager = {
                     <i class="fa-solid fa-triangle-exclamation"></i>
                     <span>Sua assinatura está com <strong>fatura pendente</strong>. Regularize para evitar bloqueio da agenda.</span>
                 </div>
-                <button onclick="SaaSPlanManager.redirectToCheckout()" style="background: var(--danger); color: #fff; border: none; font-size: 0.75rem; font-weight: 700; padding: 5px 12px; border-radius: 4px; cursor: pointer; white-space: nowrap;">
+                <button onclick="SaaSPlanManager.redirectToCheckout()" style="background: var(--danger); color: var(--text-on-status); border: none; font-size: 0.75rem; font-weight: 700; padding: 5px 12px; border-radius: 4px; cursor: pointer; white-space: nowrap;">
                     Pagar Fatura
                 </button>
             `;

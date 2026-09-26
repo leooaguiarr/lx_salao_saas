@@ -18,9 +18,9 @@
 .checkout-credit {
     margin-top: 14px;
     padding: 12px;
-    border: 1px solid rgba(245, 158, 11, .3);
+    border: 1px solid var(--warning-light);
     border-radius: var(--radius-md);
-    background: rgba(245, 158, 11, .06);
+    background: var(--warning-light);
 }
 
 .checkout-credit[hidden] { display: none; }

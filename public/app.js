@@ -37,7 +37,7 @@ const STATE_KEYS = {
 const LOGO_PADRAO = '/assets/logo_lexion.png';
 
 // Versão exibida no rodapé do login.
-const VERSAO_DO_SISTEMA = '2.3.0';
+const VERSAO_DO_SISTEMA = '2.3.1';
 
 let currentSelectedDate = new Date();
 
@@ -1489,7 +1489,7 @@ function renderAgenda() {
         // Show alert if there are pending appointments and the day is mostly over (e.g. after 18:00 or just any pending past)
         if (hasPendingPast) {
             const alertDiv = document.createElement('div');
-            alertDiv.style.cssText = "margin: 10px 20px; padding: 12px 16px; background: rgba(231,76,60,0.1); border: 1px solid rgba(231,76,60,0.3); border-radius: 8px; color: #e74c3c; font-size: 13px; display: flex; align-items: center; gap: 10px;";
+            alertDiv.style.cssText = "margin: 10px 20px; padding: 12px 16px; background: var(--danger-light); border: 1px solid var(--danger-light); border-radius: 8px; color: var(--danger); font-size: 13px; display: flex; align-items: center; gap: 10px;";
             alertDiv.innerHTML = '<i class="fa-solid fa-triangle-exclamation" style="font-size: 18px;"></i> <div><strong>Atenção:</strong> Você tem atendimentos finalizados hoje que ainda constam com pagamento pendente. Lembre-se de confirmar o recebimento!</div>';
             document.querySelector('.calendar-container').prepend(alertDiv);
         }
@@ -3178,8 +3178,10 @@ function renderServiceRevenueChart() {
         const widthPct = Math.round((val / maxVal) * 100);
         const pct = totalServiceRevenue > 0 ? Math.round((val / totalServiceRevenue) * 100) : 0;
         // Colors gradient index-based
-        const colors = ['var(--primary)', 'var(--info)', '#6366f1', 'var(--warning)', 'var(--success)'];
-        const barColor = colors[index % colors.length];
+        // Uma cor só, a do tema: a barra compara tamanhos, e revezar verde,
+        // vermelho e âmbar entre serviços dava a eles um sentido (pago,
+        // atrasado, a receber) que não têm.
+        const barColor = 'var(--primary)';
 
         const row = document.createElement('div');
         row.className = 'chart-bar-row';
@@ -6430,8 +6432,8 @@ window.closeCashRegister = function () {
         }, 0);
 
         let listHTML = `
-            <div style="background: rgba(231, 76, 60, 0.1); border: 1px solid rgba(231, 76, 60, 0.3); border-radius: 10px; padding: 12px;">
-                <p style="color: #e74c3c; font-weight: 700; margin-bottom: 6px;">
+            <div style="background: var(--danger-light); border: 1px solid var(--danger-light); border-radius: 10px; padding: 12px;">
+                <p style="color: var(--danger); font-weight: 700; margin-bottom: 6px;">
                     <i class="fa-solid fa-triangle-exclamation"></i>
                     ${travamFechamento.length} pagamento(s) pendente(s) até agora (${horaAgora})
                 </p>
@@ -6475,9 +6477,9 @@ window.closeCashRegister = function () {
                </p>`
             : '';
         pendingListEl.innerHTML = `
-            <div style="background: rgba(46, 204, 113, 0.1); border: 1px solid rgba(46, 204, 113, 0.3); border-radius: 10px; padding: 12px; text-align: center;">
-                <i class="fa-solid fa-check-circle" style="color: #2ecc71; font-size: 1.5rem; margin-bottom: 5px;"></i>
-                <p style="color: #2ecc71; font-weight: 600; margin: 0;">Todos os pagamentos até agora estão confirmados!</p>
+            <div style="background: var(--success-light); border: 1px solid var(--success-light); border-radius: 10px; padding: 12px; text-align: center;">
+                <i class="fa-solid fa-check-circle" style="color: var(--success); font-size: 1.5rem; margin-bottom: 5px;"></i>
+                <p style="color: var(--success); font-weight: 600; margin: 0;">Todos os pagamentos até agora estão confirmados!</p>
                 ${aviso}
             </div>`;
     }

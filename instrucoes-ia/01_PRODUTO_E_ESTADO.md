@@ -226,10 +226,16 @@ A direção está em [DESIGN_E_TEMAS.md](DESIGN_E_TEMAS.md) (protótipo em
 - O seletor "Identidade Visual (Cor Primária)" **saiu**: pintava só parte do
   painel e nunca era gravado. `primary_color` continua no banco, ignorado.
 
+**Também feito em 26/09 (versão 2.3.1):** as outras abas na mesma linguagem —
+todo `.metric-card` sem ícone e com número grande, títulos de painel sem
+ícone, sem faixas laterais coloridas, cores de status só com sentido, tons
+fixos antigos trocados pelas variáveis do tema (inclusive o selo "PRO" e os
+modais de plano/checkout do `saas-plan.js`).
+
 **Falta, na ordem:**
 
-1. Levar a mesma linguagem às outras abas (Vendas, Financeiro, Clientes...):
-   elas herdam as cores, mas ainda têm ícones coloridos nos indicadores.
+1. Estrutura interna das telas (tabelas, filtros, modal de venda) ainda é a
+   antiga, só com as cores novas. Refazer o que o Leonardo apontar.
 2. Acento personalizável: paleta curada e "Usar a cor da minha marca"
    (reaproveitar `ThemeManager.applyColors` e `escurecerAteLer`).
 3. `get_public_salon` devolvendo o tema, para o link público herdar.

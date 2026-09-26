@@ -49,8 +49,8 @@
     gap: 8px;
     padding: 14px 16px;
     border-radius: var(--radius-md);
-    background: rgba(16, 185, 129, 0.08);
-    border: 1px solid rgba(16, 185, 129, 0.25);
+    background: var(--success-light);
+    border: 1px solid var(--success-light);
 }
 
 .encaixe-vaga-rotulo {
@@ -76,8 +76,8 @@
     flex-direction: column;
     align-items: flex-start;
     gap: 8px;
-    background: rgba(230, 126, 34, 0.08);
-    border: 1px solid rgba(230, 126, 34, 0.3);
+    background: var(--warning-light);
+    border: 1px solid var(--warning-light);
 }
 
 .encaixe-aviso-indisponivel {
@@ -109,8 +109,8 @@
     gap: 8px;
     padding: 14px 16px;
     border-radius: var(--radius-md);
-    background: rgba(230, 126, 34, 0.08);
-    border: 1px solid rgba(230, 126, 34, 0.25);
+    background: var(--warning-light);
+    border: 1px solid var(--warning-light);
     color: var(--warning);
     font-size: 13px;
     line-height: 1.45;
@@ -337,12 +337,12 @@
 }
 
 .produto-selo.baixo {
-    background: rgba(230, 126, 34, 0.15);
+    background: var(--warning-light);
     color: var(--warning);
 }
 
 .produto-selo.esgotado {
-    background: rgba(244, 63, 94, 0.15);
+    background: var(--danger-light);
     color: var(--danger);
 }
 
@@ -353,8 +353,8 @@
     margin-bottom: 16px;
     padding: 12px 14px;
     border-radius: var(--radius-md);
-    background: rgba(230, 126, 34, 0.08);
-    border: 1px solid rgba(230, 126, 34, 0.25);
+    background: var(--warning-light);
+    border: 1px solid var(--warning-light);
     color: var(--warning);
     font-size: 13px;
     line-height: 1.5;
@@ -537,12 +537,12 @@
 }
 
 .movimento-icone.entrada {
-    background: rgba(16, 185, 129, 0.12);
+    background: var(--success-light);
     color: var(--success);
 }
 
 .movimento-icone.saida {
-    background: rgba(244, 63, 94, 0.12);
+    background: var(--danger-light);
     color: var(--danger);
 }
 

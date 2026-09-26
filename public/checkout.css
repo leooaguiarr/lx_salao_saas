@@ -269,7 +269,7 @@
     display: grid;
     gap: 6px;
     padding: 12px 14px;
-    border: 1px solid rgba(244, 63, 94, .35);
+    border: 1px solid var(--danger-light);
     border-left: 4px solid var(--danger);
     border-radius: var(--radius-md);
     background: var(--danger-light);

@@ -109,7 +109,7 @@
     --shadow-main: 0 10px 30px -10px rgba(0, 0, 0, 0.6);
     --shadow-soft: 0 4px 12px rgba(0, 0, 0, 0.3);
     --shadow-strong: 0 18px 40px -12px rgba(0, 0, 0, 0.7);
-    --shadow-glow: 0 0 20px rgba(200, 149, 71, 0.25);
+    --shadow-glow: 0 0 20px var(--primary-light);
     --overlay-backdrop: rgba(0, 0, 0, 0.7);
     --transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
 }
@@ -853,12 +853,12 @@ button, input, select, textarea {
 }
 
 .menu-item-special {
-    background: linear-gradient(135deg, var(--primary-soft), rgba(59, 130, 246, 0.05));
+    background: linear-gradient(135deg, var(--primary-soft), var(--info-light));
     border: 1px dashed var(--primary-edge);
 }
 
 .menu-item-special:hover {
-    background: linear-gradient(135deg, var(--primary-medium), rgba(59, 130, 246, 0.1));
+    background: linear-gradient(135deg, var(--primary-medium), var(--info-light));
     border-color: var(--primary);
 }
 
@@ -897,6 +897,27 @@ button, input, select, textarea {
 .badge-info {
     background-color: var(--warning-light);
     color: var(--warning);
+}
+
+/* Selo "PRO" com cadeado nos itens de menu fora do plano (saas-plan.js).
+   Nas cores do tema: um dourado fixo destoava de oito dos nove temas. */
+.plan-lock-badge {
+    margin-left: auto;
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    padding: 2px 6px;
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 0.04em;
+    color: var(--primary);
+    background-color: var(--primary-soft);
+    border: 1px solid var(--primary-edge);
+    border-radius: var(--radius-sm);
+}
+
+.plan-lock-badge i {
+    font-size: 9px;
 }
 
 .sidebar-footer {
@@ -1158,7 +1179,7 @@ button, input, select, textarea {
     margin-bottom: 12px;
     padding: 9px 12px;
     border-radius: var(--radius-md);
-    background: linear-gradient(135deg, rgba(212, 175, 55, 0.12), rgba(212, 175, 55, 0.04));
+    background: linear-gradient(135deg, var(--primary-light), var(--primary-light));
     border: 1px solid var(--primary-edge);
     display: flex;
     align-items: center;
@@ -1169,7 +1190,7 @@ button, input, select, textarea {
 }
 
 .chip-plano-sidebar:hover {
-    background: linear-gradient(135deg, rgba(212, 175, 55, 0.22), rgba(212, 175, 55, 0.08));
+    background: linear-gradient(135deg, var(--primary-light), var(--primary-light));
     border-color: var(--primary);
 }
 
@@ -1308,7 +1329,7 @@ button, input, select, textarea {
 .btn-danger {
     background-color: var(--danger-light);
     color: var(--danger);
-    border-color: rgba(244, 63, 94, 0.2);
+    border-color: var(--danger-light);
 }
 
 .btn-danger:hover {
@@ -1321,7 +1342,7 @@ button, input, select, textarea {
 .btn-warning {
     background-color: var(--warning-light);
     color: var(--warning);
-    border-color: rgba(230, 126, 34, 0.25);
+    border-color: var(--warning-light);
 }
 
 .btn-warning:hover {
@@ -1381,17 +1402,29 @@ button, input, select, textarea {
     margin-bottom: 30px;
 }
 
+/* Os cartões de número das outras abas (Atendimentos, Financeiro,
+   Comissões, Crediário, Fidelidade, Estoque) seguem a mesma linguagem dos
+   indicadores do Início (26/09/2026): sem ícone colorido — os ícones gastavam
+   o verde e o vermelho, que querem dizer pago e atrasado —, rótulo pequeno
+   em cima e número grande na fonte de título do tema. O HTML dos ícones
+   continua lá; é só o CSS que os esconde. */
 .metric-card {
-    padding: 20px;
+    padding: 14px 16px;
     display: flex;
-    align-items: center;
-    gap: 16px;
-    transition: var(--transition);
+    /* Coluna: o Estoque monta o card sem o .metric-details em volta do
+       rótulo e do número, e em linha os dois ficavam lado a lado. */
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0;
+    background-color: var(--bg-secondary);
+    border-radius: var(--radius-md);
+    box-shadow: none;
+    backdrop-filter: none;
+    -webkit-backdrop-filter: none;
 }
 
-.metric-card:hover {
-    transform: translateY(-2px);
-    border-color: var(--border-color-active);
+.metric-card .metric-icon {
+    display: none;
 }
 
 .metric-icon {
@@ -1419,8 +1452,8 @@ button, input, select, textarea {
 .bg-amber-soft { background-color: var(--warning-light); }
 .text-amber { color: var(--warning); }
 
-.bg-indigo-soft { background-color: rgba(79, 70, 229, 0.15); }
-.text-indigo { color: #6366f1; }
+.bg-indigo-soft { background-color: var(--primary-light); }
+.text-indigo { color: var(--primary); }
 
 .metric-details {
     display: flex;
@@ -1428,16 +1461,45 @@ button, input, select, textarea {
 }
 
 .metric-label {
-    font-size: 13px;
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
     color: var(--text-muted);
-    font-weight: 500;
 }
 
 .metric-value {
-    font-size: 22px;
-    font-weight: 800;
-    letter-spacing: -0.5px;
-    margin-top: 2px;
+    font-size: 28px;
+    line-height: 1.05;
+    margin-top: 6px;
+    color: var(--text-primary);
+    font-variant-numeric: tabular-nums;
+}
+
+/* Números com a fonte e o peso de título do tema (ver o bloco das
+   personalidades); o ":root" vence as regras de h3 do resto do arquivo. */
+:root .metric-value {
+    font-family: var(--fonte-titulo);
+    font-weight: var(--peso-titulo);
+    letter-spacing: var(--espaco-titulo);
+}
+
+:root[data-personalidade="classica"] .metric-value { font-size: 34px; }
+
+/* Resumo do dia do Financeiro: indicadores lado a lado. O display vem do
+   app.js (flex ou none), por isso aqui só o que ele não define. */
+.financeiro-resumo {
+    margin-bottom: 16px;
+}
+
+.financeiro-resumo-grade {
+    gap: 12px;
+    flex-wrap: wrap;
+}
+
+.financeiro-resumo-grade > .indicador {
+    flex: 1 1 200px;
+    background-color: var(--bg-tertiary);
 }
 
 /* Dashboard Panel & Layout */
@@ -1473,6 +1535,14 @@ button, input, select, textarea {
 
 .panel-title i {
     font-size: 16px;
+}
+
+/* O ícone na frente de cada título de painel ("Histórico de vendas",
+   "Caixa do Dia"...) era enfeite repetido em toda tela, cada um numa cor.
+   O título sozinho, na fonte do tema, basta — como no Início. */
+.panel-title > i:first-child,
+.panel-title > svg:first-child {
+    display: none;
 }
 
 .panel-subtitle {
@@ -2014,6 +2084,8 @@ button, input, select, textarea {
     .indicadores { gap: 10px; }
     .indicador { padding: 12px 14px; }
     .indicador-numero { font-size: 24px; }
+    /* A serifa da Clássica ganha um degrau no desktop; aqui ele estourava. */
+    :root[data-personalidade="classica"] .indicador-numero { font-size: 28px; }
 
     /* No celular a linha vira dois andares: em cima hora, cliente e valor;
        embaixo profissional, ações e situação. Um terceiro andar só para os
@@ -2326,7 +2398,7 @@ button, input, select, textarea {
 .calendar-appt-event.duplicate-week-appt {
     border-left-color: #E67E22 !important;
     border-left-width: 5px !important;
-    box-shadow: 0 0 8px rgba(245, 158, 11, 0.25), inset 0 0 0 1px rgba(245, 158, 11, 0.15);
+    box-shadow: 0 0 8px var(--warning-light), inset 0 0 0 1px var(--warning-light);
 }
 
 .duplicate-week-badge {
@@ -2336,7 +2408,7 @@ button, input, select, textarea {
     width: 14px;
     height: 14px;
     border-radius: 3px;
-    background: rgba(245, 158, 11, 0.25);
+    background: var(--warning-light);
     color: #E67E22;
     font-size: 8px;
     margin-right: 4px;
@@ -2412,7 +2484,7 @@ button, input, select, textarea {
 .bg-amber { background-color: var(--warning); }
 .bg-purple { background-color: var(--primary); }
 .bg-green { background-color: var(--success); }
-.bg-indigo { background-color: #6366f1; }
+.bg-indigo { background-color: var(--primary); }
 .bg-gray { background-color: var(--gray); }
 
 .column-title {
@@ -3138,9 +3210,9 @@ button, input, select, textarea {
 }
 
 .alert-info {
-    background-color: rgba(59, 130, 246, 0.08);
-    border: 1px solid rgba(59, 130, 246, 0.2);
-    color: #93c5fd;
+    background-color: var(--info-light);
+    border: 1px solid var(--info-light);
+    color: var(--info);
 }
 
 .alert-info i {
@@ -3469,8 +3541,8 @@ button, input, select, textarea {
     margin-top: 15px;
     padding: 12px 14px;
     border-radius: var(--radius-md);
-    background-color: rgba(244, 63, 94, 0.1);
-    border: 1px solid rgba(244, 63, 94, 0.35);
+    background-color: var(--danger-light);
+    border: 1px solid var(--danger-light);
     color: #fda4af;
     font-size: 13px;
     line-height: 1.45;
@@ -3498,7 +3570,7 @@ button, input, select, textarea {
 .success-icon-wrapper {
     width: 60px;
     height: 60px;
-    background-color: rgba(16,185,129,0.1);
+    background-color: var(--success-light);
     border-radius: 50%;
     display: flex;
     align-items: center;
@@ -3896,16 +3968,11 @@ button, input, select, textarea {
         margin-bottom: 20px;
     }
     .metric-card {
-        padding: 14px;
-        gap: 10px;
+        padding: 12px 14px;
     }
-    .metric-icon {
-        width: 40px;
-        height: 40px;
-        font-size: 16px;
-    }
-    .metric-value {
-        font-size: 18px;
+    .metric-value,
+    :root[data-personalidade="classica"] .metric-value {
+        font-size: 22px;
     }
     
     /* 1. Mobile Bottom Tab Bar */
@@ -4148,9 +4215,9 @@ button, input, select, textarea {
 .message-timeline > div { display: flex; gap: 9px; align-items: flex-start; font-size: 12px; }
 .message-timeline span { display: flex; flex-direction: column; }
 .comm-badge { position: absolute; top: 7px; right: 7px; display: grid; place-items: center; width: 22px; height: 22px; border-radius: 50%; font-size: 9px; background: var(--bg-tertiary); }
-.comm-badge.delivered, .comm-badge.replied { color: var(--success); background: rgba(16,185,129,.18); }
-.comm-badge.failed { color: var(--danger); background: rgba(239,68,68,.18); }
-.comm-badge.pending, .comm-badge.sent { color: var(--warning); background: rgba(245,158,11,.18); }
+.comm-badge.delivered, .comm-badge.replied { color: var(--success); background: var(--success-light); }
+.comm-badge.failed { color: var(--danger); background: var(--danger-light); }
+.comm-badge.pending, .comm-badge.sent { color: var(--warning); background: var(--warning-light); }
 .week-view { display: grid; grid-template-columns: repeat(7, minmax(135px, 1fr)); gap: 8px; padding: 12px; overflow-x: auto; }
 .week-day-card, .month-day { color: var(--text-primary); background: var(--bg-secondary); border: 1px solid var(--border-color); border-radius: var(--radius-md); text-align: left; cursor: pointer; }
 .week-day-card { min-height: 180px; padding: 14px; display: flex; flex-direction: column; gap: 5px; }
@@ -4378,11 +4445,11 @@ body.public-booking-mode .mobile-tab-bar {
    achar de relance quem está na cadeira. */
 .atendimento-card.status-in_progress {
     border-left-color: var(--success, #10b981);
-    background: rgba(16, 185, 129, 0.06);
+    background: var(--success-light);
 }
 
 .status-badge.in_progress {
-    background: rgba(16, 185, 129, 0.18);
+    background: var(--success-light);
     color: var(--success, #10b981);
 }
 
@@ -4480,8 +4547,8 @@ body.public-booking-mode .mobile-tab-bar {
 
 /* Sem horário livre no link público (dia fechado ou agenda cheia). */
 .pub-sem-horario {
-    background: rgba(230, 126, 34, 0.08);
-    border: 1px solid rgba(230, 126, 34, 0.25);
+    background: var(--warning-light);
+    border: 1px solid var(--warning-light);
     border-radius: var(--radius-md);
     color: #e6a15f;
     padding: 14px;
@@ -4785,10 +4852,10 @@ body.public-booking-mode .mobile-tab-bar {
     gap: 10px;
     margin-top: 14px;
     padding: 11px 13px;
-    border: 1px solid rgba(245, 158, 11, .35);
+    border: 1px solid var(--warning-light);
     border-left: 3px solid var(--warning);
     border-radius: var(--radius-md);
-    background: rgba(245, 158, 11, .08);
+    background: var(--warning-light);
     color: var(--warning);
     font-size: 12px;
 }
@@ -5315,15 +5382,15 @@ body.acesso-barbeiro #page-configuracoes {
 }
 
 .config-plano-status-badge.status-trial {
-    background: rgba(212, 175, 55, 0.15);
+    background: var(--primary-light);
     color: var(--primary);
     border: 1px solid var(--primary-edge);
 }
 
 .config-plano-status-badge.status-active {
-    background: rgba(34, 197, 94, 0.15);
+    background: var(--success-light);
     color: var(--success);
-    border: 1px solid rgba(34, 197, 94, 0.3);
+    border: 1px solid var(--success-light);
 }
 
 .config-plano-status-badge.status-past_due {

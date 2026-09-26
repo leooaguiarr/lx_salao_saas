@@ -31,8 +31,8 @@
     display: flex;
     gap: 12px;
     align-items: flex-start;
-    background: rgba(243, 156, 18, 0.08);
-    border: 1px solid rgba(243, 156, 18, 0.3);
+    background: var(--warning-light);
+    border: 1px solid var(--warning-light);
     border-radius: 12px;
     padding: 14px 16px;
     margin-bottom: 20px;

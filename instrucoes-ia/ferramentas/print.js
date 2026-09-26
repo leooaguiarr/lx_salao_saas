@@ -9,6 +9,11 @@
 //              conferir LAYOUT, não comportamento.
 //   --aba=X    abre a aba X do menu (dashboard, agenda, vendas, clientes...).
 //   --claro    aplica o tema claro.
+//   --js=ARQ   roda o arquivo JS na página antes do print, depois do --painel e
+//              antes da --aba. Serve para pôr dados de exemplo na memória
+//              (`data.appointments = [...]`) e ver a tela cheia sem tocar no
+//              banco — o modelo dos testes da Alabama. Nunca chame saveData
+//              nele: isso gravaria no banco de produção se houvesse sessão.
 //
 // Imprime a largura do viewport (vw) e os elementos que passam da borda.
 // Em largura de celular, vw tem que ser igual à largura pedida.
@@ -105,6 +110,11 @@ const RELATORIO = `JSON.stringify({
 
   if (flags.includes('--claro')) await rodar(`ThemeManager.applyMode('claro')`);
   if (flags.includes('--painel')) await rodar(MOSTRAR_PAINEL);
+  const arquivoJs = (flags.find(f => f.startsWith('--js=')) || '').slice(5);
+  if (arquivoJs) {
+    const r = await rodar(fs.readFileSync(arquivoJs, 'utf8'));
+    if (r.result.exceptionDetails) console.error('Erro no --js:', r.result.exceptionDetails.exception?.description);
+  }
   if (aba) await rodar(`document.querySelector('.menu-item[data-target="${aba}"]')?.click()`);
   const subaba = (flags.find(f => f.startsWith('--subaba=')) || '').slice(9);
   if (subaba) await rodar(`document.querySelector('[data-config-tab="${subaba}"]')?.click()`);

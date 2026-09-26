@@ -7,50 +7,93 @@
  */
 
 const ThemeManager = {
-    // Os dois temas visuais do painel. O nome do modo é o que vai para o banco
-    // (business_info.theme) e para o atributo data-theme do documento; toda a
-    // paleta em si vive no index.css, não aqui.
-    MODES: {
-        escuro: {
-            id: 'escuro',
-            name: 'Escuro Nobre',
-            description: 'Preto neutro e dourado latão. O visual padrão da Lexion.',
-            swatch: ['#0A0A0B', '#131316', '#C89547']
-        },
-        claro: {
-            id: 'claro',
-            name: 'Bege Quente',
-            description: 'Fundo claro e dourado tostado, para salões de ambiente iluminado.',
-            swatch: ['#F6F1E8', '#EFE7D9', '#8A6A3B']
-        }
+    /* Os nove temas (instrucoes-ia/DESIGN_E_TEMAS.md). O id é o que vai para
+       o banco (business_info.theme) e para o data-theme do documento; as
+       cores vivem no index.css. `base` e `personalidade` viram data-base e
+       data-personalidade — é deles que saem sombra, fonte e raio de canto.
+       A amostra é [fundo, superfície, acento], as cores de verdade do tema.
+
+       Ao mexer nesta lista, atualize também o mapa curto do <head> do
+       index.html, que aplica o tema antes da primeira pintura. */
+    TEMAS: {
+        oldschool: { nome: 'Oldschool', nicho: 'barbearia', base: 'escuro', personalidade: 'classica',
+            descricao: 'Café escuro e cobre.',
+            amostra: ['#17130F', '#201A14', '#C8862F'] },
+        aco: { nome: 'Aço', nicho: 'barbearia', base: 'escuro', personalidade: 'classica',
+            descricao: 'Grafite e aço escovado.',
+            amostra: ['#131417', '#1C1E22', '#9BA7B4'] },
+        navalha: { nome: 'Navalha', nicho: 'barbearia', base: 'claro', personalidade: 'classica',
+            descricao: 'Papel claro e vermelho-tijolo.',
+            amostra: ['#F3F1EC', '#FFFFFF', '#8C3A2E'] },
+        rose: { nome: 'Rosé', nicho: 'salao', base: 'claro', personalidade: 'refinada',
+            descricao: 'Branco quente e rosé.',
+            amostra: ['#FBF7F5', '#FFFFFF', '#A0455C'] },
+        botanico: { nome: 'Botânico', nicho: 'salao', base: 'claro', personalidade: 'refinada',
+            descricao: 'Off-white e verde-folha.',
+            amostra: ['#F7F6F1', '#FFFFFF', '#5A7446'] },
+        noir: { nome: 'Noir Chic', nicho: 'salao', base: 'escuro', personalidade: 'refinada',
+            descricao: 'Noite e rosa antigo.',
+            amostra: ['#141216', '#1E1A1F', '#D08BA0'] },
+        sereno: { nome: 'Sereno', nicho: 'estetica', base: 'claro', personalidade: 'clean',
+            descricao: 'Branco e verde-sálvia.',
+            amostra: ['#F4F8F6', '#FFFFFF', '#2F6B54'] },
+        areia: { nome: 'Areia', nicho: 'estetica', base: 'claro', personalidade: 'clean',
+            descricao: 'Areia e terracota.',
+            amostra: ['#F8F5F1', '#FFFFFF', '#A2603C'] },
+        clinico: { nome: 'Clínico', nicho: 'estetica', base: 'claro', personalidade: 'clean',
+            descricao: 'Branco e azul-petróleo.',
+            amostra: ['#F4F6F9', '#FFFFFF', '#1F5C73'] }
     },
 
-    MODE_PADRAO: 'escuro',
+    NICHOS: {
+        barbearia: 'Barbearia',
+        salao: 'Salão de beleza',
+        estetica: 'Estética e spa'
+    },
+
+    TEMA_PADRAO: 'oldschool',
+
+    /* Antes de 26/09/2026 a coluna só guardava 'escuro' ou 'claro' (e é o
+       DEFAULT dela). Esses valores viram o tema do nicho com a mesma base:
+       quem nunca escolheu abre com a cara do próprio nicho, e quem escolheu
+       claro continua no claro. Estética não tem tema escuro. */
+    LEGADO: {
+        escuro: { barbearia: 'oldschool', salao: 'noir', estetica: 'sereno' },
+        claro: { barbearia: 'navalha', salao: 'rose', estetica: 'sereno' }
+    },
 
     // Cópia local da escolha. O tema de verdade mora no banco, mas ele só chega
     // depois do login e de uma ida à rede: sem esta cópia, todo carregamento
-    // começaria escuro e piscaria para claro alguns segundos depois.
+    // começaria no tema padrão e trocaria alguns segundos depois.
     STORAGE_KEY: 'lexion_theme_mode',
 
-    modoAtual: 'escuro',
+    modoAtual: 'oldschool',
+    nichoAtual: 'barbearia',
 
-    modoValido(modo) {
-        return Object.prototype.hasOwnProperty.call(this.MODES, modo) ? modo : this.MODE_PADRAO;
+    temaDoSalao(valor, nicho) {
+        if (this.TEMAS[valor]) return valor;
+        const legado = this.LEGADO[valor];
+        if (legado) return legado[nicho] || legado.barbearia;
+        return this.TEMA_PADRAO;
+    },
+
+    // Os temas na ordem da tela de escolha: os do nicho primeiro.
+    temasDoNicho(nicho) {
+        return Object.keys(this.TEMAS).filter(id => this.TEMAS[id].nicho === nicho);
     },
 
     /**
-     * Escreve o tema no documento. É o único lugar que mexe no data-theme.
+     * Escreve o tema no documento. É o único lugar que mexe nos atributos.
      */
     applyMode(modo) {
-        const alvo = this.modoValido(modo);
+        const alvo = this.temaDoSalao(modo, this.nichoAtual);
+        const tema = this.TEMAS[alvo];
         this.modoAtual = alvo;
 
-        // O escuro é o :root puro; só o claro precisa do atributo.
-        if (alvo === this.MODE_PADRAO) {
-            document.documentElement.removeAttribute('data-theme');
-        } else {
-            document.documentElement.setAttribute('data-theme', alvo);
-        }
+        const raiz = document.documentElement;
+        raiz.setAttribute('data-theme', alvo);
+        raiz.setAttribute('data-base', tema.base);
+        raiz.setAttribute('data-personalidade', tema.personalidade);
 
         try {
             localStorage.setItem(this.STORAGE_KEY, alvo);
@@ -74,33 +117,11 @@ const ThemeManager = {
         } catch (err) {
             lembrado = null;
         }
-        return this.applyMode(lembrado || this.MODE_PADRAO);
+        return this.applyMode(lembrado || this.TEMA_PADRAO);
     },
 
     getMode() {
         return this.modoAtual;
-    },
-
-    // Presets de cores recomendados por segmento
-    PRESETS: {
-        barbearia: [
-            { name: 'Ouro Vintage (Padrão)', primary: '#d4af37', secondary: '#18181b' },
-            { name: 'Âmbar Clássico', primary: '#f59e0b', secondary: '#1c1917' },
-            { name: 'Azul Petróleo Nobre', primary: '#0284c7', secondary: '#0f172a' },
-            { name: 'Rubi Intenso', primary: '#e11d48', secondary: '#18181b' }
-        ],
-        salao: [
-            { name: 'Rose Gold Luxury', primary: '#f43f5e', secondary: '#1c1917' },
-            { name: 'Violeta Glamour', primary: '#8b5cf6', secondary: '#09090b' },
-            { name: 'Esmeralda Sofisticado', primary: '#10b981', secondary: '#064e3b' },
-            { name: 'Cobre Acobreado', primary: '#ea580c', secondary: '#1c1917' }
-        ],
-        estetica: [
-            { name: 'Lavanda & Spa', primary: '#a855f7', secondary: '#18181b' },
-            { name: 'Turquesa Clean', primary: '#06b6d4', secondary: '#0f172a' },
-            { name: 'Nude Rosé', primary: '#fb7185', secondary: '#1f1f23' },
-            { name: 'Verde Menta Suave', primary: '#14b8a6', secondary: '#134e4a' }
-        ]
     },
 
     // Dicionário de termos por segmento
@@ -145,8 +166,9 @@ const ThemeManager = {
         // escreve direto no style do <html>, que vence qualquer regra do CSS.
         // Sem o ajuste abaixo, um salão de dourado claro ou rosa ficaria com
         // ícones e links ilegíveis assim que trocasse para o tema bege.
-        const cor = this.getMode() === 'claro'
-            ? this.escurecerAteLer(primaryColor, '#F6F1E8', 3.2)
+        const tema = this.TEMAS[this.getMode()];
+        const cor = tema && tema.base === 'claro'
+            ? this.escurecerAteLer(primaryColor, tema.amostra[0], 4.5)
             : primaryColor;
 
         const root = document.documentElement;
@@ -217,6 +239,25 @@ const ThemeManager = {
         });
     },
 
+    // As cores que o banco e o cadastro gravam sozinhos: o DEFAULT da coluna
+    // primary_color e as do `typeColors` do server.js. Nenhum salão as
+    // escolheu — até 26/09/2026 o painel nem enviava primary_color ao banco
+    // (fora da allowedCols do api.js). Aplicá-las escreveria no style do
+    // <html> um dourado que vence o acento do tema no index.css.
+    CORES_DE_FABRICA: ['#d4af37', '#c89547', '#e0a96d'],
+
+    corEscolhidaPeloSalao(cor) {
+        if (!cor) return null;
+        return this.CORES_DE_FABRICA.includes(String(cor).trim().toLowerCase()) ? null : cor;
+    },
+
+    // Devolve o acento ao do tema (o do CSS), apagando o que applyColors pôs.
+    limparCores() {
+        const root = document.documentElement;
+        ['--primary', '--primary-color', '--primary-hover', '--primary-light', '--primary-glow']
+            .forEach(nome => root.style.removeProperty(nome));
+    },
+
     /**
      * Aplica o tema completo a partir dos dados do salão (business_info)
      */
@@ -224,14 +265,17 @@ const ThemeManager = {
         if (!businessInfo) return;
 
         const type = businessInfo.business_type || businessInfo.businessType || 'barbearia';
-        const primary = businessInfo.primary_color || businessInfo.primaryColor || '#d4af37';
-        const secondary = businessInfo.secondary_color || businessInfo.secondaryColor || '#18181b';
+        this.nichoAtual = type;
 
-        // Claro ou escuro vem do cadastro do salão e vale para a equipe toda.
-        // Um salão que nunca escolheu fica no escuro, como sempre foi.
-        this.applyMode(businessInfo.theme || businessInfo.themeMode || this.MODE_PADRAO);
+        // O tema vem do cadastro do salão e vale para a equipe toda. Quem
+        // nunca escolheu (ou escolheu no tempo do claro/escuro) cai no tema
+        // do próprio nicho — ver LEGADO.
+        this.applyMode(businessInfo.theme || businessInfo.themeMode || this.TEMA_PADRAO);
 
-        this.applyColors(primary, secondary);
+        // A cor da marca saiu da tela em 26/09/2026: o seletor antigo pintava
+        // só metade do painel e nunca foi gravado no banco. O acento agora é o
+        // do tema. Limpa o que uma prévia antiga tenha deixado no <html>.
+        this.limparCores();
         this.applyVocabulary(type);
 
         // Atualiza o título do documento se houver nome cadastrado

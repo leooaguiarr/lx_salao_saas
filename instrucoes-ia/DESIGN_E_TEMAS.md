@@ -1,8 +1,23 @@
 # Design e temas — decisão de 25/09/2026
 
 Leonardo não gostou das cores nem do layout do painel. Esta página guarda a
-direção aprovada e os valores exatos para implementar. **Nada disto está no
-código ainda** — é a especificação do próximo trabalho.
+direção aprovada e os valores exatos.
+
+**Estado em 26/09/2026:** implementados os seis pontos de layout (no Início e
+na Agenda), os nove temas e as três personalidades, e a migração (09). Falta
+o acento personalizável, `get_public_salon` com o tema, as outras abas na
+mesma linguagem e a landing — ver [01_PRODUTO_E_ESTADO.md](01_PRODUTO_E_ESTADO.md).
+
+Diferenças conscientes em relação ao texto abaixo:
+
+- **"A confirmar" virou "A receber"**: quase todo atendimento nasce
+  `scheduled`, e pintá-los de âmbar deixaria a lista inteira em alerta. O
+  âmbar marca quem já foi atendido e não pagou.
+- O Botânico usa `#5A7446` (e não `#5F7A4A`) e o Areia `#A2603C` como texto:
+  ajuste mínimo para passar de 4,5:1. Os valores finais estão no `index.css`,
+  gerados com o contraste conferido.
+- O Noir Chic é o tema escuro do salão; estética não tem escuro, e o legado
+  `escuro` de um salão de estética vira Sereno.
 
 Protótipo navegável (8 telas, privado na conta do Leonardo):
 <https://claude.ai/artifact/QUxn2Few2eZ7FjHF7M6ZxQ>

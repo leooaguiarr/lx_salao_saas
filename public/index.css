@@ -1,25 +1,22 @@
 /* ==========================================================================
-   LEXION SALÃO & BARBEARIA - PREMIUM UNISEX DARK THEMING
+   LEXION SALÃO & BARBEARIA
 
-   Paleta da Identidade Visual Lexion Salão:
-   - Fundo Escuro Nobre (#09090C / #0C0C0E): base imersiva e elegante do salão
-   - Branco Suave / Nítido (#F1F5F9 / #F8FAFC): contraste limpo sem ofuscar
-   - Dourado Latão Nobre (#C89547 / #D4AF37): destaque de luxo, botões e detalhes da marca
-   - Preto Escuro (#050B08): texto com contraste perfeito sobre fundos dourados
+   A direção visual está em instrucoes-ia/DESIGN_E_TEMAS.md (aprovada em
+   25/09/2026): nove temas montados de três eixos — base, personalidade e
+   acento. Por enquanto só a base "Oldschool" (escuro) está aqui, junto com o
+   claro antigo; as personalidades e os outros acentos vêm nas próximas etapas.
    ========================================================================== */
 
 /* ==========================================================================
    TEMAS
 
-   O sistema tem dois temas, escolhidos pelo salão em Configurações:
-
-   - "escuro" (padrão): verde profundo e dourado latão, a identidade original.
-   - "claro": bege quente e dourado tostado, para salões de ambiente claro.
+   O salão escolhe um de nove temas em Configurações (três por nicho). A
+   lista, com nome e nicho de cada um, está no theme.js (ThemeManager.TEMAS).
 
    Como funciona: TODA cor de superfície, texto, borda e sombra sai de um token
-   abaixo. O tema escuro vive no :root e o claro apenas redefine os mesmos
-   nomes em [data-theme="claro"] — nenhuma regra do resto do arquivo precisa
-   saber qual tema está ativo.
+   abaixo. O :root traz o Oldschool, e cada tema redefine os mesmos nomes em
+   [data-theme="<id>"] — nenhuma regra do resto do arquivo precisa saber qual
+   tema está ativo.
 
    Por isso, ao escrever CSS novo aqui: nada de #hex ou rgba() direto em cor de
    fundo, texto ou borda. O que for literal continua escuro no tema claro e
@@ -29,73 +26,80 @@
    ========================================================================== */
 
 :root {
-    /* Cores de Base
-       O escuro é PRETO NEUTRO, não verde. O verde profundo que havia aqui
-       tingia tudo de um tom oliva que brigava com o dourado; num preto neutro
-       o dourado é a única cor da tela e é ele que guia o olho. */
-    --background-primary: #0A0A0B; /* Preto neutro do fundo */
-    --text-primary: #F8FAFC;       /* Títulos e Contraste Nítido */
-    --accent-gold: #C89547;        /* Dourado Latão Nobre */
-    --text-accent-gold: #0A0A0B;   /* Texto escuro sobre dourado */
+    /* Cores de Base — tema "Oldschool" (instrucoes-ia/DESIGN_E_TEMAS.md)
+       Marrom-café quase preto e acento cobre. O preto neutro com dourado de
+       antes parecia outro sistema ao lado da landing; esta é a base escolhida
+       em 25/09/2026, e os valores vêm da tabela dos nove temas. */
+    --background-primary: #17130F; /* Fundo */
+    --text-primary: #F2EAE0;       /* Títulos */
+    --accent-gold: #C8862F;        /* Acento cobre */
+    --text-accent-gold: #17130F;   /* Texto escuro sobre o acento (6,1:1) */
 
     /* Superfícies & Layout
-       Três degraus de cinza-quase-preto: fundo, barra lateral e superfície
-       elevada (cartões, modais). A separação é sutil de propósito — quem
-       organiza a tela são as bordas, não blocos de cinza claro. */
+       Três degraus: fundo, superfície (barra lateral, cartões) e elevado
+       (modais, linhas em destaque). A separação é sutil de propósito — quem
+       organiza a tela são as bordas, não blocos de cor. */
     --bg-primary: var(--background-primary);
-    --bg-secondary: #131316;
-    --bg-tertiary: #1A1A1E;
-    --bg-glass: rgba(19, 19, 22, 0.85);
-    --border-color: rgba(255, 255, 255, 0.08);
-    --border-color-active: rgba(200, 149, 71, 0.45);
+    --bg-secondary: #201A14;
+    --bg-tertiary: #2A2219;
+    --bg-glass: rgba(32, 26, 20, 0.92);
+    --border-color: rgba(233, 216, 192, 0.10);
+    --border-color-active: rgba(200, 134, 47, 0.45);
 
-    /* Camadas sobre o fundo: no tema escuro são véus de branco, no claro
-       viram véus de preto. Sempre estes, nunca rgba(255,255,255,…) solto. */
-    --surface-sunken: rgba(255, 255, 255, 0.015);
-    --surface-hover: rgba(255, 255, 255, 0.03);
-    --surface-raised: rgba(255, 255, 255, 0.05);
-    --surface-strong: rgba(255, 255, 255, 0.08);
-    --border-subtle: rgba(255, 255, 255, 0.04);
-    --border-strong: rgba(255, 255, 255, 0.16);
+    /* Camadas sobre o fundo: no tema escuro são véus de creme (e não de
+       branco puro, que acinzentava o marrom); no claro viram véus de preto.
+       Sempre estes, nunca rgba(255,255,255,…) solto. */
+    --surface-sunken: rgba(233, 216, 192, 0.02);
+    --surface-hover: rgba(233, 216, 192, 0.04);
+    --surface-raised: rgba(233, 216, 192, 0.06);
+    --surface-strong: rgba(233, 216, 192, 0.10);
+    --border-subtle: rgba(233, 216, 192, 0.06);
+    --border-strong: rgba(233, 216, 192, 0.18);
 
     /* Brand Colors */
     --primary: var(--accent-gold);
-    --primary-hover: #D9A95E;
-    --primary-dark: #8F6A32;
-    --primary-light: rgba(200, 149, 71, 0.14);
+    --primary-hover: #E0A24B;
+    --primary-dark: #9A6522;
+    --primary-light: rgba(200, 134, 47, 0.16);
 
-    /* Degraus de transparência do dourado. Existem porque rgba() não aceita
+    /* Degraus de transparência do acento. Existem porque rgba() não aceita
        uma variável de cor com alpha novo sem color-mix, que nem todo aparelho
        de salão suporta. */
-    --primary-soft: rgba(200, 149, 71, 0.12);
-    --primary-medium: rgba(200, 149, 71, 0.18);
-    --primary-ring: rgba(200, 149, 71, 0.30);
-    --primary-edge: rgba(200, 149, 71, 0.35);
-    --primary-strong: rgba(200, 149, 71, 0.45);
+    --primary-soft: rgba(200, 134, 47, 0.10);
+    --primary-medium: rgba(200, 134, 47, 0.18);
+    --primary-ring: rgba(200, 134, 47, 0.30);
+    --primary-edge: rgba(200, 134, 47, 0.35);
+    --primary-strong: rgba(200, 134, 47, 0.45);
 
-    /* Preenchimento dos botões e realces principais. É gradiente, então não dá
-       para resolver com --primary sozinho. */
-    --primary-gradient: linear-gradient(135deg, #D9A95E, #A87B34);
-    --primary-gradient-hover: linear-gradient(135deg, #E3B972, #BE8C3E);
+    /* Preenchimento dos botões principais. Quase chapado: o degradê forte de
+       antes era enfeite e pesava ao lado de uma paleta sóbria. Continua
+       gradiente porque dezenas de regras usam `background: var(...)`. */
+    --primary-gradient: linear-gradient(135deg, #CF8F38, #BF7D27);
+    --primary-gradient-hover: linear-gradient(135deg, #DA9B45, #C8862F);
 
-    /* Action & Status Colors — iguais nos dois temas de propósito: verde é
-       recebido, vermelho é atrasado, e trocar isso por tema confundiria. */
-    --success: #10b981; /* Emerald */
-    --success-light: rgba(16, 185, 129, 0.12);
-    --warning: #E67E22; /* Laranja - distinto do dourado da marca */
-    --warning-light: rgba(230, 126, 34, 0.12);
-    --danger: #f43f5e; /* Rose */
-    --danger-light: rgba(244, 63, 94, 0.12);
-    --info: #3b82f6; /* Sky Blue */
-    --info-light: rgba(59, 130, 246, 0.12);
-    --gray: #64748b;
-    --gray-light: rgba(100, 116, 139, 0.12);
+    /* Cores de status. Verde é pago, âmbar é "a confirmar" / "a receber",
+       vermelho é atrasado ou faltou — e SÓ isso: cor que aparece sem carregar
+       um desses significados gasta o sinal (DESIGN_E_TEMAS.md, item 2).
+       Os tons são os da especificação para base escura. */
+    --success: #7FB08A;
+    --success-light: rgba(127, 176, 138, 0.14);
+    --warning: #D9954B;
+    --warning-light: rgba(217, 149, 75, 0.14);
+    --danger: #E8776A;
+    --danger-light: rgba(232, 119, 106, 0.14);
+    --info: #8FA9C4;
+    --info-light: rgba(143, 169, 196, 0.14);
+    --gray: #8A7B6A;
+    --gray-light: rgba(138, 123, 106, 0.14);
+    /* Texto sobre um fundo cheio de status (botão verde, selo âmbar). No
+       escuro os status são claros, então o texto é escuro; no claro, o inverso. */
+    --text-on-status: #17130F;
 
-    /* Typography Colors */
-    --text-main: #F1F5F9;
-    --text-muted: #9A9AA7;
+    /* Typography Colors — todos acima de 4,5:1 sobre fundo e superfície */
+    --text-main: #F2EAE0;
+    --text-muted: #A99781;
     --text-inverse: var(--text-accent-gold);
-    --text-faint: #7B7B87;  /* Rodapés e legendas de apoio */
+    --text-faint: #8F8070;  /* Rodapés e legendas de apoio */
 
     /* Spacing & Borders */
     --radius-sm: 8px;
@@ -111,67 +115,461 @@
 }
 
 /* --------------------------------------------------------------------------
-   TEMA CLARO — bege quente
+   OS NOVE TEMAS (instrucoes-ia/DESIGN_E_TEMAS.md)
 
-   O dourado precisa escurecer: #C89547 sobre bege claro não alcança contraste
-   de leitura. Vira #8A6A3B, e o texto sobre ele passa a ser branco — o
-   contrário do tema escuro, onde o texto sobre dourado é quase preto.
+   Cada tema é a soma de três atributos que o ThemeManager (theme.js) põe no
+   <html>:
+     data-theme           qual dos nove (cores: fundo, superfície, acento)
+     data-base            claro ou escuro (sombras e véu dos modais)
+     data-personalidade   classica, refinada ou clean (fonte, raio, bordas)
+
+   Os blocos de cor abaixo foram GERADOS a partir da tabela da especificação,
+   com os tons de apoio (texto secundário, legendas) calculados para passar de
+   4,5:1 sobre fundo, superfície e elevado. Ao mudar uma cor à mão, confira o
+   contraste de novo — texto que some é defeito, não gosto.
+
+   O :root puro, lá em cima, é o Oldschool: é o que vale antes do JS rodar.
    -------------------------------------------------------------------------- */
-:root[data-theme="claro"] {
-    --background-primary: #F6F1E8; /* Bege quente de fundo */
-    --text-primary: #2A2520;       /* Marrom escuro para títulos */
-    --accent-gold: #8A6A3B;        /* Dourado tostado, legível sobre bege */
-    --text-accent-gold: #FFFFFF;   /* Texto claro sobre o dourado escuro */
 
-    --bg-secondary: #EFE7D9;       /* Barra lateral e cartões de apoio */
-    --bg-tertiary: #FBF7F0;        /* Superfície elevada (modais, listas) */
-    --bg-glass: rgba(251, 247, 240, 0.88);
-    --border-color: rgba(42, 37, 32, 0.12);
-    --border-color-active: rgba(138, 106, 59, 0.50);
+/* Base clara: sombras curtas e suaves. A sombra pesada do escuro vira uma
+   mancha cinza sobre fundo claro. */
+:root[data-base="claro"] {
+    --shadow-main: 0 8px 24px -12px rgba(20, 20, 20, 0.18);
+    --shadow-soft: 0 2px 8px rgba(20, 20, 20, 0.07);
+    --shadow-strong: 0 16px 36px -14px rgba(20, 20, 20, 0.24);
+    --overlay-backdrop: rgba(20, 20, 20, 0.40);
+}
 
-    --surface-sunken: rgba(42, 37, 32, 0.02);
-    --surface-hover: rgba(42, 37, 32, 0.05);
-    --surface-raised: rgba(42, 37, 32, 0.07);
-    --surface-strong: rgba(42, 37, 32, 0.11);
-    --border-subtle: rgba(42, 37, 32, 0.07);
-    --border-strong: rgba(42, 37, 32, 0.20);
+/* PERSONALIDADES. A fonte, o raio de canto e o peso dos títulos. Sem o
+   atributo (antes do JS), fica a fonte de sempre. */
+:root {
+    --fonte-texto: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    --fonte-titulo: var(--fonte-texto);
+    --peso-titulo: 800;
+    --espaco-titulo: -0.02em;
+}
 
-    --primary-hover: #6F5330;
-    --primary-dark: #5C4526;
-    --primary-light: rgba(138, 106, 59, 0.14);
+/* Clássica (barbearia): serifa de título com texto sóbrio, cantos quase
+   retos. A Instrument Serif só tem um peso — negrito falso nela fica
+   borrado, por isso o peso do título é 400. */
+:root[data-personalidade="classica"] {
+    --fonte-texto: 'Karla', -apple-system, "Segoe UI", sans-serif;
+    --fonte-titulo: 'Instrument Serif', Georgia, serif;
+    --peso-titulo: 400;
+    --espaco-titulo: 0;
+    --radius-sm: 3px;
+    --radius-md: 4px;
+    --radius-lg: 6px;
+}
 
-    --primary-soft: rgba(138, 106, 59, 0.10);
-    --primary-medium: rgba(138, 106, 59, 0.16);
-    --primary-ring: rgba(138, 106, 59, 0.28);
-    --primary-edge: rgba(138, 106, 59, 0.34);
-    --primary-strong: rgba(138, 106, 59, 0.45);
+/* Refinada (salão): uma família só, geométrica e leve. */
+:root[data-personalidade="refinada"] {
+    --fonte-texto: 'Outfit', -apple-system, "Segoe UI", sans-serif;
+    --fonte-titulo: 'Outfit', -apple-system, "Segoe UI", sans-serif;
+    --peso-titulo: 600;
+    --espaco-titulo: -0.01em;
+    --radius-sm: 8px;
+    --radius-md: 12px;
+    --radius-lg: 16px;
+}
 
-    --primary-gradient: linear-gradient(135deg, #9C7A45, #6F5330);
-    --primary-gradient-hover: linear-gradient(135deg, #8A6A3B, #5C4526);
+/* Clean (estética): cantos bem redondos e cartões sem borda, separados por
+   sombra — a sensação de clínica, de respiro. */
+:root[data-personalidade="clean"] {
+    --fonte-texto: 'Manrope', -apple-system, "Segoe UI", sans-serif;
+    --fonte-titulo: 'Manrope', -apple-system, "Segoe UI", sans-serif;
+    --peso-titulo: 800;
+    --espaco-titulo: -0.02em;
+    --radius-sm: 10px;
+    --radius-md: 16px;
+    --radius-lg: 20px;
+}
 
-    /* Os status escurecem: os tons pensados para fundo escuro somem no bege. */
-    --success: #0F7A54;
-    --success-light: rgba(15, 122, 84, 0.12);
-    --warning: #B35309;
-    --warning-light: rgba(179, 83, 9, 0.12);
-    --danger: #C02640;
-    --danger-light: rgba(192, 38, 64, 0.12);
-    --info: #1D4ED8;
-    --info-light: rgba(29, 78, 216, 0.10);
-    --gray: #6B6257;
-    --gray-light: rgba(107, 98, 87, 0.12);
+:root[data-theme="oldschool"] {
+    --background-primary: #17130F;
+    --bg-secondary: #201A14;
+    --bg-tertiary: #2A2219;
+    --bg-glass: rgba(32, 26, 20, 0.92);
+    --text-primary: #F2EAE0;
+    --text-main: #F2EAE0;
+    --text-muted: #A99781;
+    --text-faint: #89837C;
+    --accent-gold: #C8862F;
+    --text-accent-gold: #17130F;
+    --primary-hover: #D29C54;
+    --primary-dark: #8C5E21;
+    --primary-light: rgba(200, 134, 47, 0.16);
+    --primary-soft: rgba(200, 134, 47, 0.1);
+    --primary-medium: rgba(200, 134, 47, 0.18);
+    --primary-ring: rgba(200, 134, 47, 0.3);
+    --primary-edge: rgba(200, 134, 47, 0.35);
+    --primary-strong: rgba(200, 134, 47, 0.45);
+    --primary-gradient: linear-gradient(135deg, #CB8D3B, #B87B2B);
+    --primary-gradient-hover: linear-gradient(135deg, #D0974C, #C8862F);
+    --border-color: rgba(242, 234, 224, 0.1);
+    --border-color-active: rgba(200, 134, 47, 0.45);
+    --surface-sunken: rgba(242, 234, 224, 0.02);
+    --surface-hover: rgba(242, 234, 224, 0.04);
+    --surface-raised: rgba(242, 234, 224, 0.06);
+    --surface-strong: rgba(242, 234, 224, 0.1);
+    --border-subtle: rgba(242, 234, 224, 0.06);
+    --border-strong: rgba(242, 234, 224, 0.18);
+    --success: #7FB08A;
+    --success-light: rgba(127, 176, 138, 0.14);
+    --warning: #D9954B;
+    --warning-light: rgba(217, 149, 75, 0.14);
+    --danger: #E8776A;
+    --danger-light: rgba(232, 119, 106, 0.14);
+    --info: #8FA9C4;
+    --info-light: rgba(143, 169, 196, 0.14);
+    --gray: #A99781;
+    --gray-light: rgba(169, 151, 129, 0.14);
+    --text-on-status: #17130F;
+    --shadow-glow: 0 0 18px rgba(200, 134, 47, 0.22);
+}
 
-    --text-main: #2A2520;
-    --text-muted: #6E6459;
-    --text-faint: #8A8075;
+:root[data-theme="aco"] {
+    --background-primary: #131417;
+    --bg-secondary: #1C1E22;
+    --bg-tertiary: #24272C;
+    --bg-glass: rgba(28, 30, 34, 0.92);
+    --text-primary: #EDF0F3;
+    --text-main: #EDF0F3;
+    --text-muted: #8D8F92;
+    --text-faint: #848689;
+    --accent-gold: #9BA7B4;
+    --text-accent-gold: #131417;
+    --primary-hover: #ADB7C2;
+    --primary-dark: #6D757E;
+    --primary-light: rgba(155, 167, 180, 0.16);
+    --primary-soft: rgba(155, 167, 180, 0.1);
+    --primary-medium: rgba(155, 167, 180, 0.18);
+    --primary-ring: rgba(155, 167, 180, 0.3);
+    --primary-edge: rgba(155, 167, 180, 0.35);
+    --primary-strong: rgba(155, 167, 180, 0.45);
+    --primary-gradient: linear-gradient(135deg, #A1ACB9, #8F9AA6);
+    --primary-gradient-hover: linear-gradient(135deg, #A9B3BF, #9BA7B4);
+    --border-color: rgba(237, 240, 243, 0.1);
+    --border-color-active: rgba(155, 167, 180, 0.45);
+    --surface-sunken: rgba(237, 240, 243, 0.02);
+    --surface-hover: rgba(237, 240, 243, 0.04);
+    --surface-raised: rgba(237, 240, 243, 0.06);
+    --surface-strong: rgba(237, 240, 243, 0.1);
+    --border-subtle: rgba(237, 240, 243, 0.06);
+    --border-strong: rgba(237, 240, 243, 0.18);
+    --success: #7FB08A;
+    --success-light: rgba(127, 176, 138, 0.14);
+    --warning: #D9954B;
+    --warning-light: rgba(217, 149, 75, 0.14);
+    --danger: #E8776A;
+    --danger-light: rgba(232, 119, 106, 0.14);
+    --info: #8FA9C4;
+    --info-light: rgba(143, 169, 196, 0.14);
+    --gray: #8D8F92;
+    --gray-light: rgba(141, 143, 146, 0.14);
+    --text-on-status: #131417;
+    --shadow-glow: 0 0 18px rgba(155, 167, 180, 0.22);
+}
 
-    /* Sombras de fundo claro são curtas e suaves; a sombra pesada do tema
-       escuro vira uma mancha cinza sobre bege. */
-    --shadow-main: 0 8px 24px -12px rgba(42, 37, 32, 0.28);
-    --shadow-soft: 0 2px 8px rgba(42, 37, 32, 0.10);
-    --shadow-strong: 0 16px 36px -14px rgba(42, 37, 32, 0.32);
-    --shadow-glow: 0 0 18px rgba(138, 106, 59, 0.22);
-    --overlay-backdrop: rgba(42, 37, 32, 0.45);
+:root[data-theme="navalha"] {
+    --background-primary: #F3F1EC;
+    --bg-secondary: #FFFFFF;
+    --bg-tertiary: #EDEAE3;
+    --bg-glass: rgba(255, 255, 255, 0.92);
+    --text-primary: #1E1B18;
+    --text-main: #1E1B18;
+    --text-muted: #6B6864;
+    --text-faint: #6F6C69;
+    --accent-gold: #8C3A2E;
+    --text-accent-gold: #FFFFFF;
+    --primary-hover: #773127;
+    --primary-dark: #622920;
+    --primary-light: rgba(140, 58, 46, 0.16);
+    --primary-soft: rgba(140, 58, 46, 0.1);
+    --primary-medium: rgba(140, 58, 46, 0.18);
+    --primary-ring: rgba(140, 58, 46, 0.3);
+    --primary-edge: rgba(140, 58, 46, 0.35);
+    --primary-strong: rgba(140, 58, 46, 0.45);
+    --primary-gradient: linear-gradient(135deg, #93463B, #81352A);
+    --primary-gradient-hover: linear-gradient(135deg, #9C564B, #8C3A2E);
+    --border-color: rgba(30, 27, 24, 0.11);
+    --border-color-active: rgba(140, 58, 46, 0.45);
+    --surface-sunken: rgba(30, 27, 24, 0.02);
+    --surface-hover: rgba(30, 27, 24, 0.04);
+    --surface-raised: rgba(30, 27, 24, 0.06);
+    --surface-strong: rgba(30, 27, 24, 0.1);
+    --border-subtle: rgba(30, 27, 24, 0.06);
+    --border-strong: rgba(30, 27, 24, 0.18);
+    --success: #2A6A4F;
+    --success-light: rgba(42, 106, 79, 0.11);
+    --warning: #8A5112;
+    --warning-light: rgba(138, 81, 18, 0.11);
+    --danger: #A8321F;
+    --danger-light: rgba(168, 50, 31, 0.1);
+    --info: #2F5C86;
+    --info-light: rgba(47, 92, 134, 0.1);
+    --gray: #6B6864;
+    --gray-light: rgba(107, 104, 100, 0.14);
+    --text-on-status: #FFFFFF;
+    --shadow-glow: 0 0 18px rgba(140, 58, 46, 0.22);
+}
+
+:root[data-theme="rose"] {
+    --background-primary: #FBF7F5;
+    --bg-secondary: #FFFFFF;
+    --bg-tertiary: #F6EEEA;
+    --bg-glass: rgba(255, 255, 255, 0.92);
+    --text-primary: #2A211F;
+    --text-main: #2A211F;
+    --text-muted: #716A68;
+    --text-faint: #77706E;
+    --accent-gold: #A0455C;
+    --text-accent-gold: #FFFFFF;
+    --primary-hover: #883B4E;
+    --primary-dark: #703040;
+    --primary-light: rgba(160, 69, 92, 0.16);
+    --primary-soft: rgba(160, 69, 92, 0.1);
+    --primary-medium: rgba(160, 69, 92, 0.18);
+    --primary-ring: rgba(160, 69, 92, 0.3);
+    --primary-edge: rgba(160, 69, 92, 0.35);
+    --primary-strong: rgba(160, 69, 92, 0.45);
+    --primary-gradient: linear-gradient(135deg, #A65066, #933F55);
+    --primary-gradient-hover: linear-gradient(135deg, #AD5F73, #A0455C);
+    --border-color: rgba(42, 33, 31, 0.11);
+    --border-color-active: rgba(160, 69, 92, 0.45);
+    --surface-sunken: rgba(42, 33, 31, 0.02);
+    --surface-hover: rgba(42, 33, 31, 0.04);
+    --surface-raised: rgba(42, 33, 31, 0.06);
+    --surface-strong: rgba(42, 33, 31, 0.1);
+    --border-subtle: rgba(42, 33, 31, 0.06);
+    --border-strong: rgba(42, 33, 31, 0.18);
+    --success: #2A6A4F;
+    --success-light: rgba(42, 106, 79, 0.11);
+    --warning: #8A5112;
+    --warning-light: rgba(138, 81, 18, 0.11);
+    --danger: #A8321F;
+    --danger-light: rgba(168, 50, 31, 0.1);
+    --info: #2F5C86;
+    --info-light: rgba(47, 92, 134, 0.1);
+    --gray: #716A68;
+    --gray-light: rgba(113, 106, 104, 0.14);
+    --text-on-status: #FFFFFF;
+    --shadow-glow: 0 0 18px rgba(160, 69, 92, 0.22);
+}
+
+:root[data-theme="botanico"] {
+    --background-primary: #F7F6F1;
+    --bg-secondary: #FFFFFF;
+    --bg-tertiary: #EFEFE7;
+    --bg-glass: rgba(255, 255, 255, 0.92);
+    --text-primary: #23261F;
+    --text-main: #23261F;
+    --text-muted: #696B64;
+    --text-faint: #6F716B;
+    --accent-gold: #5A7446;
+    --text-accent-gold: #FFFFFF;
+    --primary-hover: #4D633C;
+    --primary-dark: #435534;
+    --primary-light: rgba(95, 122, 74, 0.16);
+    --primary-soft: rgba(95, 122, 74, 0.1);
+    --primary-medium: rgba(95, 122, 74, 0.18);
+    --primary-ring: rgba(95, 122, 74, 0.3);
+    --primary-edge: rgba(95, 122, 74, 0.35);
+    --primary-strong: rgba(95, 122, 74, 0.45);
+    --primary-gradient: linear-gradient(135deg, #698255, #577044);
+    --primary-gradient-hover: linear-gradient(135deg, #758D63, #5F7A4A);
+    --border-color: rgba(35, 38, 31, 0.11);
+    --border-color-active: rgba(95, 122, 74, 0.45);
+    --surface-sunken: rgba(35, 38, 31, 0.02);
+    --surface-hover: rgba(35, 38, 31, 0.04);
+    --surface-raised: rgba(35, 38, 31, 0.06);
+    --surface-strong: rgba(35, 38, 31, 0.1);
+    --border-subtle: rgba(35, 38, 31, 0.06);
+    --border-strong: rgba(35, 38, 31, 0.18);
+    --success: #2A6A4F;
+    --success-light: rgba(42, 106, 79, 0.11);
+    --warning: #8A5112;
+    --warning-light: rgba(138, 81, 18, 0.11);
+    --danger: #A8321F;
+    --danger-light: rgba(168, 50, 31, 0.1);
+    --info: #2F5C86;
+    --info-light: rgba(47, 92, 134, 0.1);
+    --gray: #696B64;
+    --gray-light: rgba(105, 107, 100, 0.14);
+    --text-on-status: #FFFFFF;
+    --shadow-glow: 0 0 18px rgba(95, 122, 74, 0.22);
+}
+
+:root[data-theme="noir"] {
+    --background-primary: #141216;
+    --bg-secondary: #1E1A1F;
+    --bg-tertiary: #272229;
+    --bg-glass: rgba(30, 26, 31, 0.92);
+    --text-primary: #F4EFF1;
+    --text-main: #F4EFF1;
+    --text-muted: #8F8C8E;
+    --text-faint: #868386;
+    --accent-gold: #D08BA0;
+    --text-accent-gold: #141216;
+    --primary-hover: #D8A0B1;
+    --primary-dark: #926170;
+    --primary-light: rgba(208, 139, 160, 0.16);
+    --primary-soft: rgba(208, 139, 160, 0.1);
+    --primary-medium: rgba(208, 139, 160, 0.18);
+    --primary-ring: rgba(208, 139, 160, 0.3);
+    --primary-edge: rgba(208, 139, 160, 0.35);
+    --primary-strong: rgba(208, 139, 160, 0.45);
+    --primary-gradient: linear-gradient(135deg, #D392A6, #BF8093);
+    --primary-gradient-hover: linear-gradient(135deg, #D79BAD, #D08BA0);
+    --border-color: rgba(244, 239, 241, 0.1);
+    --border-color-active: rgba(208, 139, 160, 0.45);
+    --surface-sunken: rgba(244, 239, 241, 0.02);
+    --surface-hover: rgba(244, 239, 241, 0.04);
+    --surface-raised: rgba(244, 239, 241, 0.06);
+    --surface-strong: rgba(244, 239, 241, 0.1);
+    --border-subtle: rgba(244, 239, 241, 0.06);
+    --border-strong: rgba(244, 239, 241, 0.18);
+    --success: #7FB08A;
+    --success-light: rgba(127, 176, 138, 0.14);
+    --warning: #D9954B;
+    --warning-light: rgba(217, 149, 75, 0.14);
+    --danger: #E8776A;
+    --danger-light: rgba(232, 119, 106, 0.14);
+    --info: #8FA9C4;
+    --info-light: rgba(143, 169, 196, 0.14);
+    --gray: #8F8C8E;
+    --gray-light: rgba(143, 140, 142, 0.14);
+    --text-on-status: #141216;
+    --shadow-glow: 0 0 18px rgba(208, 139, 160, 0.22);
+}
+
+:root[data-theme="sereno"] {
+    --background-primary: #F4F8F6;
+    --bg-secondary: #FFFFFF;
+    --bg-tertiary: #EAF1ED;
+    --bg-glass: rgba(255, 255, 255, 0.92);
+    --text-primary: #1B2A24;
+    --text-main: #1B2A24;
+    --text-muted: #636E69;
+    --text-faint: #697470;
+    --accent-gold: #2F6B54;
+    --text-accent-gold: #FFFFFF;
+    --primary-hover: #285B47;
+    --primary-dark: #214B3B;
+    --primary-light: rgba(47, 107, 84, 0.16);
+    --primary-soft: rgba(47, 107, 84, 0.1);
+    --primary-medium: rgba(47, 107, 84, 0.18);
+    --primary-ring: rgba(47, 107, 84, 0.3);
+    --primary-edge: rgba(47, 107, 84, 0.35);
+    --primary-strong: rgba(47, 107, 84, 0.45);
+    --primary-gradient: linear-gradient(135deg, #3B745E, #2B624D);
+    --primary-gradient-hover: linear-gradient(135deg, #4C806C, #2F6B54);
+    --border-color: rgba(27, 42, 36, 0.11);
+    --border-color-active: rgba(47, 107, 84, 0.45);
+    --surface-sunken: rgba(27, 42, 36, 0.02);
+    --surface-hover: rgba(27, 42, 36, 0.04);
+    --surface-raised: rgba(27, 42, 36, 0.06);
+    --surface-strong: rgba(27, 42, 36, 0.1);
+    --border-subtle: rgba(27, 42, 36, 0.06);
+    --border-strong: rgba(27, 42, 36, 0.18);
+    --success: #2A6A4F;
+    --success-light: rgba(42, 106, 79, 0.11);
+    --warning: #8A5112;
+    --warning-light: rgba(138, 81, 18, 0.11);
+    --danger: #A8321F;
+    --danger-light: rgba(168, 50, 31, 0.1);
+    --info: #2F5C86;
+    --info-light: rgba(47, 92, 134, 0.1);
+    --gray: #636E69;
+    --gray-light: rgba(99, 110, 105, 0.14);
+    --text-on-status: #FFFFFF;
+    --shadow-glow: 0 0 18px rgba(47, 107, 84, 0.22);
+}
+
+:root[data-theme="areia"] {
+    --background-primary: #F8F5F1;
+    --bg-secondary: #FFFFFF;
+    --bg-tertiary: #F0EAE3;
+    --bg-glass: rgba(255, 255, 255, 0.92);
+    --text-primary: #2A231D;
+    --text-main: #2A231D;
+    --text-muted: #6C6661;
+    --text-faint: #746F69;
+    --accent-gold: #A2603C;
+    --text-accent-gold: #FFFFFF;
+    --primary-hover: #8A5233;
+    --primary-dark: #71432A;
+    --primary-light: rgba(162, 96, 60, 0.16);
+    --primary-soft: rgba(162, 96, 60, 0.1);
+    --primary-medium: rgba(162, 96, 60, 0.18);
+    --primary-ring: rgba(162, 96, 60, 0.3);
+    --primary-edge: rgba(162, 96, 60, 0.35);
+    --primary-strong: rgba(162, 96, 60, 0.45);
+    --primary-gradient: linear-gradient(135deg, #A86A48, #955837);
+    --primary-gradient-hover: linear-gradient(135deg, #AF7657, #A2603C);
+    --border-color: rgba(42, 35, 29, 0.11);
+    --border-color-active: rgba(162, 96, 60, 0.45);
+    --surface-sunken: rgba(42, 35, 29, 0.02);
+    --surface-hover: rgba(42, 35, 29, 0.04);
+    --surface-raised: rgba(42, 35, 29, 0.06);
+    --surface-strong: rgba(42, 35, 29, 0.1);
+    --border-subtle: rgba(42, 35, 29, 0.06);
+    --border-strong: rgba(42, 35, 29, 0.18);
+    --success: #2A6A4F;
+    --success-light: rgba(42, 106, 79, 0.11);
+    --warning: #8A5112;
+    --warning-light: rgba(138, 81, 18, 0.11);
+    --danger: #A8321F;
+    --danger-light: rgba(168, 50, 31, 0.1);
+    --info: #2F5C86;
+    --info-light: rgba(47, 92, 134, 0.1);
+    --gray: #6C6661;
+    --gray-light: rgba(108, 102, 97, 0.14);
+    --text-on-status: #FFFFFF;
+    --shadow-glow: 0 0 18px rgba(162, 96, 60, 0.22);
+}
+
+:root[data-theme="clinico"] {
+    --background-primary: #F4F6F9;
+    --bg-secondary: #FFFFFF;
+    --bg-tertiary: #E9EEF4;
+    --bg-glass: rgba(255, 255, 255, 0.92);
+    --text-primary: #16202A;
+    --text-main: #16202A;
+    --text-muted: #646B72;
+    --text-faint: #6A7179;
+    --accent-gold: #1F5C73;
+    --text-accent-gold: #FFFFFF;
+    --primary-hover: #1A4E62;
+    --primary-dark: #164051;
+    --primary-light: rgba(31, 92, 115, 0.16);
+    --primary-soft: rgba(31, 92, 115, 0.1);
+    --primary-medium: rgba(31, 92, 115, 0.18);
+    --primary-ring: rgba(31, 92, 115, 0.3);
+    --primary-edge: rgba(31, 92, 115, 0.35);
+    --primary-strong: rgba(31, 92, 115, 0.45);
+    --primary-gradient: linear-gradient(135deg, #2C667B, #1D556A);
+    --primary-gradient-hover: linear-gradient(135deg, #3E7387, #1F5C73);
+    --border-color: rgba(22, 32, 42, 0.11);
+    --border-color-active: rgba(31, 92, 115, 0.45);
+    --surface-sunken: rgba(22, 32, 42, 0.02);
+    --surface-hover: rgba(22, 32, 42, 0.04);
+    --surface-raised: rgba(22, 32, 42, 0.06);
+    --surface-strong: rgba(22, 32, 42, 0.1);
+    --border-subtle: rgba(22, 32, 42, 0.06);
+    --border-strong: rgba(22, 32, 42, 0.18);
+    --success: #2A6A4F;
+    --success-light: rgba(42, 106, 79, 0.11);
+    --warning: #8A5112;
+    --warning-light: rgba(138, 81, 18, 0.11);
+    --danger: #A8321F;
+    --danger-light: rgba(168, 50, 31, 0.1);
+    --info: #2F5C86;
+    --info-light: rgba(47, 92, 134, 0.1);
+    --gray: #646B72;
+    --gray-light: rgba(100, 107, 114, 0.14);
+    --text-on-status: #FFFFFF;
+    --shadow-glow: 0 0 18px rgba(31, 92, 115, 0.22);
 }
 
 /* Base Styles */
@@ -185,7 +583,7 @@ body {
     /* As fontes de emoji no fim da pilha são o que garante o desenho de 💈, 🎉 etc.
        Sem elas, aparelhos cuja fonte de texto não tem o glifo mostram quadradinhos
        — foi o que acontecia na mensagem de agendamento do WhatsApp. */
-    font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif,
+    font-family: var(--fonte-texto),
                  "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji";
     background-color: var(--bg-primary);
     color: var(--text-main);
@@ -196,6 +594,45 @@ body {
 
 h1, h2, h3, h4, h5, h6 {
     color: var(--text-primary);
+}
+
+/* Onde a personalidade do tema aparece: títulos de tela e de painel, os
+   números grandes e o nome do salão. O resto do texto segue a fonte de texto.
+   Botões e campos herdam a fonte (sem isto, o navegador põe a dele). */
+button, input, select, textarea {
+    font-family: inherit;
+}
+
+/* O ":root" na frente não é enfeite: as regras de cada componente, mais
+   abaixo no arquivo, declaram font-weight e venceriam por virem depois. */
+:root .header-title,
+:root .indicador-numero,
+:root .inicio-painel-titulo,
+:root .panel-title,
+:root .modal-title,
+:root .agenda-current-date-title,
+:root .tema-escolha-cabecalho h5,
+:root #sidebar-salon-name {
+    font-family: var(--fonte-titulo);
+    font-weight: var(--peso-titulo);
+    letter-spacing: var(--espaco-titulo);
+}
+
+/* A serifa da Clássica é estreita e sem peso: um degrau maior para ter a
+   mesma presença dos títulos em negrito das outras personalidades. */
+:root[data-personalidade="classica"] .header-title { font-size: 30px; }
+:root[data-personalidade="classica"] .indicador-numero { font-size: 38px; }
+:root[data-personalidade="classica"] .inicio-painel-titulo,
+:root[data-personalidade="classica"] .panel-title { font-size: 19px; }
+:root[data-personalidade="classica"] .agenda-current-date-title { font-size: 21px; }
+:root[data-personalidade="classica"] #sidebar-salon-name { font-size: 21px; }
+
+/* Clean: cartões sem borda, separados por uma sombra curta. */
+:root[data-personalidade="clean"] .indicador,
+:root[data-personalidade="clean"] .glass-effect,
+:root[data-personalidade="clean"] .inicio-layout .dashboard-panel {
+    border-color: transparent;
+    box-shadow: 0 1px 2px rgba(20, 30, 25, 0.04), 0 6px 20px -10px rgba(20, 30, 25, 0.14);
 }
 
 /* Custom Scrollbar */
@@ -352,8 +789,9 @@ h1, h2, h3, h4, h5, h6 {
     font-weight: 700;
     letter-spacing: 0.08em;
     text-transform: uppercase;
-    color: var(--text-muted);
-    opacity: 0.65;
+    /* Sem a opacidade de 0.65 de antes: ela derrubava o rótulo para 3,5:1.
+       O --text-faint já é o tom de apoio e passa de 4,5:1. */
+    color: var(--text-faint);
 }
 
 /* Grupo sem nenhum item visível (barbeiro logado, recurso pausado): some
@@ -888,12 +1326,12 @@ h1, h2, h3, h4, h5, h6 {
 
 .btn-warning:hover {
     background-color: var(--warning);
-    color: white;
+    color: var(--text-on-status);
 }
 
 .btn-success {
     background-color: var(--success);
-    color: white;
+    color: var(--text-on-status);
 }
 
 .btn-success:hover {
@@ -1283,6 +1721,322 @@ h1, h2, h3, h4, h5, h6 {
     display: block;
 }
 
+/* ==========================================================================
+   INÍCIO (redesenho de 26/09/2026 — instrucoes-ia/DESIGN_E_TEMAS.md)
+
+   Três regras guiam este bloco:
+   1. O número manda: rótulo pequeno, número grande, referência ao lado.
+   2. Cor só com sentido: verde = pago, âmbar = a receber, acento = agora.
+   3. Densidade: quem usa está em pé entre dois clientes; uma linha por
+      atendimento, sem cartão gordo em volta de cada um.
+   ========================================================================== */
+.indicadores {
+    display: grid;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: 12px;
+    margin-bottom: 16px;
+}
+
+.indicador {
+    padding: 14px 16px;
+    background-color: var(--bg-secondary);
+    border: 1px solid var(--border-color);
+    border-radius: var(--radius-md);
+    min-width: 0;
+}
+
+.indicador-rotulo {
+    display: block;
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--text-muted);
+}
+
+.indicador-linha {
+    display: flex;
+    align-items: baseline;
+    flex-wrap: wrap;
+    gap: 4px 8px;
+    margin-top: 6px;
+}
+
+.indicador-numero {
+    font-size: 32px;
+    font-weight: 700;
+    line-height: 1;
+    letter-spacing: -0.02em;
+    color: var(--text-primary);
+    font-variant-numeric: tabular-nums;
+    white-space: nowrap;
+}
+
+.indicador-ref {
+    font-size: 12px;
+    color: var(--text-muted);
+    white-space: nowrap;
+}
+
+.indicador-ref.ref-pago { color: var(--success); }
+.indicador-ref.ref-a-receber { color: var(--warning); }
+
+/* O layout do Início usa grade em vez do flex antigo: a coluna da direita
+   tem largura fixa e a agenda fica com o resto. */
+.inicio-layout {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) 330px;
+    gap: 16px;
+    align-items: start;
+}
+
+.inicio-layout .dashboard-panel {
+    padding: 0;
+    border-radius: var(--radius-md);
+    background-color: var(--bg-secondary);
+    box-shadow: none;
+    backdrop-filter: none;
+    -webkit-backdrop-filter: none;
+    overflow: hidden;
+}
+
+.inicio-lateral {
+    gap: 12px;
+}
+
+.inicio-lateral .dashboard-panel {
+    padding: 14px 16px;
+}
+
+.inicio-painel-topo {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+}
+
+.inicio-agenda .inicio-painel-topo {
+    padding: 13px 16px;
+    border-bottom: 1px solid var(--border-color);
+}
+
+.inicio-painel-titulo {
+    font-size: 14px;
+    font-weight: 700;
+    color: var(--text-primary);
+}
+
+.inicio-painel-nota {
+    font-size: 12px;
+    color: var(--text-muted);
+}
+
+.inicio-painel-desc {
+    font-size: 12px;
+    color: var(--text-muted);
+    margin-top: 3px;
+}
+
+.inicio-contador {
+    font-size: 11px;
+    font-weight: 700;
+    padding: 2px 8px;
+    border-radius: var(--radius-full);
+    background-color: var(--warning-light);
+    color: var(--warning);
+}
+
+.inicio-link {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    margin-top: 12px;
+    padding: 0;
+    background: none;
+    border: none;
+    font: inherit;
+    font-size: 12px;
+    font-weight: 600;
+    color: var(--primary);
+    cursor: pointer;
+}
+
+.inicio-link:hover { color: var(--primary-hover); }
+
+.inicio-vazio {
+    padding: 28px 16px;
+    font-size: 13px;
+    color: var(--text-muted);
+    text-align: center;
+}
+
+/* Linha da agenda de hoje. Grade fixa para as colunas alinharem de uma
+   linha para a outra — o olho desce pela coluna de horário e pela de valor. */
+.inicio-agenda .atendimentos-lista {
+    gap: 0;
+}
+
+.inicio-linha {
+    display: grid;
+    grid-template-columns: 56px minmax(0, 1fr) auto 76px 92px 64px;
+    align-items: center;
+    gap: 14px;
+    padding: 10px 16px;
+    border-bottom: 1px solid var(--border-subtle);
+    border-left: 2px solid transparent;
+}
+
+.inicio-linha:last-child { border-bottom: none; }
+.inicio-linha:hover { background-color: var(--surface-hover); }
+
+.inicio-linha.situacao-pago { border-left-color: var(--success); }
+.inicio-linha.situacao-a-receber { border-left-color: var(--warning); }
+.inicio-linha.situacao-agora {
+    border-left-color: var(--primary);
+    background-color: var(--primary-soft);
+}
+
+.inicio-linha-hora {
+    font-size: 13px;
+    font-weight: 700;
+    color: var(--text-muted);
+    font-variant-numeric: tabular-nums;
+    white-space: nowrap;
+}
+
+.situacao-agora .inicio-linha-hora { color: var(--primary-hover); }
+
+.inicio-linha-quem {
+    min-width: 0;
+    font-size: 14px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.inicio-linha-quem strong {
+    font-weight: 600;
+    color: var(--text-main);
+}
+
+.inicio-linha-servico {
+    color: var(--text-muted);
+}
+
+.inicio-linha-servico::before {
+    content: " · ";
+}
+
+.inicio-linha-prof {
+    font-size: 12px;
+    color: var(--text-muted);
+    white-space: nowrap;
+}
+
+.inicio-linha-valor {
+    font-size: 13px;
+    font-weight: 600;
+    text-align: right;
+    font-variant-numeric: tabular-nums;
+    white-space: nowrap;
+}
+
+.inicio-selo {
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    text-align: center;
+    padding: 3px 0;
+    border-radius: var(--radius-sm);
+    background-color: var(--surface-raised);
+    color: var(--text-muted);
+    white-space: nowrap;
+}
+
+.inicio-selo.selo-pago { background-color: var(--success-light); color: var(--success); }
+.inicio-selo.selo-a-receber { background-color: var(--warning-light); color: var(--warning); }
+/* "Agora" é cheio, na cor do tema: nos temas de acento verde (Sereno,
+   Botânico) um selo claro de acento se confundiria com o "Pago". */
+.inicio-selo.selo-agora { background-color: var(--primary); color: var(--text-accent-gold); }
+.inicio-selo.selo-faltou { background-color: var(--danger-light); color: var(--danger); }
+
+.inicio-linha-acoes {
+    display: flex;
+    justify-content: flex-end;
+    gap: 4px;
+}
+
+/* No desktop as ações aparecem ao passar o mouse, para a coluna de situação
+   continuar sendo o que o olho lê. No toque não há hover: ficam sempre. */
+@media (hover: hover) {
+    .inicio-linha-acoes { opacity: 0; transition: opacity 0.15s; }
+    .inicio-linha:hover .inicio-linha-acoes,
+    .inicio-linha:focus-within .inicio-linha-acoes { opacity: 1; }
+}
+
+/* Listas da coluna da direita: linhas simples separadas por fio, não
+   cartões dentro de cartão. */
+.inicio-lateral .crm-quick-actions {
+    gap: 0;
+    margin-top: 8px;
+}
+
+.inicio-lateral .crm-alert-card {
+    padding: 8px 0;
+    background: none;
+    border: none;
+    border-top: 1px solid var(--border-subtle);
+    border-radius: 0;
+    gap: 10px;
+}
+
+.inicio-lateral .crm-alert-text {
+    min-width: 0;
+}
+
+.inicio-lateral .crm-alert-text strong {
+    font-weight: 600;
+}
+
+.inicio-lateral .crm-alert-card .btn {
+    flex-shrink: 0;
+    padding: 5px 10px;
+    font-size: 12px;
+}
+
+@media (max-width: 1100px) {
+    .indicadores { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+    .inicio-layout { grid-template-columns: minmax(0, 1fr); }
+}
+
+@media (max-width: 768px) {
+    .indicadores { gap: 10px; }
+    .indicador { padding: 12px 14px; }
+    .indicador-numero { font-size: 24px; }
+
+    /* No celular a linha vira dois andares: em cima hora, cliente e valor;
+       embaixo profissional, ações e situação. Um terceiro andar só para os
+       botões deixava cada atendimento com o dobro da altura. */
+    .inicio-linha {
+        grid-template-columns: 48px minmax(0, 1fr) auto auto;
+        grid-template-areas:
+            "hora quem quem valor"
+            "hora prof acoes selo";
+        gap: 4px 10px;
+        padding: 12px 14px;
+    }
+    .inicio-linha-hora { grid-area: hora; align-self: start; }
+    .inicio-linha-quem { grid-area: quem; white-space: normal; }
+    .inicio-linha-servico { display: block; font-size: 12px; }
+    .inicio-linha-servico::before { content: none; }
+    .inicio-linha-prof { grid-area: prof; }
+    .inicio-linha-valor { grid-area: valor; }
+    .inicio-selo { grid-area: selo; padding: 3px 8px; justify-self: end; }
+    .inicio-linha-acoes { grid-area: acoes; }
+    .inicio-linha-acoes:empty { display: none; }
+}
+
 /* Data Tables */
 .table-container {
     margin-top: 20px;
@@ -1366,7 +2120,9 @@ h1, h2, h3, h4, h5, h6 {
     display: flex;
     align-items: center;
     justify-content: space-between;
-    margin-bottom: 20px;
+    gap: 16px 20px;
+    flex-wrap: wrap;
+    margin-bottom: 16px;
 }
 
 .agenda-navigation {
@@ -1378,6 +2134,30 @@ h1, h2, h3, h4, h5, h6 {
 .agenda-current-date-title {
     font-size: 16px;
     font-weight: 700;
+}
+
+.agenda-resumo {
+    flex: 1;
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: flex-end;
+    gap: 4px 16px;
+    font-size: 13px;
+    color: var(--text-muted);
+}
+
+.agenda-resumo strong {
+    color: var(--text-main);
+    font-weight: 700;
+    font-variant-numeric: tabular-nums;
+}
+
+/* O par "Chegou agora" / "Novo agendamento" já está no cabeçalho da página.
+   No desktop este segundo par some; no celular o cabeçalho esconde o dele, e
+   é este que fica (ver o @media de 768px). */
+@media (min-width: 769px) {
+    #page-agenda .agenda-actions { display: none; }
 }
 
 .calendar-wrapper {
@@ -1426,7 +2206,7 @@ h1, h2, h3, h4, h5, h6 {
     width: 60px;
     border-right: 1px solid var(--border-color);
     position: relative;
-    background-color: rgba(11, 15, 25, 0.2);
+    background-color: var(--surface-sunken);
 }
 
 .time-axis-label {
@@ -1494,11 +2274,53 @@ h1, h2, h3, h4, h5, h6 {
     box-shadow: var(--shadow-soft);
 }
 
-.calendar-appt-event.scheduled { background-color: var(--info-light); border-left-color: var(--info); color: #93c5fd; }
-.calendar-appt-event.confirmed { background-color: var(--primary-light); border-left-color: var(--primary); color: var(--primary-hover); }
-.calendar-appt-event.done { background-color: var(--success-light); border-left-color: var(--success); color: #6ee7b7; }
-.calendar-appt-event.no_show { background-color: var(--danger-light); border-left-color: var(--danger); color: #fca5a5; }
-.calendar-appt-event.cancelled { background-color: var(--gray-light); border-left-color: var(--gray); color: var(--text-muted); }
+/* A cor do bloco vem da SITUAÇÃO (situacaoDoAtendimento no app.js), a mesma
+   do Início: verde = pago, âmbar = terminou e não pagou, acento = na cadeira
+   agora, vermelho = faltou. Agendado e confirmado ficam neutros. Antes cada
+   status tinha a sua cor (azul, dourado, verde) e o texto era um tom claro
+   fixo, que sumia no tema claro. */
+.calendar-appt-event {
+    background-color: var(--surface-raised);
+    border-left-color: var(--border-strong);
+    color: var(--text-main);
+}
+.calendar-appt-event.situacao-pago { background-color: var(--success-light); border-left-color: var(--success); }
+.calendar-appt-event.situacao-a-receber { background-color: var(--warning-light); border-left-color: var(--warning); }
+.calendar-appt-event.situacao-agora { background-color: var(--primary-medium); border-left-color: var(--primary); }
+.calendar-appt-event.situacao-faltou { background-color: var(--danger-light); border-left-color: var(--danger); color: var(--text-muted); }
+.calendar-appt-event .event-desc,
+.calendar-appt-event .event-time { color: var(--text-muted); }
+
+/* Vaga livre: um convite para agendar, não um buraco mudo. É botão de
+   verdade (Tab chega nele) e abre o agendamento já com hora e profissional. */
+.calendar-vaga-livre {
+    position: absolute;
+    left: 4px;
+    right: 4px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font: inherit;
+    font-size: 11px;
+    color: var(--text-faint);
+    background: transparent;
+    border: 1px dashed var(--border-color);
+    border-radius: var(--radius-sm);
+    cursor: pointer;
+    transition: background-color 0.15s, color 0.15s, border-color 0.15s;
+}
+.calendar-vaga-livre:hover,
+.calendar-vaga-livre:focus-visible {
+    background-color: var(--primary-soft);
+    border-color: var(--primary-edge);
+    color: var(--primary-hover);
+    outline: none;
+}
+.calendar-vaga-livre:hover::before,
+.calendar-vaga-livre:focus-visible::before {
+    content: "+ ";
+    white-space: pre;
+}
 
 /* Destaque para clientes com 2+ agendamentos na mesma semana */
 .calendar-appt-event.duplicate-week-appt {
@@ -2956,6 +3778,52 @@ h1, h2, h3, h4, h5, h6 {
     .sidebar-toggle-arrow {
         display: none;
     }
+
+    /* TRILHO DA AGENDA. Na Agenda a barra recolhe para 60px, só ícones: ali
+       cada pixel é coluna de profissional. O nome de cada item volta como
+       dica do mouse (title, posto pelo app.js). Quem recolheu a barra de vez
+       pela seta continua com ela escondida — a escolha dele vence. */
+    .sidebar {
+        transition: margin-left 0.25s cubic-bezier(0.4, 0, 0.2, 1), width 0.2s ease, opacity 0.2s ease;
+    }
+    .app-container.aba-agenda .sidebar {
+        width: 60px;
+    }
+    .app-container.aba-agenda.sidebar-collapsed .sidebar {
+        margin-left: -60px;
+    }
+    .app-container.aba-agenda .sidebar-header {
+        justify-content: center;
+        padding: 16px 0 12px;
+    }
+    .app-container.aba-agenda #sidebar-salon-name,
+    .app-container.aba-agenda .sidebar-collapse-btn,
+    .app-container.aba-agenda .menu-group-label,
+    .app-container.aba-agenda .menu-item span,
+    .app-container.aba-agenda .chip-plano-sidebar,
+    .app-container.aba-agenda .sidebar-instalar,
+    .app-container.aba-agenda .profile-info {
+        display: none !important;
+    }
+    .app-container.aba-agenda .sidebar-menu {
+        padding: 4px 8px 12px;
+        align-items: center;
+    }
+    .app-container.aba-agenda .menu-group + .menu-group {
+        margin-top: 8px;
+    }
+    .app-container.aba-agenda .menu-item {
+        justify-content: center;
+        width: 44px;
+        height: 40px;
+        padding: 0;
+    }
+    .app-container.aba-agenda .sidebar-footer {
+        padding: 10px 8px;
+    }
+    .app-container.aba-agenda .user-profile {
+        justify-content: center !important;
+    }
 }
 
 @media (max-width: 768px) {
@@ -3340,6 +4208,7 @@ h1, h2, h3, h4, h5, h6 {
     .agenda-filters .btn { justify-content: center; min-height: 42px; }
     .agenda-navigation { display: grid; grid-template-columns: 42px 1fr 42px; width: 100%; }
     .agenda-current-date-title { text-align: center; font-size: 12px; }
+    .agenda-resumo { justify-content: center; font-size: 12px; }
     .agenda-actions .btn { width: 100%; min-height: 46px; justify-content: center; }
     .calendar-wrapper { border-radius: 16px; }
     .calendar-body-scroll { max-height: calc(100vh - 330px); min-height: 410px; }
@@ -4075,16 +4944,99 @@ body.acesso-barbeiro #page-configuracoes {
 }
 
 .tema-opcoes {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.tema-grupo-rotulo {
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--text-muted);
+}
+
+.tema-grupo-rotulo + .tema-grade { margin-bottom: 10px; }
+
+/* Tamanho FIXO dos cartões (e não 1fr): esticados para encher a linha, os
+   nove viravam cartazes. Os do nicho têm destaque; os outros são miniaturas
+   só com o nome — a descrição da paleta aparece ao passar o mouse. */
+.tema-grade {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
-    gap: 14px;
+    grid-template-columns: repeat(auto-fill, 128px);
+    gap: 10px;
+}
+
+.tema-grade-principal {
+    grid-template-columns: repeat(auto-fill, 190px);
+    gap: 12px;
+}
+
+.tema-grade:not(.tema-grade-principal) .tema-opcao { padding: 6px; gap: 6px; }
+.tema-grade:not(.tema-grade-principal) .tema-previa { padding: 7px; gap: 4px; }
+.tema-grade:not(.tema-grade-principal) .tema-previa-titulo { font-size: 13px; }
+.tema-grade:not(.tema-grade-principal) .tema-previa-cartao { padding: 5px; gap: 3px; }
+.tema-grade:not(.tema-grade-principal) .tema-previa-linha { height: 3px; }
+.tema-grade:not(.tema-grade-principal) .tema-previa-botao { height: 9px; }
+.tema-grade:not(.tema-grade-principal) .tema-opcao-nome { font-size: 12px; }
+.tema-grade:not(.tema-grade-principal) .tema-opcao-desc { display: none; }
+
+/* Miniatura do tema: fundo, um cartão com duas linhas de texto e o botão,
+   nas cores do PRÓPRIO tema (inline, pelo app.js), e o título na fonte da
+   personalidade dele. A pessoa vê a diferença antes de clicar. */
+.tema-previa {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    width: 100%;
+    padding: 10px;
+    border-radius: var(--radius-sm);
+    border: 1px solid var(--border-strong);
+}
+
+.tema-previa-titulo {
+    font-size: 18px;
+    line-height: 1;
+}
+
+.tema-previa-cartao {
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+    padding: 8px;
+}
+
+.tema-previa-linha {
+    height: 5px;
+    width: 80%;
+    border-radius: 3px;
+    opacity: 0.55;
+}
+
+.tema-previa-linha.curta { width: 45%; opacity: 0.3; }
+
+.tema-previa-botao {
+    align-self: flex-end;
+    width: 42%;
+    height: 14px;
+}
+
+.tema-opcao-grande .tema-previa-titulo { font-size: 20px; }
+
+/* No celular: os três do nicho lado a lado e os outros em três colunas. */
+@media (max-width: 600px) {
+    .tema-grade-principal { grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 8px; }
+    .tema-grade-principal .tema-opcao-desc { display: none; }
+    .tema-grade:not(.tema-grade-principal) { grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 8px; }
 }
 
 .tema-opcao {
     display: flex;
-    align-items: center;
-    gap: 14px;
-    padding: 14px;
+    flex-direction: column;
+    align-items: stretch;
+    gap: 10px;
+    padding: 10px;
     border-radius: var(--radius-md);
     border: 1px solid var(--border-color);
     background-color: var(--surface-hover);
@@ -4102,22 +5054,6 @@ body.acesso-barbeiro #page-configuracoes {
 .tema-opcao.tema-opcao-ativa {
     border-color: var(--primary);
     background-color: var(--primary-light);
-}
-
-/* Amostra da paleta: fundo, superfície e dourado do tema, na ordem em que
-   aparecem na tela. Mostra a cor de verdade, não uma ilustração dela. */
-.tema-amostra {
-    display: flex;
-    flex-shrink: 0;
-    width: 52px;
-    height: 52px;
-    border-radius: var(--radius-sm);
-    overflow: hidden;
-    border: 1px solid var(--border-strong);
-}
-
-.tema-amostra span {
-    flex: 1;
 }
 
 .tema-opcao-texto {

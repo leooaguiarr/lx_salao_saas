@@ -50,21 +50,22 @@ O Dashboard apresenta os dados mais importantes do dia em uma tela resumida.
 
 ### Indicadores principais
 
-- Quantidade de agendamentos do dia.
-- Previsão financeira dos atendimentos agendados.
-- Valor efetivamente recebido no dia.
-- Quantidade de clientes que estão no período de retorno.
+- Atendimentos do dia, com quantos já foram atendidos.
+- Previsto no dia.
+- Recebido, com a porcentagem do previsto.
+- A receber, com quantos atendimentos estão em aberto.
 
 ### Acompanhamento da rotina
 
-- Lista dos próximos atendimentos.
-- Diferenciação visual entre compromissos de hoje e futuros.
-- Acesso rápido aos dados e ações de cada atendimento.
-- Painel de pagamentos que ainda precisam ser confirmados.
+- Agenda de hoje inteira, uma linha por atendimento: hora, cliente, serviço,
+  profissional, valor e situação (pago, a receber, agora, agendado,
+  confirmado, faltou). Sem nada hoje, mostra os próximos dias.
+- "Próximo às HH:MM" no topo da lista.
+- Iniciar, concluir e editar o atendimento direto da linha.
 
 ### Relacionamento com clientes
 
-- Recomendações de clientes que estão há mais tempo sem retornar.
+- "Sumiram": clientes que passaram do retorno esperado, com contador.
 - Atalho para a lista completa de clientes atrasados.
 - Painel de próximos aniversariantes.
 - Envio de mensagem de aniversário por WhatsApp.
@@ -90,6 +91,12 @@ A Agenda organiza os horários da barbearia e distribui os atendimentos entre os
 - Navegação entre datas anteriores e futuras.
 - Colunas individuais por profissional na visualização diária.
 - Seletor de profissional adaptado para celular.
+- Resumo do dia ao lado da data: atendimentos, valor previsto e vagas livres.
+- Vagas livres desenhadas na grade ("livre · 14:30"); um clique abre o
+  agendamento com hora e profissional preenchidos. Respeitam expediente,
+  folgas e bloqueios, e não aparecem para horário que já passou.
+- No computador, a barra lateral recolhe para só ícones na Agenda, para
+  sobrar espaço às colunas.
 
 ### Cadastro e edição de agendamentos
 
@@ -496,6 +503,17 @@ Todos os caminhos utilizam a mesma regra de movimentação e mantêm estoque e f
 - WhatsApp para contato.
 - Perfil do Instagram.
 - Endereço personalizado do link público por meio de um slug.
+- Tipo de estabelecimento (barbearia, salão, estética).
+
+### Tema do painel
+
+- Nove temas, três por tipo de estabelecimento: Oldschool, Aço e Navalha
+  (barbearia); Rosé, Botânico e Noir Chic (salão); Sereno, Areia e Clínico
+  (estética).
+- Cada tema muda cores, fonte e formato dos cantos.
+- Os três do tipo de estabelecimento aparecem em destaque; os outros seis
+  também podem ser escolhidos.
+- Prévia na hora do clique; vale para a equipe inteira depois de salvar.
 
 ### Horário de funcionamento
 

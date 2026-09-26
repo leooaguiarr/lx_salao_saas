@@ -162,8 +162,13 @@ outro cliente.
 
 ## Tema e aparência
 
-- Tokens de cor no `:root` do `index.css` (escuro é o padrão; o claro é
-  `[data-theme="claro"]`). Use as variáveis (`--bg-primary`, `--primary`,
-  `--text-muted`, `--border-color`...), nunca cor fixa.
+- Nove temas ([DESIGN_E_TEMAS.md](DESIGN_E_TEMAS.md)). O `theme.js` põe três
+  atributos no `<html>`: `data-theme` (cores), `data-base` (claro/escuro:
+  sombras) e `data-personalidade` (fonte, raio de canto). Os tokens ficam no
+  `index.css`; o `:root` puro é o Oldschool. Use as variáveis (`--bg-primary`,
+  `--primary`, `--text-muted`, `--border-color`, `--fonte-titulo`...), nunca
+  cor ou fonte fixa.
 - O tema é do **salão** (`business_info.theme`), vale para a equipe toda.
+  Valores antigos (`escuro`/`claro`) são traduzidos pelo nicho
+  (`ThemeManager.LEGADO`).
 - Breakpoints usados: 1460, 1024, 992, 880, 768 (celular), 600, 420 px.

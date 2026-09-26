@@ -1,7 +1,7 @@
 # Produto e estado atual
 
 - Repositório: <https://github.com/leooaguiarr/lx_salao_saas> (público), branch `main`
-- Última atualização deste documento: 24/09/2026
+- Última atualização deste documento: 26/09/2026
 
 ## O que é
 
@@ -71,7 +71,7 @@ crediário são travados apenas na tela. Ver *Riscos*.
   continua em `POST /api/auth/register-salon`.
 - Painel completo: tudo o que está em [FUNCIONALIDADES.md](FUNCIONALIDADES.md),
   menos os módulos pausados (Mensagens e Kanban de Leads, ocultos no menu).
-- Tema claro/escuro por salão.
+- Nove temas por salão, três por nicho (ver *Redesenho*, mais abaixo).
 - **PWA instalável** com barra de abas inferior no celular — conferido em
   produção por teste headless em 21/09/2026.
 - Link público de agendamento, depois da migração
@@ -207,27 +207,34 @@ feito.
    checkout Pix → pagar → webhook com 200 no log do Asaas → salão `active`.
    Depois, estornar pelo painel do Asaas.
 
-## Trabalho combinado e ainda não começado (25/09/2026)
+## Redesenho com temas por nicho (26/09/2026) — em andamento
 
-**Redesenho do painel com temas por nicho.** O Leonardo não gostou das cores
-nem do layout do painel; a direção foi desenhada, revisada com ele e aprovada
-em 25/09. Ele pediu para retomar na noite de 25/09.
+A direção está em [DESIGN_E_TEMAS.md](DESIGN_E_TEMAS.md) (protótipo em
+<https://claude.ai/artifact/QUxn2Few2eZ7FjHF7M6ZxQ>, privado).
 
-A especificação completa — nove temas com os valores de cor exatos, as três
-personalidades tipográficas, o modelo de escolha do salão e as seis correções
-de layout — está em [DESIGN_E_TEMAS.md](DESIGN_E_TEMAS.md). O protótipo de oito
-telas está em <https://claude.ai/artifact/QUxn2Few2eZ7FjHF7M6ZxQ> (privado).
+**Feito e publicado em 26/09 (versão 2.3.0, migração 09 aplicada):**
 
-Pontos que essa página não repete e valem lembrar aqui:
+- Os seis defeitos de layout no **Início** e na **Agenda**: indicadores com
+  número grande e referência, cor só com sentido (verde pago, âmbar a
+  receber, acento "agora"), agenda de hoje em linhas densas, um par só de
+  botões, contraste dos rótulos, trilho de 60px na Agenda e vagas livres
+  clicáveis ("livre · 14:30").
+- Os **nove temas** e as **três personalidades** (fonte, raio de canto,
+  cartões sem borda no Clean), escolhidos em Configurações → Dados do
+  Estabelecimento. Os do nicho aparecem primeiro.
+- `business_type` passou a ser gravado (entrou na `allowedCols`).
+- O seletor "Identidade Visual (Cor Primária)" **saiu**: pintava só parte do
+  painel e nunca era gravado. `primary_color` continua no banco, ignorado.
 
-- **A landing também será refeita** nessa linguagem. O Leonardo disse que a
-  landing atual é protótipo, então a identidade nasce no painel. Combinar com
-  o Gemini, que mexeu nela por último.
-- **Duas colunas que o painel nunca envia**: `business_type` e `primary_color`
-  existem em `business_info` mas ficaram fora da `allowedCols` do `api.js`, e
-  por isso o nicho e a cor configurados na tela não persistem. Entra junto.
-- Nada disso foi implementado: o código no ar continua com o tema claro/escuro
-  da migração 05.
+**Falta, na ordem:**
+
+1. Levar a mesma linguagem às outras abas (Vendas, Financeiro, Clientes...):
+   elas herdam as cores, mas ainda têm ícones coloridos nos indicadores.
+2. Acento personalizável: paleta curada e "Usar a cor da minha marca"
+   (reaproveitar `ThemeManager.applyColors` e `escurecerAteLer`).
+3. `get_public_salon` devolvendo o tema, para o link público herdar.
+4. A landing refeita na mesma linguagem. Combinar com o Gemini, que mexeu
+   nela por último.
 
 ## O que vem a seguir
 

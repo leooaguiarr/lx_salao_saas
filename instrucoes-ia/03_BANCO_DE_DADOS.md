@@ -24,6 +24,7 @@
 | `05_tema_do_painel.sql` | coluna `theme` em `business_info` |
 | `06_rpcs_publicas.sql` | RPCs do link público, freio por IP, colunas que faltavam |
 | `07_protege_cobranca.sql` | `process_asaas_webhook` só para a service_role; gatilho que impede o navegador de mudar `status`, `plan_id`, `trial_ends_at` e ids do Asaas |
+| `09_nove_temas.sql` | o CHECK de `business_info.theme` passa a aceitar os nove temas, além de `escuro`/`claro` (traduzidos pelo `theme.js` conforme o nicho). Aplicada em 26/09/2026 |
 | `08_plano_so_apos_pagamento.sql` | `process_asaas_webhook` aplica o plano de `subscriptions.plan_id` só na confirmação do pagamento, e acha o salão pela assinatura antes do cliente |
 
 **Colunas de cobrança de `business_info` são do servidor.** O gatilho

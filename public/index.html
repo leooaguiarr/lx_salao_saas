@@ -9,7 +9,7 @@
          voltava mais — a página ficava ~9px mais larga e "solta" para o lado.
          Não impede ampliar com os dedos, só reduzir abaixo de 100%. -->
     <meta name="viewport" content="width=device-width, initial-scale=1.0, minimum-scale=1, viewport-fit=cover">
-    <meta name="theme-color" content="#0A0A0B">
+    <meta name="theme-color" content="#17130F">
     <link rel="icon" href="/assets/favicon_lexion.png" type="image/png">
     <link rel="apple-touch-icon" href="/assets/apple-touch-icon.png">
     <meta name="apple-mobile-web-app-capable" content="yes">
@@ -42,32 +42,47 @@
          valor oficial continua vindo do banco logo depois. -->
     <script>
         (function () {
+            // [base, personalidade] de cada tema. Cópia curta do
+            // ThemeManager.TEMAS do theme.js — mudou lá, muda aqui.
+            var temas = {
+                oldschool: ['escuro', 'classica'], aco: ['escuro', 'classica'], navalha: ['claro', 'classica'],
+                rose: ['claro', 'refinada'], botanico: ['claro', 'refinada'], noir: ['escuro', 'refinada'],
+                sereno: ['claro', 'clean'], areia: ['claro', 'clean'], clinico: ['claro', 'clean']
+            };
             try {
                 var modo = localStorage.getItem('lexion_theme_mode');
-                if (modo === 'claro') document.documentElement.setAttribute('data-theme', 'claro');
+                if (modo === 'claro') modo = 'navalha';
+                var t = temas[modo] || temas.oldschool;
+                var raiz = document.documentElement;
+                raiz.setAttribute('data-theme', temas[modo] ? modo : 'oldschool');
+                raiz.setAttribute('data-base', t[0]);
+                raiz.setAttribute('data-personalidade', t[1]);
             } catch (e) {
-                /* armazenamento bloqueado: segue no tema escuro */
+                /* armazenamento bloqueado: segue no tema padrão do :root */
             }
         })();
     </script>
-    <!-- Google Fonts: Plus Jakarta Sans -->
+    <!-- Google Fonts: a Plus Jakarta Sans de antes e as fontes das três
+         personalidades dos temas (Clássica: Instrument Serif + Karla;
+         Refinada: Outfit; Clean: Manrope). O navegador só baixa o arquivo
+         da fonte que a tela usa de fato. -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=Instrument+Serif&family=Karla:wght@400;500;600;700&family=Outfit:wght@400;500;600;700&family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <!-- Font Awesome Icons -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <!-- CSS Customizado -->
-    <link rel="stylesheet" href="/index.css?v=66">
-    <link rel="stylesheet" href="/estoque.css?v=66">
-    <link rel="stylesheet" href="/ajuda.css?v=66">
-    <link rel="stylesheet" href="/auth.css?v=66">
+    <link rel="stylesheet" href="/index.css?v=69">
+    <link rel="stylesheet" href="/estoque.css?v=69">
+    <link rel="stylesheet" href="/ajuda.css?v=69">
+    <link rel="stylesheet" href="/auth.css?v=69">
     <!-- Evolução de Vendas. Depois dos anteriores de propósito: estes só
          acrescentam as telas novas e não redefinem nada do index.css. -->
-    <link rel="stylesheet" href="/vendas.css?v=66">
-    <link rel="stylesheet" href="/checkout.css?v=66">
-    <link rel="stylesheet" href="/comissoes.css?v=66">
-    <link rel="stylesheet" href="/crediario.css?v=66">
-    <link rel="stylesheet" href="/fidelidade.css?v=66">
+    <link rel="stylesheet" href="/vendas.css?v=69">
+    <link rel="stylesheet" href="/checkout.css?v=69">
+    <link rel="stylesheet" href="/comissoes.css?v=69">
+    <link rel="stylesheet" href="/crediario.css?v=69">
+    <link rel="stylesheet" href="/fidelidade.css?v=69">
 </head>
 <body class="dark-theme">
     <!--
@@ -369,7 +384,7 @@
                             <i class="fa-solid fa-person-walking-arrow-right"></i> Chegou agora
                         </button>
                         <button class="btn btn-primary" id="btn-quick-appointment">
-                            <i class="fa-solid fa-plus"></i> Novo Agendamento
+                            <i class="fa-solid fa-plus"></i> Novo agendamento
                         </button>
                     </div>
 
@@ -399,105 +414,97 @@
                          preenche é renderDashboard(). Um número de exemplo aqui
                          vira faturamento inventado na tela durante o
                          carregamento, e é o primeiro que o dono lê. -->
-                    <div class="metrics-grid">
-                        <div class="metric-card glass-effect">
-                            <div class="metric-icon bg-purple-soft">
-                                <i class="fa-solid fa-calendar-check text-purple"></i>
-                            </div>
-                            <div class="metric-details">
-                                <span class="metric-label">Agendamentos Hoje</span>
-                                <h3 class="metric-value" id="dash-total-appts">—</h3>
-                            </div>
-                        </div>
-                        <div class="metric-card glass-effect">
-                            <div class="metric-icon bg-blue-soft">
-                                <i class="fa-solid fa-circle-dollar-to-slot text-blue"></i>
-                            </div>
-                            <div class="metric-details">
-                                <span class="metric-label">Previsão Financeira</span>
-                                <h3 class="metric-value" id="dash-expected-revenue">—</h3>
+                    <!-- INDICADORES. O número é a razão da tela existir: rótulo
+                         pequeno em cima, número grande, e ao lado a referência
+                         que diz se ele é bom ("14" sozinho não diz nada; "14 · 5
+                         atendidos" diz). Sem ícone colorido: os quatro ícones de
+                         antes gastavam o verde e o vermelho, que no resto do
+                         sistema querem dizer pago e atrasado. A cor aparece só
+                         na referência, e só quando ela carrega esse sentido. -->
+                    <div class="indicadores">
+                        <div class="indicador">
+                            <span class="indicador-rotulo">Atendimentos hoje</span>
+                            <div class="indicador-linha">
+                                <span class="indicador-numero" id="dash-total-appts">—</span>
+                                <span class="indicador-ref" id="dash-total-appts-ref"></span>
                             </div>
                         </div>
-                        <div class="metric-card glass-effect">
-                            <div class="metric-icon bg-green-soft">
-                                <i class="fa-solid fa-money-bill-trend-up text-green"></i>
-                            </div>
-                            <div class="metric-details">
-                                <span class="metric-label">Recebido Hoje</span>
-                                <h3 class="metric-value" id="dash-actual-revenue">—</h3>
+                        <div class="indicador">
+                            <span class="indicador-rotulo">Previsto no dia</span>
+                            <div class="indicador-linha">
+                                <span class="indicador-numero" id="dash-expected-revenue">—</span>
                             </div>
                         </div>
-                        <div class="metric-card glass-effect click-tab" data-target="clientes" style="cursor: pointer;">
-                            <div class="metric-icon bg-red-soft">
-                                <i class="fa-solid fa-users-viewfinder text-red"></i>
+                        <div class="indicador">
+                            <span class="indicador-rotulo">Recebido</span>
+                            <div class="indicador-linha">
+                                <span class="indicador-numero" id="dash-actual-revenue">—</span>
+                                <span class="indicador-ref ref-pago" id="dash-actual-revenue-ref"></span>
                             </div>
-                            <div class="metric-details">
-                                <span class="metric-label">Clientes p/ Retorno</span>
-                                <h3 class="metric-value" id="dash-recall-count">—</h3>
+                        </div>
+                        <div class="indicador">
+                            <span class="indicador-rotulo">A receber</span>
+                            <div class="indicador-linha">
+                                <span class="indicador-numero" id="dash-pending-revenue">—</span>
+                                <span class="indicador-ref ref-a-receber" id="dash-pending-revenue-ref"></span>
                             </div>
                         </div>
                     </div>
 
                     <!-- Dashboard Layout Grid -->
-                    <div class="dashboard-layout">
-                        <!-- Column 1: Today's agenda list -->
-                        <div class="dashboard-panel glass-effect flex-2">
-                            <div class="panel-header">
-                                <h4 class="panel-title"><i class="fa-solid fa-clock-rotate-left"></i> Próximos Atendimentos</h4>
-                                <div class="dash-agenda-legend">
-                                    <span class="legend-item"><span class="legend-color" style="background: var(--primary-light); border: 1px solid var(--primary);"></span> Hoje</span>
-                                    <span class="legend-item"><span class="legend-color" style="background: var(--bg-secondary); border: 1px solid var(--border-color);"></span> Futuro</span>
-                                </div>
+                    <div class="dashboard-layout inicio-layout">
+                        <!-- AGENDA DE HOJE. Linhas densas, uma por atendimento,
+                             com tudo que se decide em pé entre dois clientes:
+                             hora, cliente, serviço, profissional, valor e
+                             situação. O card de antes ocupava 40% da tela para
+                             dizer que não havia nada; no mesmo espaço cabem sete
+                             atendimentos. -->
+                        <div class="dashboard-panel glass-effect flex-2 inicio-agenda">
+                            <div class="inicio-painel-topo">
+                                <h4 class="inicio-painel-titulo" id="dash-agenda-titulo">Agenda de hoje</h4>
+                                <span class="inicio-painel-nota" id="dash-agenda-nota"></span>
                             </div>
-                            <div class="panel-body">
-                                <div class="atendimentos-lista" id="dash-atendimentos-list">
-                                    <!-- Populated dynamically via JS -->
-                                </div>
+                            <div class="atendimentos-lista" id="dash-atendimentos-list">
+                                <!-- Populated dynamically via JS -->
                             </div>
                         </div>
 
-                        <!-- Column 2: CRM + Leads Quick Actions -->
-                        <div class="dashboard-side-panels">
-                            <!-- CRM Panel -->
+                        <!-- Coluna da direita: listas curtas, cada uma com uma ação -->
+                        <div class="dashboard-side-panels inicio-lateral">
                             <div class="dashboard-panel glass-effect">
-                                <div class="panel-header">
-                                    <h4 class="panel-title"><i class="fa-solid fa-bullhorn text-purple"></i> Ações Recomendadas CRM</h4>
+                                <div class="inicio-painel-topo">
+                                    <h4 class="inicio-painel-titulo">Sumiram</h4>
+                                    <span class="inicio-contador" id="dash-recall-count">—</span>
                                 </div>
-                                <div class="panel-body">
-                                    <div class="crm-quick-actions" id="dash-crm-list">
-                                        <!-- CRM alert list populated dynamically -->
-                                    </div>
-                                    <button class="btn btn-secondary btn-full click-tab" data-target="clientes" style="margin-top: 12px;">
-                                        Ver todos os clientes sumidos <i class="fa-solid fa-arrow-right-long" style="margin-left: 8px;"></i>
-                                    </button>
+                                <p class="inicio-painel-desc">Passaram do retorno esperado.</p>
+                                <div class="crm-quick-actions" id="dash-crm-list">
+                                    <!-- CRM alert list populated dynamically -->
                                 </div>
+                                <button type="button" class="inicio-link click-tab" data-target="clientes">
+                                    Ver todos os clientes <i class="fa-solid fa-arrow-right-long"></i>
+                                </button>
                             </div>
 
-                            <!-- Birthdays Panel -->
-                            <div class="dashboard-panel glass-effect" style="margin-top: 20px;">
-                                <div class="panel-header">
-                                    <h4 class="panel-title"><i class="fa-solid fa-cake-candles" style="color: #f43f5e;"></i> Próximos Aniversariantes</h4>
+                            <div class="dashboard-panel glass-effect">
+                                <div class="inicio-painel-topo">
+                                    <h4 class="inicio-painel-titulo">Aniversários da semana</h4>
                                 </div>
-                                <div class="panel-body">
-                                    <div class="crm-quick-actions" id="dash-birthdays-list">
-                                        <!-- Birthdays populated dynamically -->
-                                    </div>
+                                <div class="crm-quick-actions" id="dash-birthdays-list">
+                                    <!-- Birthdays populated dynamically -->
                                 </div>
                             </div>
 
                             <!-- Estoque: só aparece quando há item no mínimo. Um card
                                  vazio ocupando espaço todo dia treina a pessoa a
                                  ignorar a área. -->
-                            <div class="dashboard-panel glass-effect" id="dash-estoque-panel" style="margin-top: 20px; display:none;">
-                                <div class="panel-header">
-                                    <h4 class="panel-title"><i class="fa-solid fa-box-open" style="color: var(--warning);"></i> Estoque no mínimo</h4>
+                            <div class="dashboard-panel glass-effect" id="dash-estoque-panel" style="display:none;">
+                                <div class="inicio-painel-topo">
+                                    <h4 class="inicio-painel-titulo">Estoque no mínimo</h4>
                                 </div>
-                                <div class="panel-body">
-                                    <div class="crm-quick-actions" id="dash-estoque-list"></div>
-                                    <button class="btn btn-secondary btn-full click-tab" data-target="estoque" style="margin-top: 12px;">
-                                        Ver produtos e estoque <i class="fa-solid fa-arrow-right-long" style="margin-left: 8px;"></i>
-                                    </button>
-                                </div>
+                                <div class="crm-quick-actions" id="dash-estoque-list"></div>
+                                <button type="button" class="inicio-link click-tab" data-target="estoque">
+                                    Ver produtos e estoque <i class="fa-solid fa-arrow-right-long"></i>
+                                </button>
                             </div>
 
 
@@ -543,12 +550,19 @@
                             <span class="agenda-current-date-title" id="agenda-current-date-title">Quarta-feira, 08/07/2026</span>
                             <button class="btn btn-icon" id="btn-agenda-next"><i class="fa-solid fa-chevron-right"></i></button>
                         </div>
+                        <!-- O dia em três números, preenchido pelo renderAgenda(). -->
+                        <div class="agenda-resumo" id="agenda-resumo"></div>
+                        <!-- "Chegou agora" e "Novo agendamento" já estão no
+                             cabeçalho da página. No desktop este par some (o
+                             index.css esconde) para não haver dois pares iguais
+                             na mesma tela; no celular o cabeçalho não tem os
+                             botões, então é aqui que eles ficam. -->
                         <div class="agenda-actions">
                             <button class="btn btn-encaixe" onclick="abrirEncaixe()">
                                 <i class="fa-solid fa-person-walking-arrow-right"></i> Chegou agora
                             </button>
                             <button class="btn btn-primary" id="btn-new-appointment">
-                                <i class="fa-solid fa-plus"></i> Agendar Horário
+                                <i class="fa-solid fa-plus"></i> Novo agendamento
                             </button>
                         </div>
                     </div>
@@ -1515,19 +1529,10 @@
                                             <option value="estetica">✨ Clínica de Estética & Manicure</option>
                                         </select>
                                     </div>
-                                    <div class="form-group">
-                                        <label><i class="fa-solid fa-palette"></i> Identidade Visual (Cor Primária)</label>
-                                        <div style="display: flex; gap: 8px; align-items: center;">
-                                            <input type="color" id="biz-primary-color" value="#d4af37" style="width: 44px; height: 38px; padding: 2px; border-radius: 8px; border: 1px solid var(--border-strong); background: transparent; cursor: pointer;">
-                                            <div id="theme-presets-bar" style="display: flex; gap: 6px; flex-wrap: wrap; align-items: center;">
-                                                <button type="button" class="btn btn-secondary btn-sm" onclick="document.getElementById('biz-primary-color').value='#d4af37'; window.ThemeManager.applyColors('#d4af37')" style="padding: 4px 8px; font-size: 0.75rem;">Ouro</button>
-                                                <button type="button" class="btn btn-secondary btn-sm" onclick="document.getElementById('biz-primary-color').value='#f43f5e'; window.ThemeManager.applyColors('#f43f5e')" style="padding: 4px 8px; font-size: 0.75rem;">Rose</button>
-                                                <button type="button" class="btn btn-secondary btn-sm" onclick="document.getElementById('biz-primary-color').value='#8b5cf6'; window.ThemeManager.applyColors('#8b5cf6')" style="padding: 4px 8px; font-size: 0.75rem;">Violeta</button>
-                                                <button type="button" class="btn btn-secondary btn-sm" onclick="document.getElementById('biz-primary-color').value='#0284c7'; window.ThemeManager.applyColors('#0284c7')" style="padding: 4px 8px; font-size: 0.75rem;">Azul</button>
-                                                <button type="button" class="btn btn-secondary btn-sm" onclick="document.getElementById('biz-primary-color').value='#10b981'; window.ThemeManager.applyColors('#10b981')" style="padding: 4px 8px; font-size: 0.75rem;">Verde</button>
-                                            </div>
-                                        </div>
-                                    </div>
+                                    <!-- O seletor "Identidade Visual (Cor Primária)" saiu
+                                         em 26/09/2026: ele pintava só parte do painel, deixava
+                                         combinações ilegíveis e nunca foi gravado no banco. A
+                                         cor agora vem do tema escolhido acima. -->
                                 </div>
                                 <div class="form-row">
                                     <div class="form-group">
@@ -3117,36 +3122,36 @@
     <!-- Estes três também levam versão: o servidor manda cache de um dia para
          arquivos estáticos, e sem o ?v= uma correção aqui só chegaria ao
          navegador de quem já usou o sistema no dia seguinte. -->
-    <script src="/config.js?v=66"></script>
-    <script src="/theme.js?v=66"></script>
-    <script src="/saas-plan.js?v=66"></script>
-    <script src="/api.js?v=66"></script>
+    <script src="/config.js?v=69"></script>
+    <script src="/theme.js?v=69"></script>
+    <script src="/saas-plan.js?v=69"></script>
+    <script src="/api.js?v=69"></script>
 
     <!-- JavaScript Principal -->
-    <script src="/app.js?v=66"></script>
+    <script src="/app.js?v=69"></script>
 
     <!-- Funcionalidades acrescentadas depois. A ordem importa: elas leem o
          estado global e as funções de cálculo que app.js define. -->
-    <script src="/estoque.js?v=66"></script>
-    <script src="/encaixe.js?v=66"></script>
-    <script src="/ajuda.js?v=66"></script>
+    <script src="/estoque.js?v=69"></script>
+    <script src="/encaixe.js?v=69"></script>
+    <script src="/ajuda.js?v=69"></script>
 
     <!-- Evolução de Vendas (banco: docs/14 a 28). A ordem entre eles TAMBÉM
          importa, e não é a mesma coisa que a ordem acima: `venda-calculo`
          precisa das constantes de `vendas-base`, `checkout` precisa do cálculo,
          e `recibo` é chamado no fim do checkout. Portados do projeto de origem
          (`lexion_salao`), onde nasceram como 22- a 28- e foram testados. -->
-    <script src="/vendas-base.js?v=66"></script>
-    <script src="/venda-calculo.js?v=66"></script>
-    <script src="/checkout.js?v=66"></script>
-    <script src="/comissoes.js?v=66"></script>
-    <script src="/crediario.js?v=66"></script>
-    <script src="/fidelidade.js?v=66"></script>
-    <script src="/recibo.js?v=66"></script>
+    <script src="/vendas-base.js?v=69"></script>
+    <script src="/venda-calculo.js?v=69"></script>
+    <script src="/checkout.js?v=69"></script>
+    <script src="/comissoes.js?v=69"></script>
+    <script src="/crediario.js?v=69"></script>
+    <script src="/fidelidade.js?v=69"></script>
+    <script src="/recibo.js?v=69"></script>
 
     <!-- Barra superior: lê o estado e os cálculos de todos os anteriores
          (clientes, estoque mínimo, crediário atrasado), por isso vem por último. -->
-    <script src="/topbar.js?v=66"></script>
-    <script src="/pwa.js?v=66"></script>
+    <script src="/topbar.js?v=69"></script>
+    <script src="/pwa.js?v=69"></script>
 </body>
 </html>

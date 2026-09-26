@@ -37,7 +37,7 @@ const STATE_KEYS = {
 const LOGO_PADRAO = '/assets/logo_lexion.png';
 
 // Versão exibida no rodapé do login.
-const VERSAO_DO_SISTEMA = '2.2.0';
+const VERSAO_DO_SISTEMA = '2.3.0';
 
 let currentSelectedDate = new Date();
 
@@ -421,6 +421,12 @@ function initNavigation() {
     const sections = document.querySelectorAll('.page-section');
     const pageTitle = document.getElementById('page-title');
 
+    // No trilho de ícones da Agenda o nome some; a dica do mouse o devolve.
+    menuItems.forEach(m => {
+        const nome = m.querySelector('span')?.innerText;
+        if (nome && !m.title) m.title = nome;
+    });
+
     /* O endereço da aba vive no HASH (#vendas), nunca no caminho — e isso é
        decisão, não limitação. O caminho pertence ao link público, onde
        `/lexion` é o exemplo de slug: com a aba no caminho, quem recebesse o
@@ -456,6 +462,11 @@ function initNavigation() {
             if (t.getAttribute('data-target') === target) t.classList.add('active');
             else t.classList.remove('active');
         });
+
+        // Na Agenda a barra lateral vira trilho de ícones (60px): ali cada
+        // pixel é coluna de profissional. Quem faz é o CSS; aqui só se diz em
+        // que aba estamos. No celular a barra é gaveta e isto não tem efeito.
+        document.getElementById('app-container')?.classList.toggle('aba-agenda', target === 'agenda');
 
         // Show active section
         sections.forEach(sec => sec.classList.remove('active'));
@@ -767,10 +778,27 @@ function renderDashboard() {
         }
     });
 
-    // Update Indicators
+    // Indicadores: o número e, ao lado, a referência que diz se ele é bom.
+    const atendidos = todayAppts.filter(a => a.status === 'done').length;
+    // Quem faltou não vai pagar: fica fora do "a receber", senão o número
+    // cobraria um dinheiro que não existe.
+    const abertos = todayAppts.filter(a => a.paymentStatus !== 'paid' && a.status !== 'no_show');
+    const emAberto = abertos.length;
+    const aReceber = abertos.reduce((soma, a) => {
+        const s = data.services.find(srv => srv.id === a.serviceId);
+        return soma + (s ? s.price : 0);
+    }, 0);
+
     document.getElementById('dash-total-appts').innerText = todayAppts.length;
+    document.getElementById('dash-total-appts-ref').innerText =
+        todayAppts.length > 0 ? `${atendidos} ${atendidos === 1 ? 'atendido' : 'atendidos'}` : '';
     document.getElementById('dash-expected-revenue').innerText = formatCurrency(revenueExpected);
     document.getElementById('dash-actual-revenue').innerText = formatCurrency(revenueReceived);
+    document.getElementById('dash-actual-revenue-ref').innerText =
+        revenueExpected > 0 ? `${Math.round((revenueReceived / revenueExpected) * 100)}%` : '';
+    document.getElementById('dash-pending-revenue').innerText = formatCurrency(aReceber);
+    document.getElementById('dash-pending-revenue-ref').innerText =
+        emAberto > 0 ? `${emAberto} em aberto` : '';
 
     // Clients recall counts
     const recallClients = getRecallClients();
@@ -803,101 +831,85 @@ function renderDashboard() {
     const leadConversionRate = totalLeads > 0 ? Math.round((convertedLeads / totalLeads) * 100) : 0;
     document.getElementById('dash-leads-progress-bar').style.width = `${leadConversionRate}%`;
 
-    // 2. Render Today's Agenda List
+    // 2. Agenda de hoje
+    // Antes a lista mostrava só os "próximos" e sumia com quem já foi
+    // atendido — no fim da tarde ela ficava vazia com o dia cheio. Agora é o
+    // dia inteiro, em ordem, com a situação de cada um: quem já pagou, quem
+    // está na cadeira, quem falta confirmar. Dia sem nada marcado cai nos
+    // próximos dias, para a tela ainda responder "quando é o próximo?".
     const atendimentosList = document.getElementById('dash-atendimentos-list');
     atendimentosList.innerHTML = '';
 
-    // "Próximos" = só o que ainda vai acontecer (ou está em andamento agora);
-    // atendimentos de horários já passados saem da lista, mas seguem nos KPIs
     const now = new Date();
     const realTodayStr = getLocalDateString(now);
+    const agoraMin = now.getHours() * 60 + now.getMinutes();
+    const tituloAgenda = document.getElementById('dash-agenda-titulo');
+    const notaAgenda = document.getElementById('dash-agenda-nota');
 
-    // Get all future appointments starting from NOW
-    let allUpcoming = data.appointments.filter(appt => {
-        if (appt.status === 'cancelled' || appt.status === 'done' || appt.status === 'no_show') return false;
-        if (appt.date < realTodayStr) return false;
+    const porHorario = (a, b) => a.date !== b.date ? a.date.localeCompare(b.date) : a.time.localeCompare(b.time);
+    let linhas = data.appointments
+        .filter(a => a.date === realTodayStr && a.status !== 'cancelled')
+        .sort(porHorario);
+    let mostrandoProximosDias = false;
 
-        // se for hoje, verifica se já passou do horário de fim
-        if (appt.date === realTodayStr) {
-            const service = data.services.find(s => s.id === appt.serviceId);
-            const [hours, minutes] = appt.time.split(':').map(Number);
-            const end = new Date(now);
-            end.setHours(hours, minutes + (service?.duration || 30), 0, 0);
-            return end >= now;
-        }
+    if (linhas.length === 0) {
+        linhas = data.appointments
+            .filter(a => a.date > realTodayStr && atendimentoEmAberto(a.status))
+            .sort(porHorario)
+            .slice(0, 8);
+        mostrandoProximosDias = linhas.length > 0;
+    }
 
-        // se for de amanhã em diante, inclui
-        return true;
-    });
+    tituloAgenda.innerText = mostrandoProximosDias ? 'Próximos atendimentos' : 'Agenda de hoje';
 
-    // Sort chronologically (date then time)
-    allUpcoming.sort((a, b) => {
-        if (a.date !== b.date) return a.date.localeCompare(b.date);
-        return a.time.localeCompare(b.time);
-    });
+    // "Próximo às 14:30": o primeiro de hoje que ainda não começou.
+    const proximo = mostrandoProximosDias ? null : linhas.find(a =>
+        atendimentoEmAberto(a.status) && a.status !== 'in_progress' && timeToMinutes(a.time) >= agoraMin);
+    notaAgenda.innerText = proximo ? `Próximo às ${proximo.time}`
+        : (mostrandoProximosDias ? 'Nada marcado para hoje' : '');
 
-    // Take up to 10
-    const upcomingAppts = allUpcoming.slice(0, 10);
-
-
-    if (upcomingAppts.length === 0) {
+    if (linhas.length === 0) {
         atendimentosList.innerHTML = `
-            <div style="text-align: center; padding: 30px; color: var(--text-muted);">
-                <i class="fa-regular fa-calendar-minus" style="font-size: 32px; margin-bottom: 12px; display: block;"></i>
-                ${todayAppts.length > 0 ? 'Os atendimentos de hoje já passaram do horário.' : 'Nenhum agendamento para hoje.'}
+            <div class="inicio-vazio">
+                Nenhum atendimento marcado para hoje nem para os próximos dias.
+                <button type="button" class="inicio-link" onclick="openNewAppointmentModal()">Agendar agora <i class="fa-solid fa-arrow-right-long"></i></button>
             </div>
         `;
     } else {
-        upcomingAppts.forEach(appt => {
+        linhas.forEach(appt => {
             const client = data.clients.find(c => c.id === appt.clientId) || { name: 'Cliente Desconhecido', phone: '' };
             const service = data.services.find(s => s.id === appt.serviceId) || { name: 'Serviço Desconhecido', price: 0, duration: 30 };
             const professional = data.professionals.find(p => p.id === appt.profId) || { name: 'Profissional' };
+            const situacao = situacaoDoAtendimento(appt);
 
-            let dateLabel = '';
-            const [yyyy, mm, dd] = appt.date.split('-');
-
-            const tomorrowDate = new Date();
-            tomorrowDate.setDate(tomorrowDate.getDate() + 1);
-            const tomorrowStr = getLocalDateString(tomorrowDate);
-
-            let dateText = `${dd}/${mm}`;
-            let colorVar = "var(--text-muted)";
-
-            if (appt.date === realTodayStr) {
-                dateText = "Hoje";
-                colorVar = "var(--primary)";
-            } else if (appt.date === tomorrowStr) {
-                dateText = "Amanhã";
-                colorVar = "var(--info)";
+            // Nos próximos dias a hora sozinha engana: "14:00" de quando?
+            let quando = appt.time;
+            if (mostrandoProximosDias) {
+                const amanha = new Date(now);
+                amanha.setDate(amanha.getDate() + 1);
+                const [, mm, dd] = appt.date.split('-');
+                quando = appt.date === getLocalDateString(amanha) ? `Amanhã ${appt.time}` : `${dd}/${mm} ${appt.time}`;
             }
 
-            dateLabel = `<span style="font-size: 11px; color: ${colorVar}; font-weight: 800; display: block; margin-top: 4px; letter-spacing: 0.5px; text-transform: uppercase;">${dateText}</span>`;
-
-            const dayClass = (appt.date === realTodayStr) ? 'is-hoje' : 'is-futuro';
-            const card = document.createElement('div');
-            card.className = `atendimento-card status-${appt.status} ${dayClass}`;
-            card.innerHTML = `
-                <div class="appt-time-box">
-                    <span class="appt-time">${appt.time}</span>
-                    <span class="appt-duration">${service.duration} min</span>
-                    ${dateLabel}
-                </div>
-                <div class="appt-client-info">
-                    <strong class="appt-client-name">${escapeHTML(client.name)}</strong>
-                    <span class="appt-service-tag">${service.name} • c/ <strong>${professional.name}</strong></span>
-                </div>
-                <div class="appt-meta-tags">
-                    <span class="status-badge ${appt.status}">${translateStatus(appt.status)}</span>
-                </div>
-                <div class="appt-price">${formatCurrency(service.price)}</div>
-                <div class="appt-actions">
+            const linha = document.createElement('div');
+            linha.className = `inicio-linha situacao-${situacao.classe}`;
+            linha.innerHTML = `
+                <span class="inicio-linha-hora">${quando}</span>
+                <span class="inicio-linha-quem">
+                    <strong>${escapeHTML(client.name)}</strong>
+                    <span class="inicio-linha-servico">${escapeHTML(service.name)}</span>
+                </span>
+                <span class="inicio-linha-prof">${escapeHTML(primeiroNomeApresentavel(professional.name))}</span>
+                <span class="inicio-linha-valor">${formatCurrency(service.price)}</span>
+                <span class="inicio-selo selo-${situacao.classe}">${situacao.rotulo}</span>
+                <span class="inicio-linha-acoes">
                     ${botaoDeVezDoCliente(appt)}
-                    <button class="btn-card-action" onclick="openEditAppointment('${appt.id}')" title="Editar Atendimento">
+                    <button class="btn-card-action" onclick="openEditAppointment('${appt.id}')" title="Editar atendimento" aria-label="Editar atendimento">
                         <i class="fa-solid fa-pen"></i>
                     </button>
-                </div>
+                </span>
             `;
-            atendimentosList.appendChild(card);
+            atendimentosList.appendChild(linha);
         });
     }
 
@@ -919,9 +931,9 @@ function renderDashboard() {
             card.innerHTML = `
                 <div class="crm-alert-text">
                     <strong>${escapeHTML(client.name)}</strong>
-                    <span class="crm-alert-subtext">Corte habitual a cada ${frequenciaDoCliente(client)} dias. Último há ${client.daysSinceLast} dias.</span>
+                    <span class="crm-alert-subtext">Há ${client.daysSinceLast} dias · costuma voltar em ${frequenciaDoCliente(client)}</span>
                 </div>
-                <button class="btn btn-primary btn-sm" onclick="openWhatsAppCRMSimulator('${client.id}')">
+                <button class="btn btn-secondary btn-sm" onclick="openWhatsAppCRMSimulator('${client.id}')">
                     <i class="fa-brands fa-whatsapp"></i> Chamar
                 </button>
             `;
@@ -1002,15 +1014,16 @@ function renderDashboard() {
                     nome: primeiroNomeApresentavel(client.name)
                 }));
 
+                // Sem o rosa fixo de antes: aniversário não é alerta, e cor
+                // aqui só competiria com o verde de pago e o âmbar de a receber.
                 const card = document.createElement('div');
                 card.className = 'crm-alert-card';
-                card.style.borderLeftColor = '#f43f5e'; // rose color for birthday
                 card.innerHTML = `
                     <div class="crm-alert-text">
                         <strong>${escapeHTML(client.name)}</strong>
-                        <span class="crm-alert-subtext">Faz aniversário: ${dayText}</span>
+                        <span class="crm-alert-subtext">${dayText}</span>
                     </div>
-                    <a href="https://wa.me/${client.phone.replace(/\D/g, '')}?text=${msg}" target="_blank" class="btn btn-sm" style="background: #f43f5e; color: white;">
+                    <a href="https://wa.me/${client.phone.replace(/\D/g, '')}?text=${msg}" target="_blank" rel="noopener" class="btn btn-secondary btn-sm">
                         <i class="fa-brands fa-whatsapp"></i> Parabéns
                     </a>
                 `;
@@ -1098,6 +1111,31 @@ function translateStatus(st) {
         cancelled: 'Cancelado'
     };
     return match[st] || st;
+}
+
+/* A situação de um atendimento numa palavra, para o Início e a Agenda.
+   Junta status e pagamento porque é isso que o dono quer saber de relance:
+   já pagou? está na cadeira? terminou e ficou devendo?
+
+   Só três situações têm cor, e cada cor tem um sentido fixo no sistema:
+   verde = pago, âmbar = terminou e não pagou (o mesmo "a receber" do
+   indicador), acento = na cadeira agora. "Agendado" e "Confirmado" ficam
+   neutros: quase todo atendimento nasce "scheduled", e pintá-los de âmbar
+   como "a confirmar" deixaria a lista inteira em alerta sem motivo. */
+function situacaoDoAtendimento(appt) {
+    if (appt.status === 'no_show') return { classe: 'faltou', rotulo: 'Faltou' };
+    if (appt.paymentStatus === 'paid') return { classe: 'pago', rotulo: 'Pago' };
+    if (appt.status === 'in_progress') return { classe: 'agora', rotulo: 'Agora' };
+
+    const hoje = getLocalDateString(new Date());
+    const service = data.services.find(s => s.id === appt.serviceId);
+    const agora = new Date();
+    const terminou = appt.status === 'done' || appt.date < hoje || (appt.date === hoje &&
+        timeToMinutes(appt.time) + (parseInt(service?.duration, 10) || 30) <= agora.getHours() * 60 + agora.getMinutes());
+    if (terminou) return { classe: 'a-receber', rotulo: 'A receber' };
+
+    if (appt.status === 'confirmed') return { classe: 'neutro', rotulo: 'Confirmado' };
+    return { classe: 'neutro', rotulo: 'Agendado' };
 }
 
 // Status que ainda contam como "vai acontecer". Existe porque a fila do
@@ -1208,10 +1246,13 @@ function renderAgenda() {
         timeAxis.appendChild(timeLabel);
     }
 
+    const resumo = document.getElementById('agenda-resumo');
     if (activeProfs.length === 0) {
         headerCols.innerHTML = `<div class="calendar-header-col" style="border:none;">Cadastre profissionais ativos nas Configurações.</div>`;
+        if (resumo) resumo.innerHTML = '';
         return;
     }
+    let totalDeVagas = 0;
 
     // Detecta clientes com múltiplos agendamentos na mesma semana (duplicata)
     const selectedDateObj = typeof currentSelectedDate === 'string' ? new Date(currentSelectedDate + 'T12:00:00') : currentSelectedDate;
@@ -1336,7 +1377,12 @@ function renderAgenda() {
             // Only show if within calendar range (09:00 to 19:00 = 600px total height)
             if (topPosition >= 0 && topPosition < 600) {
                 const eventEl = document.createElement('div');
-                eventEl.className = `calendar-appt-event ${ev.appt.status}`;
+                // A cor do bloco é a SITUAÇÃO (pago, a receber, agora), a mesma
+                // do Início. O status puro pintava "agendado" de azul e
+                // "concluído" de verde, e verde aqui quer dizer pago.
+                const situacao = situacaoDoAtendimento(ev.appt);
+                eventEl.className = `calendar-appt-event ${ev.appt.status} situacao-${situacao.classe}`;
+                eventEl.title = `${ev.client.name} · ${ev.service.name} · ${ev.appt.time} · ${situacao.rotulo}`;
 
                 // Marca visualmente se o cliente tem 2+ agendamentos na semana
                 const isDuplicateWeek = ev.appt.clientId && duplicateWeekClients.has(ev.appt.clientId);
@@ -1365,7 +1411,6 @@ function renderAgenda() {
                         </div>
                     </div>
                     <div class="event-time" style="position: absolute; bottom: 4px; right: 6px; font-size: 9px; font-weight: 600; line-height: 1;">${ev.appt.time}</div>
-                    ${renderAppointmentStatusBadge(ev.appt, ev.duration)}
                 `;
 
                 eventEl.addEventListener('click', (e) => {
@@ -1375,6 +1420,24 @@ function renderAgenda() {
 
                 col.appendChild(eventEl);
             }
+        });
+
+        // Vagas livres viram convite ("livre · 14:30"), não buraco mudo.
+        vagasLivresDoDia(prof.id, dateStr, events).forEach(vaga => {
+            totalDeVagas++;
+            const hhmm = `${String(Math.floor(vaga.inicio / 60)).padStart(2, '0')}:${String(vaga.inicio % 60).padStart(2, '0')}`;
+            const vagaEl = document.createElement('button');
+            vagaEl.type = 'button';
+            vagaEl.className = 'calendar-vaga-livre';
+            vagaEl.style.top = `${vaga.inicio - 9 * 60 + 2}px`;
+            vagaEl.style.height = `${vaga.fim - vaga.inicio - 4}px`;
+            vagaEl.textContent = `livre · ${hhmm}`;
+            vagaEl.setAttribute('aria-label', `Agendar com ${prof.name} às ${hhmm}`);
+            vagaEl.addEventListener('click', (e) => {
+                e.stopPropagation();
+                openNewAppointmentModal(prof.id, hhmm);
+            });
+            col.appendChild(vagaEl);
         });
 
         // Click column space to create quick appointment at that approximate hour
@@ -1391,6 +1454,22 @@ function renderAgenda() {
 
         colsContainer.appendChild(col);
     });
+
+    // O dia em três números, ao lado da data: quantos, quanto, e quanto
+    // ainda cabe. As vagas só contam de agora em diante (vagasLivresDoDia).
+    if (resumo) {
+        const doDia = data.appointments.filter(a =>
+            a.date === getLocalDateString(currentSelectedDate) && a.status !== 'cancelled' && a.status !== 'no_show');
+        const previsto = doDia.reduce((soma, a) => {
+            const s = data.services.find(srv => srv.id === a.serviceId);
+            return soma + (s ? s.price : 0);
+        }, 0);
+        resumo.innerHTML = `
+            <span><strong>${doDia.length}</strong> ${doDia.length === 1 ? 'atendimento' : 'atendimentos'}</span>
+            <span><strong>${formatCurrency(previsto)}</strong> previstos</span>
+            <span><strong class="resumo-vagas">${totalDeVagas}</strong> ${totalDeVagas === 1 ? 'vaga livre' : 'vagas livres'}</span>
+        `;
+    }
 
     // Check for end-of-day pending payments alert
     const todayStr = getLocalDateString(new Date());
@@ -2166,6 +2245,65 @@ function profissionalBloqueado(profId, dateStr, inicioMin, fimMin) {
         if (bIni === null) return true;
         return inicioMin < bFim && fimMin > bIni;
     });
+}
+
+/* Vagas livres de um profissional num dia, para a grade da Agenda desenhar
+   como convite. Devolve faixas em minutos do dia ({ inicio, fim }).
+
+   - Só dentro do expediente do dia e da janela que a grade desenha (9h–19h).
+   - Só de agora em diante: vaga que já passou não é convite, é lembrança.
+   - Folga e bloqueio do profissional não viram vaga.
+   - Buraco grande é partido em blocos de até 1h, cada um com o seu horário,
+     e sobra menor que 30 min não aparece: não cabe um atendimento.
+
+   `eventos` são os que o renderAgenda já montou, com start/end contados a
+   partir das 9h. */
+function vagasLivresDoDia(profId, dateStr, eventos) {
+    const INICIO_GRADE = 9 * 60, FIM_GRADE = 19 * 60, BLOCO = 60, MINIMO = 30;
+
+    const hoje = getLocalDateString(new Date());
+    if (dateStr < hoje) return [];
+
+    const funcionamento = funcionamentoDoDia(dateStr);
+    if (!funcionamento.aberto) return [];
+
+    let inicio = Math.max(INICIO_GRADE, minutosDoHorario(funcionamento.abre) ?? INICIO_GRADE);
+    const fim = Math.min(FIM_GRADE, minutosDoHorario(funcionamento.fecha) ?? FIM_GRADE);
+    if (dateStr === hoje) {
+        const agora = new Date();
+        // Arredonda para o próximo quarto de hora: "livre · 14:07" não é
+        // um horário que alguém marque.
+        const agoraMin = Math.ceil((agora.getHours() * 60 + agora.getMinutes()) / 15) * 15;
+        inicio = Math.max(inicio, agoraMin);
+    }
+    if (fim - inicio < MINIMO) return [];
+
+    const ocupado = eventos
+        .filter(ev => ev.appt.status !== 'no_show')
+        .map(ev => ({ inicio: ev.start + INICIO_GRADE, fim: ev.end + INICIO_GRADE }));
+    (data.professionalBlocks || []).forEach(b => {
+        if (b.profId !== profId || b.date !== dateStr) return;
+        const bIni = b.startTime ? minutosDoHorario(b.startTime) : null;
+        // Bloqueio sem horário é o dia inteiro, como em profissionalBloqueado().
+        if (bIni === null) ocupado.push({ inicio: 0, fim: 24 * 60 });
+        else ocupado.push({ inicio: bIni, fim: minutosDoHorario(b.endTime) ?? 24 * 60 });
+    });
+    ocupado.sort((a, b) => a.inicio - b.inicio);
+
+    const vagas = [];
+    const partir = (de, ate) => {
+        for (let t = de; ate - t >= MINIMO; t += BLOCO) {
+            vagas.push({ inicio: t, fim: Math.min(t + BLOCO, ate) });
+        }
+    };
+    let cursor = inicio;
+    ocupado.forEach(o => {
+        if (o.fim <= cursor) return;
+        if (o.inicio > cursor) partir(cursor, Math.min(o.inicio, fim));
+        cursor = Math.max(cursor, o.fim);
+    });
+    if (cursor < fim) partir(cursor, fim);
+    return vagas;
 }
 
 /* --- Grade de horários de um profissional num dia --------------------------
@@ -3285,9 +3423,6 @@ function renderConfig() {
     if (document.getElementById('biz-type')) {
         document.getElementById('biz-type').value = data.businessInfo.business_type || data.businessInfo.businessType || 'barbearia';
     }
-    if (document.getElementById('biz-primary-color')) {
-        document.getElementById('biz-primary-color').value = data.businessInfo.primary_color || data.businessInfo.primaryColor || '#d4af37';
-    }
     renderSeletorDeTema();
     const whatsappMsgElem = document.getElementById('biz-whatsapp-msg');
     if (whatsappMsgElem) {
@@ -3447,48 +3582,79 @@ function renderConfigPlano() {
     `;
 }
 
-// Escolha do tema (claro ou escuro). Aplica no clique e só grava quando o
-// formulário do estabelecimento é salvo — quem experimentar e desistir sai da
-// tela sem ter mudado nada para a equipe.
+/* Escolha do tema, entre os nove. Aplica no clique e só grava quando o
+   formulário do estabelecimento é salvo — quem experimentar e desistir sai da
+   tela sem ter mudado nada para a equipe.
+
+   Os três do nicho do salão vêm primeiro e maiores; os outros seis ficam
+   abaixo, em "Outros estilos" — nada impede uma barbearia de usar o Clínico.
+   Cada cartão é uma miniatura do tema (fundo, cartão, botão e a fonte do
+   título), pintada com as cores dele e não com as do tema em uso. */
+const FONTE_DA_PERSONALIDADE = {
+    classica: "'Instrument Serif', Georgia, serif",
+    refinada: "'Outfit', sans-serif",
+    clean: "'Manrope', sans-serif"
+};
+
+function cartaoDeTema(id, atual, grande) {
+    const tema = window.ThemeManager.TEMAS[id];
+    const [fundo, superficie, acento] = tema.amostra;
+    const ativo = id === atual;
+    const texto = tema.base === 'claro' ? '#1E1B18' : '#F2EAE0';
+    const pesoTitulo = tema.personalidade === 'classica' ? 400 : 700;
+    const raio = { classica: 3, refinada: 8, clean: 12 }[tema.personalidade];
+    return `
+        <button type="button" class="tema-opcao ${grande ? 'tema-opcao-grande' : ''} ${ativo ? 'tema-opcao-ativa' : ''}"
+                data-tema="${id}" aria-pressed="${ativo}" title="${escapeHTML(tema.nome)}: ${escapeHTML(tema.descricao)}">
+            <span class="tema-previa" aria-hidden="true" style="background:${fundo}; color:${texto};">
+                <span class="tema-previa-titulo" style="font-family:${FONTE_DA_PERSONALIDADE[tema.personalidade]}; font-weight:${pesoTitulo};">Agenda</span>
+                <span class="tema-previa-cartao" style="background:${superficie}; border-radius:${raio}px;">
+                    <span class="tema-previa-linha" style="background:${texto};"></span>
+                    <span class="tema-previa-linha curta" style="background:${texto};"></span>
+                </span>
+                <span class="tema-previa-botao" style="background:${acento}; border-radius:${raio}px;"></span>
+            </span>
+            <span class="tema-opcao-texto">
+                <span class="tema-opcao-nome">
+                    ${escapeHTML(tema.nome)}
+                    ${ativo ? '<i class="fa-solid fa-circle-check"></i>' : ''}
+                </span>
+                <span class="tema-opcao-desc">${escapeHTML(tema.descricao)}</span>
+            </span>
+        </button>
+    `;
+}
+
 function renderSeletorDeTema() {
     const caixa = document.getElementById('tema-opcoes');
     if (!caixa || !window.ThemeManager) return;
 
-    const atual = window.ThemeManager.getMode();
+    const tm = window.ThemeManager;
+    const atual = tm.getMode();
+    // O nicho vem do campo da tela (se a pessoa acabou de trocar) ou do cadastro.
+    const nicho = document.getElementById('biz-type')?.value
+        || data.businessInfo.business_type || data.businessInfo.businessType || 'barbearia';
+    const doNicho = tm.temasDoNicho(nicho);
+    const outros = Object.keys(tm.TEMAS).filter(id => !doNicho.includes(id));
 
-    caixa.innerHTML = Object.values(window.ThemeManager.MODES).map(modo => `
-        <button type="button" class="tema-opcao ${modo.id === atual ? 'tema-opcao-ativa' : ''}"
-                data-tema="${escapeHTML(modo.id)}">
-            <span class="tema-amostra" aria-hidden="true">
-                ${modo.swatch.map(cor => `<span style="background:${escapeHTML(cor)};"></span>`).join('')}
-            </span>
-            <span class="tema-opcao-texto">
-                <span class="tema-opcao-nome">
-                    ${escapeHTML(modo.name)}
-                    ${modo.id === atual ? '<i class="fa-solid fa-circle-check"></i>' : ''}
-                </span>
-                <span class="tema-opcao-desc">${escapeHTML(modo.description)}</span>
-            </span>
-        </button>
-    `).join('');
+    caixa.innerHTML = `
+        <span class="tema-grupo-rotulo">Para ${escapeHTML((tm.NICHOS[nicho] || 'o seu negócio').toLowerCase())}</span>
+        <div class="tema-grade tema-grade-principal">${doNicho.map(id => cartaoDeTema(id, atual, true)).join('')}</div>
+        <span class="tema-grupo-rotulo">Outros estilos</span>
+        <div class="tema-grade">${outros.map(id => cartaoDeTema(id, atual, false)).join('')}</div>
+    `;
 
     caixa.querySelectorAll('.tema-opcao').forEach(botao => {
         botao.addEventListener('click', () => {
-            window.ThemeManager.applyMode(botao.getAttribute('data-tema'));
-
-            // A cor da marca precisa ser recalculada junto: no tema claro ela é
-            // escurecida para continuar legível sobre o bege, e voltar ao
-            // escuro tem de devolver o tom original.
-            const corEscolhida = document.getElementById('biz-primary-color')?.value
-                || data.businessInfo.primary_color
-                || data.businessInfo.primaryColor;
-            if (corEscolhida) window.ThemeManager.applyColors(corEscolhida);
-
+            tm.applyMode(botao.getAttribute('data-tema'));
             renderSeletorDeTema();
-            showToast('Tema aplicado. Salve os dados do estabelecimento para valer para a equipe.', 'info');
+            showToast('Tema aplicado. Clique em Salvar, logo abaixo, para valer para a equipe.', 'info');
         });
     });
 }
+
+// Trocar o tipo de estabelecimento reordena os temas na hora, sem salvar.
+document.getElementById('biz-type')?.addEventListener('change', () => renderSeletorDeTema());
 
 // Extraída de renderConfig() para poder ser chamada sozinha por
 // carregarQuadroDeAcesso() — sem isso, cada resposta da Edge Function
@@ -3682,17 +3848,15 @@ document.getElementById('form-business-info').addEventListener('submit', (e) => 
     const whatsappBirthdayMessage = birthdayMsgElem ? birthdayMsgElem.value : '';
 
     const businessType = document.getElementById('biz-type')?.value || 'barbearia';
-    const primaryColor = document.getElementById('biz-primary-color')?.value || '#d4af37';
     // O tema já está aplicado na tela desde o clique; aqui ele entra no que
     // será gravado, para valer nos outros aparelhos e para a equipe.
-    const theme = (window.ThemeManager && window.ThemeManager.getMode()) || 'escuro';
+    const theme = (window.ThemeManager && window.ThemeManager.getMode()) || 'oldschool';
 
     data.businessInfo = {
         ...data.businessInfo,
         name, slug, phone, instagram, address,
         whatsappRecallMessage, whatsappBirthdayMessage,
         business_type: businessType,
-        primary_color: primaryColor,
         theme: theme
     };
 
@@ -5323,25 +5487,6 @@ function syncAppointmentMessages(appointment) {
     }
     saveData(STATE_KEYS.MESSAGE_JOBS, data.messageJobs);
 }
-function renderAppointmentStatusBadge(appt, serviceDuration) {
-    if (appt.paymentStatus === 'paid') {
-        return '<span class="comm-badge" style="background: rgba(46,204,113,0.2); color: #2ecc71;" title="Pago"><i class="fa-solid fa-sack-dollar"></i></span>';
-    }
-
-    const todayStr = getLocalDateString(new Date());
-    if (appt.date < todayStr) {
-        return '<span class="comm-badge" style="background: rgba(231,76,60,0.2); color: #e74c3c;" title="Pagamento Atrasado"><i class="fa-solid fa-triangle-exclamation"></i></span>';
-    } else if (appt.date === todayStr) {
-        const endMins = timeToMinutes(appt.time) + (serviceDuration || 30);
-        const now = new Date();
-        const nowMins = now.getHours() * 60 + now.getMinutes();
-        if (nowMins > endMins) {
-            return '<span class="comm-badge" style="background: rgba(231,76,60,0.2); color: #e74c3c;" title="Pagamento Pendente"><i class="fa-solid fa-triangle-exclamation"></i></span>';
-        }
-    }
-    return '<span class="comm-badge" style="background: rgba(241,196,15,0.2); color: #f1c40f;" title="Agendado"><i class="fa-solid fa-clock"></i></span>';
-}
-
 function renderAppointmentCommunicationBadge(appointmentId) {
     const job = data.messageJobs.find(item => item.appointmentId === appointmentId);
     if (!job) return '<span class="comm-badge neutral"><i class="fa-regular fa-bell"></i></span>';

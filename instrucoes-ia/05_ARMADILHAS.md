@@ -80,6 +80,16 @@ aqui (data, sintoma, causa, o que fazer).
 - **O headless também mede errado com barra de rolagem clássica** e ao medir
   antes da animação de um modal terminar. Desconfie de "estouro" de poucos
   pixels: confira com `clientWidth` e reaplicando a emulação.
+- **O headless não avança transições de CSS** (26/09/2026). A barra lateral
+  da Agenda aparecia com 248px no print, com a classe certa aplicada, porque
+  a animação de largura nunca terminava. Antes de concluir que uma regra "não
+  pegou", meça com `transition: none` — o `--js` do `print.js` serve para
+  isso.
+- **Tema novo precisa estar em três lugares**: o bloco de cores no
+  `index.css`, a lista `ThemeManager.TEMAS` do `theme.js` e o mapa curto do
+  `<head>` do `index.html` (que aplica o tema antes da primeira pintura). E
+  no CHECK de `business_info.theme` (migração 09) — sem ele, o `api.js` grava
+  `escuro`/`claro` no lugar e a escolha não chega aos outros aparelhos.
 - **`python` no Windows abre a Microsoft Store** e trava o comando. Use `node`
   para scripts.
 - **Heredoc do Bash come barras invertidas.** Arquivo com `\` escrito por

@@ -816,6 +816,11 @@ const DataService = {
                             // Precisa vir ao banco: a escolha é do salão e vale
                             // para a equipe toda, não só para quem clicou.
                             'theme',
+                            // Nicho do salão: decide quais temas aparecem primeiro e o
+                            // vocabulário. A coluna existe desde a migração 01, mas
+                            // ficou fora daqui até 26/09/2026 — a troca na tela não
+                            // chegava ao banco.
+                            'business_type',
                             'created_at','avatarUrl'];
                         const biz = { user_id: userId };
                         for (const col of allowedCols) {
@@ -843,6 +848,19 @@ const DataService = {
                                 for (const col of presentes) delete semOpcionais[col];
                                 ({ error } = await supabaseClient.from('business_info').upsert(semOpcionais, { onConflict: 'user_id' }));
                             }
+                        }
+
+                        // Banco sem a migração 09: a regra CHECK da coluna theme só
+                        // aceita 'escuro'/'claro' e recusa a linha INTEIRA com um dos
+                        // nove temas novos (erro 23514). Regrava com o equivalente
+                        // antigo — mesma base — para não perder o resto do cadastro.
+                        if (error && (error.code === '23514' || /theme_check/i.test(error.message || '')) && biz.theme) {
+                            const base = window.ThemeManager?.TEMAS?.[biz.theme]?.base || 'escuro';
+                            console.warn(
+                                `[business_info] O banco recusou o tema "${biz.theme}". Gravando "${base}". ` +
+                                `Rode supabase/migrations/09_nove_temas.sql para o tema valer para a equipe.`
+                            );
+                            ({ error } = await supabaseClient.from('business_info').upsert({ ...biz, theme: base }, { onConflict: 'user_id' }));
                         }
                     } else if (Array.isArray(value)) {
                         // Injeta user_id em cada item antes de upsert
@@ -935,7 +953,7 @@ const DataService = {
             // faria a migração inicial perder texto que o dono já tinha escrito.
             const allowedCols = ['id','user_id','name','slug','phone','instagram','address','hours',
                 'whatsappRecallMessage','whatsappBookingMessage','whatsappBirthdayMessage',
-                'whatsappChargeMessage','theme','created_at','avatarUrl'];
+                'whatsappChargeMessage','theme','business_type','created_at','avatarUrl'];
             const biz = { user_id: userId };
             for (const col of allowedCols) {
                 if (localData.businessInfo[col] !== undefined) biz[col] = localData.businessInfo[col];

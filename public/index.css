@@ -730,27 +730,34 @@ button, input, select, textarea {
     color: var(--primary);
 }
 
-/* Botão de recolher/abrir barra lateral com seta (desktop) */
+/* Botão de recolher a barra (desktop): um círculo montado sobre a linha que
+   separa a barra do conteúdo, metade de cada lado. Dentro do cabeçalho da
+   barra ele parecia um ícone solto ao lado do nome; na linha fica claro que
+   é a barra inteira que se move. A .sidebar é sticky, então serve de
+   referência para o absolute, e o z-index dela o põe por cima do conteúdo. */
 .sidebar-collapse-btn {
+    position: absolute;
+    top: 22px;
+    right: -14px;
     display: flex;
     align-items: center;
     justify-content: center;
     width: 28px;
     height: 28px;
-    border-radius: var(--radius-sm);
-    background: transparent;
-    border: 1px solid transparent;
+    border-radius: 50%;
+    background: var(--bg-secondary);
+    border: 1px solid var(--border-color);
+    box-shadow: var(--shadow-soft);
     color: var(--text-muted);
-    font-size: 13px;
+    font-size: 11px;
     cursor: pointer;
     transition: var(--transition);
-    flex-shrink: 0;
 }
 
 .sidebar-collapse-btn:hover {
     background: var(--surface-hover);
-    color: var(--text-main);
-    border-color: var(--border-color);
+    color: var(--primary);
+    border-color: var(--border-color-active);
 }
 
 .sidebar-close {
@@ -1012,11 +1019,21 @@ button, input, select, textarea {
     height: 32px;
     border-radius: var(--radius-md);
     background: var(--surface-raised);
+    flex-shrink: 0;
     border: 1px solid var(--border-color);
     color: var(--text-main);
     font-size: 13px;
     cursor: pointer;
     transition: var(--transition);
+}
+
+/* Com a barra recolhida, o botão de abrir é o mesmo círculo do de recolher. */
+.sidebar-toggle-arrow {
+    width: 28px;
+    height: 28px;
+    border-radius: 50%;
+    font-size: 11px;
+    color: var(--text-muted);
 }
 
 .sidebar-toggle:hover,

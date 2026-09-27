@@ -445,6 +445,8 @@ Assim, um atendimento realizado ontem e pago hoje aparece corretamente no fatura
 - Foto otimizada para exibição no celular.
 - Ativação ou desativação.
 - Controle de visibilidade na vitrine pública.
+- Busca por nome ou categoria que filtra a lista a cada letra digitada, sem
+  diferenciar acento nem maiúscula.
 
 ### Controle de saldo
 

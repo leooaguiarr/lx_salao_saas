@@ -238,8 +238,7 @@ modais de plano/checkout do `saas-plan.js`).
 **Também feito em 27/09 (versão 2.4.0):** acento personalizável (paleta
 curada por tema e "Usar a cor da minha marca", ajustada até ter 4,5:1 e
 gravada em `primary_color`); link público herdando tema e acento (migração
-10, que faz `get_public_salon` devolver `theme` — sem ela o link cai no tema
-padrão do nicho); cards do Início alinhados à grade de 4 colunas; sino no fim
+10, que faz `get_public_salon` devolver `theme`, aplicada em 27/09); cards do Início alinhados à grade de 4 colunas; sino no fim
 do cabeçalho; tela de carregamento neutra até o tema do salão estar aplicado
 (nada de piscar o tema padrão).
 

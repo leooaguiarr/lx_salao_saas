@@ -53,11 +53,19 @@ function renderProdutos() {
     const grade = document.getElementById('estoque-produtos-grid');
     if (!grade) return;
 
-    const lista = data.products || [];
-    if (!lista.length) {
+    const todos = data.products || [];
+    const termo = termoDaBuscaDeProduto();
+    const lista = termo ? todos.filter(p => produtoCombinaComBusca(p, termo)) : todos;
+
+    if (!todos.length) {
         grade.innerHTML = `
             <p class="lista-vazia">
                 Nenhum produto cadastrado. Comece pelo que sai da geladeira e pelo que fica na prateleira.
+            </p>`;
+    } else if (!lista.length) {
+        grade.innerHTML = `
+            <p class="lista-vazia">
+                Nenhum produto com "${escapeHTML(document.getElementById('estoque-busca').value.trim())}".
             </p>`;
     } else {
         // Agrupado por categoria: é como a barbearia pensa o estoque, e é como
@@ -76,6 +84,19 @@ function renderProdutos() {
 
     renderAlertaDeEstoqueNaAba();
     preencherCategoriasConhecidas();
+}
+
+// A busca filtra a própria grade a cada letra: o resultado já é a sugestão, e
+// dali a pessoa movimenta ou edita sem abrir outra lista. Sem acento e sem
+// maiúscula, porque ninguém digita "Pomada Modeladora" com cuidado no balcão.
+function termoDaBuscaDeProduto() {
+    return normalizeSaleText(document.getElementById('estoque-busca')?.value);
+}
+
+function produtoCombinaComBusca(p, termo) {
+    // Cada palavra pode estar em qualquer parte: "pom mat" acha "Pomada Matte".
+    const texto = normalizeSaleText(`${p.name} ${p.category || ''}`);
+    return termo.split(/\s+/).every(palavra => texto.includes(palavra));
 }
 
 function cardDeProduto(p) {
@@ -988,6 +1009,11 @@ document.getElementById('btn-add-product')?.addEventListener('click', abrirNovoP
 document.getElementById('form-product')?.addEventListener('submit', salvarProduto);
 document.getElementById('btn-delete-product')?.addEventListener('click', excluirProduto);
 document.getElementById('product-photo')?.addEventListener('change', lerFotoDoProduto);
+
+document.getElementById('estoque-busca')?.addEventListener('input', renderProdutos);
+document.getElementById('estoque-busca')?.addEventListener('keydown', function (e) {
+    if (e.key === 'Escape') { this.value = ''; renderProdutos(); }
+});
 
 document.getElementById('btn-estoque-entrada')?.addEventListener('click', () => abrirMovimento('in'));
 document.getElementById('btn-estoque-saida')?.addEventListener('click', () => abrirMovimento('out'));

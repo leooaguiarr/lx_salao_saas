@@ -466,6 +466,11 @@
     white-space: nowrap;
 }
 
+/* O cabeçalho do painel já traz margem e linha embaixo; a busca encosta nele. */
+.estoque-busca {
+    margin: -8px 0 4px;
+}
+
 /* .panel-header é flex com space-between, o que deixaria título e descrição
    lado a lado. O <div> interno os empilha, como no cabeçalho com ação. */
 .estoque-painel-cabecalho {

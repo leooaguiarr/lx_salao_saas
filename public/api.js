@@ -821,6 +821,9 @@ const DataService = {
                             // ficou fora daqui até 26/09/2026 — a troca na tela não
                             // chegava ao banco.
                             'business_type',
+                            // Cor da marca por cima do tema (ThemeManager.aplicarAcento).
+                            // '' = sem cor própria: a coluna é NOT NULL.
+                            'primary_color',
                             'created_at','avatarUrl'];
                         const biz = { user_id: userId };
                         for (const col of allowedCols) {
@@ -953,7 +956,7 @@ const DataService = {
             // faria a migração inicial perder texto que o dono já tinha escrito.
             const allowedCols = ['id','user_id','name','slug','phone','instagram','address','hours',
                 'whatsappRecallMessage','whatsappBookingMessage','whatsappBirthdayMessage',
-                'whatsappChargeMessage','theme','business_type','created_at','avatarUrl'];
+                'whatsappChargeMessage','theme','business_type','primary_color','created_at','avatarUrl'];
             const biz = { user_id: userId };
             for (const col of allowedCols) {
                 if (localData.businessInfo[col] !== undefined) biz[col] = localData.businessInfo[col];

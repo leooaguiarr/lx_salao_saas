@@ -49,16 +49,37 @@
                 rose: ['claro', 'refinada'], botanico: ['claro', 'refinada'], noir: ['escuro', 'refinada'],
                 sereno: ['claro', 'clean'], areia: ['claro', 'clean'], clinico: ['claro', 'clean']
             };
+            var raiz = document.documentElement;
+            // Link público (/<slug>): o tema é o do salão do link, que só chega
+            // com a resposta do banco. O guardado neste aparelho seria o de
+            // outro salão (ou nenhum) — a tela de carregamento fica neutra.
+            var primeiro = decodeURIComponent(location.pathname).replace(/^\/+|\/+$/g, '').split('/')[0].toLowerCase();
+            var painel = ['', 'index.html', 'app', 'painel', 'login', 'admin', 'dashboard', 'home', 'landing', 'checkout'];
+            if (painel.indexOf(primeiro) === -1) {
+                raiz.setAttribute('data-boot-neutro', '');
+                return;
+            }
             try {
                 var modo = localStorage.getItem('lexion_theme_mode');
                 if (modo === 'claro') modo = 'navalha';
+                // Aparelho que nunca abriu este painel: não há tema certo a
+                // mostrar ainda, e mostrar o padrão seria mentir. A tela de
+                // carregamento fica neutra até o banco responder.
+                if (!temas[modo]) raiz.setAttribute('data-boot-neutro', '');
                 var t = temas[modo] || temas.oldschool;
-                var raiz = document.documentElement;
                 raiz.setAttribute('data-theme', temas[modo] ? modo : 'oldschool');
                 raiz.setAttribute('data-base', t[0]);
                 raiz.setAttribute('data-personalidade', t[1]);
+                // A cor da marca, já calculada pelo ThemeManager.guardarAcento.
+                var acento = JSON.parse(localStorage.getItem('lexion_theme_acento') || 'null');
+                if (acento) {
+                    for (var nome in acento) {
+                        if (nome.indexOf('--') === 0) raiz.style.setProperty(nome, acento[nome]);
+                    }
+                }
             } catch (e) {
-                /* armazenamento bloqueado: segue no tema padrão do :root */
+                /* armazenamento bloqueado: tela de carregamento neutra */
+                raiz.setAttribute('data-boot-neutro', '');
             }
         })();
     </script>
@@ -72,17 +93,17 @@
     <!-- Font Awesome Icons -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <!-- CSS Customizado -->
-    <link rel="stylesheet" href="/index.css?v=74">
-    <link rel="stylesheet" href="/estoque.css?v=74">
-    <link rel="stylesheet" href="/ajuda.css?v=74">
-    <link rel="stylesheet" href="/auth.css?v=74">
+    <link rel="stylesheet" href="/index.css?v=80">
+    <link rel="stylesheet" href="/estoque.css?v=80">
+    <link rel="stylesheet" href="/ajuda.css?v=80">
+    <link rel="stylesheet" href="/auth.css?v=80">
     <!-- Evolução de Vendas. Depois dos anteriores de propósito: estes só
          acrescentam as telas novas e não redefinem nada do index.css. -->
-    <link rel="stylesheet" href="/vendas.css?v=74">
-    <link rel="stylesheet" href="/checkout.css?v=74">
-    <link rel="stylesheet" href="/comissoes.css?v=74">
-    <link rel="stylesheet" href="/crediario.css?v=74">
-    <link rel="stylesheet" href="/fidelidade.css?v=74">
+    <link rel="stylesheet" href="/vendas.css?v=80">
+    <link rel="stylesheet" href="/checkout.css?v=80">
+    <link rel="stylesheet" href="/comissoes.css?v=80">
+    <link rel="stylesheet" href="/crediario.css?v=80">
+    <link rel="stylesheet" href="/fidelidade.css?v=80">
 </head>
 <body class="dark-theme">
     <!--
@@ -388,20 +409,22 @@
                         </button>
                     </div>
 
+                    <div class="header-date" id="current-date-display">
+                        <i class="fa-regular fa-calendar"></i>
+                        <span></span>
+                    </div>
+
                     <!-- Sino: reúne os avisos que hoje só aparecem espalhados
                          em badges do menu (retornos, estoque mínimo, crediário
                          vencido). Não é notificação push, é um resumo do que já
-                         está calculado na tela. -->
+                         está calculado na tela. Fica por último, na ponta
+                         direita (pedido do Leonardo em 26/09/2026): o painel
+                         de avisos abre ancorado nessa borda, logo abaixo dele. -->
                     <button type="button" class="header-sino" id="btn-alertas" title="Avisos do dia">
                         <i class="fa-regular fa-bell"></i>
                         <span class="header-sino-ponto" id="header-sino-ponto" hidden></span>
                     </button>
                     <div class="painel-alertas" id="painel-alertas" hidden></div>
-
-                    <div class="header-date" id="current-date-display">
-                        <i class="fa-regular fa-calendar"></i>
-                        <span></span>
-                    </div>
                 </div>
             </header>
 
@@ -1512,7 +1535,7 @@
                             <div class="tema-escolha" id="tema-escolha">
                                 <div class="tema-escolha-cabecalho">
                                     <h5><i class="fa-solid fa-circle-half-stroke"></i> Tema do painel</h5>
-                                    <p>Vale para todos os aparelhos e para a equipe inteira. A página pública de agendamento não muda.</p>
+                                    <p>Vale para todos os aparelhos, para a equipe inteira e para o seu link de agendamento.</p>
                                 </div>
                                 <div class="tema-opcoes" id="tema-opcoes"></div>
                             </div>
@@ -3124,36 +3147,36 @@
     <!-- Estes três também levam versão: o servidor manda cache de um dia para
          arquivos estáticos, e sem o ?v= uma correção aqui só chegaria ao
          navegador de quem já usou o sistema no dia seguinte. -->
-    <script src="/config.js?v=74"></script>
-    <script src="/theme.js?v=74"></script>
-    <script src="/saas-plan.js?v=74"></script>
-    <script src="/api.js?v=74"></script>
+    <script src="/config.js?v=80"></script>
+    <script src="/theme.js?v=80"></script>
+    <script src="/saas-plan.js?v=80"></script>
+    <script src="/api.js?v=80"></script>
 
     <!-- JavaScript Principal -->
-    <script src="/app.js?v=74"></script>
+    <script src="/app.js?v=80"></script>
 
     <!-- Funcionalidades acrescentadas depois. A ordem importa: elas leem o
          estado global e as funções de cálculo que app.js define. -->
-    <script src="/estoque.js?v=74"></script>
-    <script src="/encaixe.js?v=74"></script>
-    <script src="/ajuda.js?v=74"></script>
+    <script src="/estoque.js?v=80"></script>
+    <script src="/encaixe.js?v=80"></script>
+    <script src="/ajuda.js?v=80"></script>
 
     <!-- Evolução de Vendas (banco: docs/14 a 28). A ordem entre eles TAMBÉM
          importa, e não é a mesma coisa que a ordem acima: `venda-calculo`
          precisa das constantes de `vendas-base`, `checkout` precisa do cálculo,
          e `recibo` é chamado no fim do checkout. Portados do projeto de origem
          (`lexion_salao`), onde nasceram como 22- a 28- e foram testados. -->
-    <script src="/vendas-base.js?v=74"></script>
-    <script src="/venda-calculo.js?v=74"></script>
-    <script src="/checkout.js?v=74"></script>
-    <script src="/comissoes.js?v=74"></script>
-    <script src="/crediario.js?v=74"></script>
-    <script src="/fidelidade.js?v=74"></script>
-    <script src="/recibo.js?v=74"></script>
+    <script src="/vendas-base.js?v=80"></script>
+    <script src="/venda-calculo.js?v=80"></script>
+    <script src="/checkout.js?v=80"></script>
+    <script src="/comissoes.js?v=80"></script>
+    <script src="/crediario.js?v=80"></script>
+    <script src="/fidelidade.js?v=80"></script>
+    <script src="/recibo.js?v=80"></script>
 
     <!-- Barra superior: lê o estado e os cálculos de todos os anteriores
          (clientes, estoque mínimo, crediário atrasado), por isso vem por último. -->
-    <script src="/topbar.js?v=74"></script>
-    <script src="/pwa.js?v=74"></script>
+    <script src="/topbar.js?v=80"></script>
+    <script src="/pwa.js?v=80"></script>
 </body>
 </html>

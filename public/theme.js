@@ -72,7 +72,9 @@ const ThemeManager = {
 
     temaDoSalao(valor, nicho) {
         if (this.TEMAS[valor]) return valor;
-        const legado = this.LEGADO[valor];
+        // Sem valor (link público antes da migração 10, que passa a devolver o
+        // tema) vale o mesmo que 'escuro', o DEFAULT da coluna: o do nicho.
+        const legado = this.LEGADO[valor || 'escuro'];
         if (legado) return legado[nicho] || legado.barbearia;
         return this.TEMA_PADRAO;
     },
@@ -85,7 +87,10 @@ const ThemeManager = {
     /**
      * Escreve o tema no documento. É o único lugar que mexe nos atributos.
      */
-    applyMode(modo) {
+    // `opcoes.lembrar === false`: aplica sem gravar no aparelho. É o caso do
+    // link público — o dono que abre o link de OUTRO salão não pode ter o
+    // tema do próprio painel trocado por isso.
+    applyMode(modo, opcoes) {
         const alvo = this.temaDoSalao(modo, this.nichoAtual);
         const tema = this.TEMAS[alvo];
         this.modoAtual = alvo;
@@ -95,11 +100,16 @@ const ThemeManager = {
         raiz.setAttribute('data-base', tema.base);
         raiz.setAttribute('data-personalidade', tema.personalidade);
 
-        try {
-            localStorage.setItem(this.STORAGE_KEY, alvo);
-        } catch (err) {
-            // Navegador com armazenamento bloqueado: o tema ainda funciona
-            // nesta sessão, só não é lembrado na próxima.
+        if (!opcoes || opcoes.lembrar !== false) {
+            // O tema certo do painel agora é conhecido: a tela de carregamento
+            // (se voltar, no login) pode usar as cores dele. Ver o <head>.
+            raiz.removeAttribute('data-boot-neutro');
+            try {
+                localStorage.setItem(this.STORAGE_KEY, alvo);
+            } catch (err) {
+                // Navegador com armazenamento bloqueado: o tema ainda funciona
+                // nesta sessão, só não é lembrado na próxima.
+            }
         }
 
         document.dispatchEvent(new CustomEvent('tema:alterado', { detail: { modo: alvo } }));
@@ -155,48 +165,127 @@ const ThemeManager = {
         }
     },
 
-    /**
-     * Aplica as cores dinamicamente no CSS do documento
-     */
-    applyColors(primaryColor, secondaryColor) {
-        if (!primaryColor) return;
+    /* COR DE DESTAQUE (acento). A paleta curada que a tela mostra: a cor do
+       próprio tema primeiro, depois sete tons pensados para a base — claros o
+       bastante para ler sobre fundo escuro, escuros o bastante sobre fundo
+       claro. Quem tem identidade própria usa "Usar a cor da minha marca". */
+    ACENTOS: {
+        escuro: ['#C8862F', '#D1A54A', '#D07A55', '#D08BA0', '#A99BD6', '#8FB0CF', '#9BA7B4'],
+        claro: ['#8C3A2E', '#A0455C', '#7A4A7E', '#1F5C73', '#2E4A7A', '#5A7446', '#A2603C']
+    },
 
-        // A cor da marca escolhida pelo salão e o tema claro/escuro são duas
-        // escolhas independentes que caem no MESMO --primary, e esta função
-        // escreve direto no style do <html>, que vence qualquer regra do CSS.
-        // Sem o ajuste abaixo, um salão de dourado claro ou rosa ficaria com
-        // ícones e links ilegíveis assim que trocasse para o tema bege.
-        const tema = this.TEMAS[this.getMode()];
-        const cor = tema && tema.base === 'claro'
-            ? this.escurecerAteLer(primaryColor, tema.amostra[0], 4.5)
-            : primaryColor;
+    // null = o acento do próprio tema (o do index.css).
+    acentoAtual: null,
 
-        const root = document.documentElement;
-        root.style.setProperty('--primary', cor);
-        root.style.setProperty('--primary-color', cor);
-        root.style.setProperty('--primary-hover', this.adjustBrightness(cor, -15));
-        root.style.setProperty('--primary-light', this.hexToRgba(cor, 0.15));
-        root.style.setProperty('--primary-glow', this.hexToRgba(cor, 0.35));
-
-        if (secondaryColor) {
-            root.style.setProperty('--secondary-color', secondaryColor);
-        }
+    acentosDoTema(id) {
+        const tema = this.TEMAS[id] || this.TEMAS[this.TEMA_PADRAO];
+        const proprio = tema.amostra[2].toUpperCase();
+        return [proprio, ...this.ACENTOS[tema.base].filter(c => c.toUpperCase() !== proprio)];
     },
 
     /**
-     * Escurece a cor em passos pequenos até ela alcançar o contraste pedido
-     * sobre o fundo. Preserva o matiz — um salão de identidade rosa continua
-     * rosa, só num tom que dá para ler sobre bege.
+     * Aplica uma cor de destaque por cima do tema. Mexe SÓ nas variáveis do
+     * acento: fundo, cartões e texto continuam os do tema, e é isso que
+     * impede o salão de deixar o próprio painel ilegível.
+     *
+     * A cor passa por ajustarAteLer: clareia (base escura) ou escurece (base
+     * clara) até ler a 4,5:1 sobre fundo e cartão, preservando o matiz — um
+     * salão de identidade rosa continua rosa, num tom que dá para ler.
      */
-    escurecerAteLer(cor, fundo, minimo) {
+    aplicarAcento(corEscolhida, opcoes) {
+        const lembrar = !opcoes || opcoes.lembrar !== false;
+        const tema = this.TEMAS[this.getMode()];
+        if (!corEscolhida || !tema || corEscolhida.toUpperCase() === tema.amostra[2].toUpperCase()) {
+            this.acentoAtual = null;
+            this.limparCores();
+            if (lembrar) this.guardarAcento(null);
+            return null;
+        }
+        const [fundo, cartao] = tema.amostra;
+        const escuro = tema.base === 'escuro';
+        const cor = this.ajustarAteLer(corEscolhida, [fundo, cartao], 4.5, escuro);
+        // Texto dentro do botão: branco quando lê, senão o fundo do tema.
+        const sobre = this.contraste('#FFFFFF', cor) >= 4.5 ? '#FFFFFF'
+            : (this.contraste(fundo, cor) >= 4.5 ? fundo : '#111111');
+
+        const vars = {
+            '--accent-gold': cor,
+            '--primary': cor,
+            '--primary-color': cor,
+            '--text-accent-gold': sobre,
+            '--primary-hover': this.misturar(cor, escuro ? '#FFFFFF' : '#000000', 0.18),
+            '--primary-dark': this.misturar(cor, '#000000', 0.3),
+            '--primary-light': this.hexToRgba(cor, 0.16),
+            '--primary-soft': this.hexToRgba(cor, 0.10),
+            '--primary-medium': this.hexToRgba(cor, 0.18),
+            '--primary-ring': this.hexToRgba(cor, 0.30),
+            '--primary-edge': this.hexToRgba(cor, 0.35),
+            '--primary-strong': this.hexToRgba(cor, 0.45),
+            '--primary-glow': this.hexToRgba(cor, 0.35),
+            '--border-color-active': this.hexToRgba(cor, 0.45),
+            '--shadow-glow': `0 0 18px ${this.hexToRgba(cor, 0.22)}`,
+            '--primary-gradient': `linear-gradient(135deg, ${this.misturar(cor, '#FFFFFF', 0.06)}, ${this.misturar(cor, '#000000', 0.08)})`,
+            '--primary-gradient-hover': `linear-gradient(135deg, ${this.misturar(cor, '#FFFFFF', 0.14)}, ${cor})`
+        };
+        const root = document.documentElement;
+        Object.entries(vars).forEach(([nome, valor]) => root.style.setProperty(nome, valor));
+        this.acentoAtual = corEscolhida;
+        if (lembrar) this.guardarAcento(vars);
+        return cor;
+    },
+
+    /* As variáveis já calculadas do acento ficam guardadas no aparelho, junto
+       com o tema. O script curto do <head> do index.html as aplica antes da
+       primeira pintura — sem isso a tela nascia com a cor do tema e trocava
+       para a da marca um segundo depois, quando o banco respondia. Guarda o
+       resultado, e não a cor crua, porque o <head> não tem como refazer o
+       ajuste de contraste antes do theme.js carregar. */
+    ACENTO_KEY: 'lexion_theme_acento',
+
+    guardarAcento(vars) {
+        try {
+            if (vars) localStorage.setItem(this.ACENTO_KEY, JSON.stringify(vars));
+            else localStorage.removeItem(this.ACENTO_KEY);
+        } catch (err) {
+            // Armazenamento bloqueado: a cor só não é lembrada na próxima.
+        }
+    },
+
+    // Mantido para quem ainda chama o nome antigo.
+    applyColors(primaryColor, opcoes) {
+        return this.aplicarAcento(primaryColor, opcoes);
+    },
+
+    /**
+     * Clareia (ou escurece) a cor em passos pequenos até ela alcançar o
+     * contraste pedido sobre TODOS os fundos dados.
+     */
+    ajustarAteLer(cor, fundos, minimo, clarear) {
         let atual = cor;
-        // 20 passos de 4% cobrem do branco ao quase preto; o limite existe para
-        // uma cor impossível não virar laço infinito.
-        for (let i = 0; i < 20; i++) {
-            if (this.contraste(atual, fundo) >= minimo) return atual;
-            atual = this.adjustBrightness(atual, -4);
+        // 30 passos de 5% vão da cor até quase branco ou preto; o limite
+        // existe para uma cor impossível não virar laço infinito.
+        for (let i = 0; i < 30; i++) {
+            if (fundos.every(f => this.contraste(atual, f) >= minimo)) return atual;
+            atual = this.misturar(atual, clarear ? '#FFFFFF' : '#000000', 0.05);
         }
         return atual;
+    },
+
+    escurecerAteLer(cor, fundo, minimo) {
+        return this.ajustarAteLer(cor, [fundo], minimo, false);
+    },
+
+    // Mistura `cor` com `alvo` na proporção `t` (0 = cor, 1 = alvo).
+    misturar(cor, alvo, t) {
+        const a = this.rgb(cor), b = this.rgb(alvo);
+        return '#' + a.map((v, i) => Math.round(v + (b[i] - v) * t).toString(16).padStart(2, '0')).join('').toUpperCase();
+    },
+
+    rgb(hex) {
+        let c = String(hex).replace('#', '');
+        if (c.length === 3) c = c.split('').map(x => x + x).join('');
+        const num = parseInt(c, 16);
+        return [(num >> 16) & 255, (num >> 8) & 255, num & 255];
     },
 
     contraste(corA, corB) {
@@ -246,36 +335,49 @@ const ThemeManager = {
     // <html> um dourado que vence o acento do tema no index.css.
     CORES_DE_FABRICA: ['#d4af37', '#c89547', '#e0a96d'],
 
+    // A cor da marca guardada em primary_color. String vazia é "sem cor
+    // própria" (a coluna é NOT NULL; é o que o "Voltar ao padrão" grava).
     corEscolhidaPeloSalao(cor) {
-        if (!cor) return null;
-        return this.CORES_DE_FABRICA.includes(String(cor).trim().toLowerCase()) ? null : cor;
+        if (!cor || !/^#[0-9a-f]{6}$/i.test(String(cor).trim())) return null;
+        return this.CORES_DE_FABRICA.includes(String(cor).trim().toLowerCase()) ? null : String(cor).trim();
     },
 
-    // Devolve o acento ao do tema (o do CSS), apagando o que applyColors pôs.
+    // Devolve o acento ao do tema (o do CSS), apagando o que aplicarAcento pôs.
     limparCores() {
         const root = document.documentElement;
-        ['--primary', '--primary-color', '--primary-hover', '--primary-light', '--primary-glow']
+        ['--accent-gold', '--primary', '--primary-color', '--text-accent-gold', '--primary-hover',
+            '--primary-dark', '--primary-light', '--primary-soft', '--primary-medium', '--primary-ring',
+            '--primary-edge', '--primary-strong', '--primary-glow', '--border-color-active',
+            '--shadow-glow', '--primary-gradient', '--primary-gradient-hover']
             .forEach(nome => root.style.removeProperty(nome));
     },
 
     /**
-     * Aplica o tema completo a partir dos dados do salão (business_info)
+     * Aplica o tema completo a partir dos dados do salão (business_info).
+     * `opcoes.lembrar === false` no link público (ver applyMode).
      */
-    applyTheme(businessInfo) {
+    applyTheme(businessInfo, opcoes) {
         if (!businessInfo) return;
 
         const type = businessInfo.business_type || businessInfo.businessType || 'barbearia';
         this.nichoAtual = type;
 
+        // Cadastro sem tema = ainda não veio do banco (o boot chama isto com o
+        // cache vazio antes do login). Aplicar tudo bem, mas não guardar nem
+        // dar o tema como conhecido: senão o aparelho novo "lembraria" o tema
+        // padrão e a tela de carregamento do login sairia com ele.
+        if (!businessInfo.theme && !businessInfo.themeMode) {
+            opcoes = Object.assign({}, opcoes, { lembrar: false });
+        }
+
         // O tema vem do cadastro do salão e vale para a equipe toda. Quem
         // nunca escolheu (ou escolheu no tempo do claro/escuro) cai no tema
         // do próprio nicho — ver LEGADO.
-        this.applyMode(businessInfo.theme || businessInfo.themeMode || this.TEMA_PADRAO);
+        this.applyMode(businessInfo.theme || businessInfo.themeMode, opcoes);
 
-        // A cor da marca saiu da tela em 26/09/2026: o seletor antigo pintava
-        // só metade do painel e nunca foi gravado no banco. O acento agora é o
-        // do tema. Limpa o que uma prévia antiga tenha deixado no <html>.
-        this.limparCores();
+        // A cor da marca, por cima do tema. As cores de fábrica que o banco
+        // grava sozinho não contam como escolha (CORES_DE_FABRICA).
+        this.aplicarAcento(this.corEscolhidaPeloSalao(businessInfo.primary_color || businessInfo.primaryColor), opcoes);
         this.applyVocabulary(type);
 
         // Atualiza o título do documento se houver nome cadastrado

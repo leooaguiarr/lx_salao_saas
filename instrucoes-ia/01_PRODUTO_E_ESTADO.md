@@ -186,7 +186,10 @@ feito.
      `asaas_webhooks`, `asaas_invoices` e `subscriptions` do período sandbox —
      são ids da sandbox, que não existem na conta de produção.
    - Pergunte se algum salão ou login deve ficar (ex.: uma conta de
-     demonstração da Lexion).
+     demonstração da Lexion). **Existe uma conta de desenvolvedor** (pedida
+     em 26/09/2026): salão no plano `ilimitado`, `status = 'active'` e
+     `trial_ends_at` daqui a 100 anos, liberado pelo SQL Editor, no e-mail
+     `contato@lexionconsultoria.com.br`. Deixe-a fora da limpeza.
 2. **Asaas de volta para produção**, no Coolify (aplicação
    `lx_salao_saas`, variáveis do tipo Production) e depois **Redeploy**:
    - `ASAAS_ENV=production`
@@ -224,7 +227,7 @@ A direção está em [DESIGN_E_TEMAS.md](DESIGN_E_TEMAS.md) (protótipo em
   Estabelecimento. Os do nicho aparecem primeiro.
 - `business_type` passou a ser gravado (entrou na `allowedCols`).
 - O seletor "Identidade Visual (Cor Primária)" **saiu**: pintava só parte do
-  painel e nunca era gravado. `primary_color` continua no banco, ignorado.
+  painel e nunca era gravado. `primary_color` voltou a ser usado em 27/09, para o acento.
 
 **Também feito em 26/09 (versão 2.3.1):** as outras abas na mesma linguagem —
 todo `.metric-card` sem ícone e com número grande, títulos de painel sem
@@ -232,15 +235,21 @@ todo `.metric-card` sem ícone e com número grande, títulos de painel sem
 fixos antigos trocados pelas variáveis do tema (inclusive o selo "PRO" e os
 modais de plano/checkout do `saas-plan.js`).
 
+**Também feito em 27/09 (versão 2.4.0):** acento personalizável (paleta
+curada por tema e "Usar a cor da minha marca", ajustada até ter 4,5:1 e
+gravada em `primary_color`); link público herdando tema e acento (migração
+10, que faz `get_public_salon` devolver `theme` — sem ela o link cai no tema
+padrão do nicho); cards do Início alinhados à grade de 4 colunas; sino no fim
+do cabeçalho; tela de carregamento neutra até o tema do salão estar aplicado
+(nada de piscar o tema padrão).
+
 **Falta, na ordem:**
 
 1. Estrutura interna das telas (tabelas, filtros, modal de venda) ainda é a
    antiga, só com as cores novas. Refazer o que o Leonardo apontar.
-2. Acento personalizável: paleta curada e "Usar a cor da minha marca"
-   (reaproveitar `ThemeManager.applyColors` e `escurecerAteLer`).
-3. `get_public_salon` devolvendo o tema, para o link público herdar.
-4. A landing refeita na mesma linguagem. Combinar com o Gemini, que mexeu
-   nela por último.
+2. A landing refeita na mesma linguagem — **fica com outro agente de IA**,
+   decisão do Leonardo em 26/09/2026. Não mexer em `landing.html` nem em
+   `qutter-landing.css` sem ele pedir.
 
 ## O que vem a seguir
 

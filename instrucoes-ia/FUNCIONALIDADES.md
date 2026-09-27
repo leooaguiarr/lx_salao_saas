@@ -514,6 +514,10 @@ Todos os caminhos utilizam a mesma regra de movimentação e mantêm estoque e f
 - Os três do tipo de estabelecimento aparecem em destaque; os outros seis
   também podem ser escolhidos.
 - Prévia na hora do clique; vale para a equipe inteira depois de salvar.
+- Cor de destaque: a do próprio tema, uma paleta pronta combinada com ele ou a cor da marca do
+  estabelecimento, ajustada automaticamente para continuar legível.
+- O link de agendamento on-line usa o mesmo tema e a mesma cor de destaque.
+- Tela de carregamento enquanto o painel abre, sem mostrar outro tema antes.
 
 ### Horário de funcionamento
 

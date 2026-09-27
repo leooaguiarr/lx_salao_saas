@@ -1851,14 +1851,19 @@ button, input, select, textarea {
 .indicador-ref.ref-pago { color: var(--success); }
 .indicador-ref.ref-a-receber { color: var(--warning); }
 
-/* O layout do Início usa grade em vez do flex antigo: a coluna da direita
-   tem largura fixa e a agenda fica com o resto. */
+/* O layout do Início usa a MESMA grade de 4 colunas dos indicadores logo
+   acima, com o mesmo espaço entre elas: a agenda ocupa três e a coluna da
+   direita fica exatamente embaixo do "A receber". Com a coluna em largura
+   fixa (330px) e outro espaçamento, as bordas das duas faixas não batiam. */
 .inicio-layout {
     display: grid;
-    grid-template-columns: minmax(0, 1fr) 330px;
-    gap: 16px;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: 12px;
     align-items: start;
 }
+
+.inicio-layout > .inicio-agenda { grid-column: span 3; }
+.inicio-layout > .inicio-lateral { grid-column: span 1; min-width: 0; }
 
 .inicio-layout .dashboard-panel {
     padding: 0;
@@ -2078,6 +2083,8 @@ button, input, select, textarea {
 @media (max-width: 1100px) {
     .indicadores { grid-template-columns: repeat(2, minmax(0, 1fr)); }
     .inicio-layout { grid-template-columns: minmax(0, 1fr); }
+    .inicio-layout > .inicio-agenda,
+    .inicio-layout > .inicio-lateral { grid-column: auto; }
 }
 
 @media (max-width: 768px) {
@@ -3345,6 +3352,31 @@ button, input, select, textarea {
     font-weight: 800;
     color: var(--text-primary);
 }
+
+/* O nome do salão e o título de cada passo usam a fonte de título do tema:
+   o link público é a vitrine da personalidade escolhida no painel. */
+:root .pub-title,
+:root .pub-section-title {
+    font-family: var(--fonte-titulo);
+    font-weight: var(--peso-titulo);
+    letter-spacing: var(--espaco-titulo);
+}
+
+:root[data-personalidade="classica"] .pub-title { font-size: 26px; }
+
+/* Cada bloco do link público. Esta regra não existia: os campos encostavam
+   nas bordas da tela do celular. */
+.pub-section {
+    padding: 18px 20px;
+}
+
+.pub-section-title {
+    font-size: 15px;
+    color: var(--text-primary);
+    margin-bottom: 14px;
+}
+
+:root[data-personalidade="classica"] .pub-section-title { font-size: 20px; }
 
 .pub-desc {
     font-size: 11px;
@@ -4940,6 +4972,24 @@ body.acesso-barbeiro #page-configuracoes {
     pointer-events: none;
 }
 
+/* Tela de carregamento NEUTRA, em cores fixas e de propósito. Vale quando o
+   aparelho ainda não sabe o tema do salão (primeiro acesso, outra máquina,
+   link público): pintá-la com o tema padrão e trocar um segundo depois era
+   mostrar uma aparência que não é a do salão. O <head> do index.html põe o
+   atributo; um cinza-grafite serve para qualquer tema que venha depois. */
+:root[data-boot-neutro] #boot-overlay {
+    background: #161618;
+}
+
+:root[data-boot-neutro] .boot-spinner {
+    border-color: rgba(255, 255, 255, 0.12);
+    border-top-color: rgba(255, 255, 255, 0.75);
+}
+
+:root[data-boot-neutro] .boot-texto {
+    color: #A1A1A6;
+}
+
 .boot-card {
     display: flex;
     flex-direction: column;
@@ -5090,6 +5140,63 @@ body.acesso-barbeiro #page-configuracoes {
 }
 
 .tema-opcao-grande .tema-previa-titulo { font-size: 20px; }
+
+.tema-personalizado {
+    font-weight: 500;
+    color: var(--text-muted);
+}
+
+/* Cor de destaque: bolinhas da paleta curada e o botão da cor livre. */
+.tema-acento {
+    margin-top: 6px;
+    padding-top: 14px;
+    border-top: 1px solid var(--border-subtle);
+}
+
+.tema-acento-nota {
+    font-size: 12px;
+    color: var(--text-muted);
+    margin: 4px 0 10px;
+}
+
+.tema-acento-linha {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 10px;
+    position: relative;
+}
+
+.tema-acento-cor {
+    width: 30px;
+    height: 30px;
+    border-radius: 50%;
+    border: 2px solid var(--bg-secondary);
+    box-shadow: 0 0 0 1px var(--border-strong);
+    cursor: pointer;
+    padding: 0;
+    transition: transform 0.12s;
+}
+
+.tema-acento-cor:hover { transform: scale(1.08); }
+
+.tema-acento-cor.ativa {
+    box-shadow: 0 0 0 2px var(--text-main);
+}
+
+/* O seletor nativo fica invisível: quem abre é o botão "Usar a cor da minha
+   marca". Não é display:none porque aí o navegador não abre a paleta. */
+.tema-acento-livre {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    opacity: 0;
+    pointer-events: none;
+    left: 0;
+    bottom: 0;
+}
+
+.tema-acento-voltar { margin-top: 0; }
 
 /* No celular: os três do nicho lado a lado e os outros em três colunas. */
 @media (max-width: 600px) {

@@ -37,7 +37,7 @@ const STATE_KEYS = {
 const LOGO_PADRAO = '/assets/logo_lexion.png';
 
 // Versão exibida no rodapé do login.
-const VERSAO_DO_SISTEMA = '2.3.1';
+const VERSAO_DO_SISTEMA = '2.4.0';
 
 let currentSelectedDate = new Date();
 
@@ -931,7 +931,7 @@ function renderDashboard() {
             card.innerHTML = `
                 <div class="crm-alert-text">
                     <strong>${escapeHTML(client.name)}</strong>
-                    <span class="crm-alert-subtext">Há ${client.daysSinceLast} dias · costuma voltar em ${frequenciaDoCliente(client)}</span>
+                    <span class="crm-alert-subtext">Há ${client.daysSinceLast} dias · volta a cada ${frequenciaDoCliente(client)}</span>
                 </div>
                 <button class="btn btn-secondary btn-sm" onclick="openWhatsAppCRMSimulator('${client.id}')">
                     <i class="fa-brands fa-whatsapp"></i> Chamar
@@ -3618,7 +3618,7 @@ function cartaoDeTema(id, atual, grande) {
             </span>
             <span class="tema-opcao-texto">
                 <span class="tema-opcao-nome">
-                    ${escapeHTML(tema.nome)}
+                    ${escapeHTML(tema.nome)}${ativo && window.ThemeManager.acentoAtual ? ' <span class="tema-personalizado">(personalizado)</span>' : ''}
                     ${ativo ? '<i class="fa-solid fa-circle-check"></i>' : ''}
                 </span>
                 <span class="tema-opcao-desc">${escapeHTML(tema.descricao)}</span>
@@ -3644,15 +3644,66 @@ function renderSeletorDeTema() {
         <div class="tema-grade tema-grade-principal">${doNicho.map(id => cartaoDeTema(id, atual, true)).join('')}</div>
         <span class="tema-grupo-rotulo">Outros estilos</span>
         <div class="tema-grade">${outros.map(id => cartaoDeTema(id, atual, false)).join('')}</div>
+        ${blocoDeAcento(atual)}
     `;
 
     caixa.querySelectorAll('.tema-opcao').forEach(botao => {
         botao.addEventListener('click', () => {
             tm.applyMode(botao.getAttribute('data-tema'));
+            // Trocar de tema volta à cor dele: uma cor escolhida para fundo
+            // escuro pode não servir no claro, e o salão vê o tema como ele é.
+            tm.aplicarAcento(null);
             renderSeletorDeTema();
             showToast('Tema aplicado. Clique em Salvar, logo abaixo, para valer para a equipe.', 'info');
         });
     });
+
+    const escolherAcento = (cor) => {
+        tm.aplicarAcento(cor);
+        renderSeletorDeTema();
+        showToast('Cor aplicada. Clique em Salvar, logo abaixo, para valer para a equipe.', 'info');
+    };
+    caixa.querySelectorAll('.tema-acento-cor').forEach(botao => {
+        botao.addEventListener('click', () => escolherAcento(botao.getAttribute('data-cor')));
+    });
+    caixa.querySelector('#tema-acento-voltar')?.addEventListener('click', () => escolherAcento(null));
+
+    // "Usar a cor da minha marca": o seletor livre só aparece para quem pede.
+    // Enquanto a pessoa arrasta, a tela acompanha (input); o redesenho do
+    // bloco espera ela soltar (change), senão o seletor fecharia no meio.
+    const livre = caixa.querySelector('#tema-acento-livre');
+    caixa.querySelector('#tema-acento-marca')?.addEventListener('click', () => livre?.click());
+    livre?.addEventListener('input', () => tm.aplicarAcento(livre.value));
+    livre?.addEventListener('change', () => escolherAcento(livre.value));
+}
+
+/* Cor de destaque do tema. Paleta curada visível; a cor livre fica atrás do
+   botão "Usar a cor da minha marca" — a maioria nunca abre, quem tem
+   identidade própria consegue. O rótulo diz em voz alta que fundo e
+   cartões não mudam: é o que impede uma combinação ilegível. */
+function blocoDeAcento(temaAtual) {
+    const tm = window.ThemeManager;
+    const cores = tm.acentosDoTema(temaAtual);
+    const escolhida = tm.acentoAtual ? tm.acentoAtual.toUpperCase() : cores[0];
+    const daMarca = tm.acentoAtual && !cores.includes(escolhida);
+    const bolinha = (cor, rotulo) => `
+        <button type="button" class="tema-acento-cor ${cor === escolhida ? 'ativa' : ''}" data-cor="${cor}"
+                style="background:${cor};" title="${rotulo}" aria-label="${rotulo}" aria-pressed="${cor === escolhida}"></button>`;
+    return `
+        <div class="tema-acento">
+            <span class="tema-grupo-rotulo">Cor de destaque</span>
+            <p class="tema-acento-nota">Muda botões, links e seleções. O fundo e os cartões continuam os do tema.</p>
+            <div class="tema-acento-linha">
+                ${cores.map((cor, i) => bolinha(cor, i === 0 ? 'Cor do tema' : cor)).join('')}
+                ${daMarca ? bolinha(escolhida, 'Cor da sua marca') : ''}
+                <button type="button" class="btn btn-secondary btn-sm tema-acento-marca" id="tema-acento-marca">
+                    <i class="fa-solid fa-eye-dropper"></i> Usar a cor da minha marca
+                </button>
+                <input type="color" id="tema-acento-livre" class="tema-acento-livre" value="${daMarca ? escolhida : cores[0]}" tabindex="-1" aria-hidden="true">
+                ${tm.acentoAtual ? '<button type="button" class="inicio-link tema-acento-voltar" id="tema-acento-voltar">Voltar ao padrão</button>' : ''}
+            </div>
+        </div>
+    `;
 }
 
 // Trocar o tipo de estabelecimento reordena os temas na hora, sem salvar.
@@ -3859,7 +3910,9 @@ document.getElementById('form-business-info').addEventListener('submit', (e) => 
         name, slug, phone, instagram, address,
         whatsappRecallMessage, whatsappBirthdayMessage,
         business_type: businessType,
-        theme: theme
+        theme: theme,
+        // Cor da marca por cima do tema; '' = a do próprio tema.
+        primary_color: (window.ThemeManager && window.ThemeManager.acentoAtual) || ''
     };
 
     if (window.ThemeManager) {
@@ -4564,6 +4617,11 @@ async function initPublicBookingPage() {
         // lê daqui. Vem vazio em instância sem docs/add_disponibilidade.sql.
         data.professionalBlocks = sanitizeForStorage(salon.blocks || []);
         currentSelectedDate = new Date(); // agenda real começa hoje
+        // O link público é a cara do salão para o cliente final: herda o tema
+        // e a cor da marca do painel. `lembrar: false` porque o tema de um
+        // salão não pode virar o tema guardado no aparelho de quem abriu o
+        // link — se for o dono de outro salão, o painel dele mudaria.
+        if (window.ThemeManager) window.ThemeManager.applyTheme(data.businessInfo, { lembrar: false });
         document.title = `${escapeHTML(data.businessInfo.name)} - Agendamento Online`;
         renderPhoneScreen();
     } else if (DataService.isSupabaseConfigured()) {
@@ -4575,9 +4633,9 @@ async function initPublicBookingPage() {
 function renderPublicNotFound() {
     publicBookingContainer.innerHTML = `
         <div class="pub-loading">
-            <i class="fa-solid fa-link-slash" style="color: #64748b;"></i>
+            <i class="fa-solid fa-link-slash" style="color: var(--text-muted);"></i>
             <p><strong>Link de agendamento não encontrado.</strong></p>
-            <p style="color:#94a3b8;">Confira se o endereço está correto ou peça um novo link ao estabelecimento.</p>
+            <p style="color: var(--text-muted);">Confira se o endereço está correto ou peça um novo link ao estabelecimento.</p>
         </div>` + rodapeLexion();
 }
 
@@ -4675,7 +4733,7 @@ function renderPhoneScreen() {
             <div class="pub-section" id="pub-fila-conteudo">
                 <form class="pub-form" onsubmit="consultarFila(event)">
                     <div class="form-group" style="margin-bottom:18px;">
-                        <label style="color:#94a3b8; font-size:12px; font-weight:500; margin-bottom:6px; display:block;">SEU WHATSAPP:</label>
+                        <label style="color: var(--text-muted); font-size:12px; font-weight:500; margin-bottom:6px; display:block;">SEU WHATSAPP:</label>
                         <input type="text" class="pub-input" style="font-size:16px; padding:14px; height:auto;" id="pub-fila-phone" placeholder="Ex: (11) 98888-7777" maxlength="15" required value="${escapeHTML(simSelection.clientPhone || '')}">
                     </div>
                     <button type="submit" class="pub-btn-submit btn-full" id="pub-btn-fila">
@@ -4709,16 +4767,16 @@ function renderPhoneScreen() {
                 <h5 class="pub-section-title">Passo 1: Seus dados</h5>
                 <form class="pub-form" onsubmit="submitSimNamePhone(event)">
                     <div class="form-group">
-                        <label style="color:#94a3b8; font-size:12px; font-weight: 500; margin-bottom: 6px; display: block;">SEU NOME COMPLETO:</label>
+                        <label style="color: var(--text-muted); font-size:12px; font-weight: 500; margin-bottom: 6px; display: block;">SEU NOME COMPLETO:</label>
                         <input type="text" class="pub-input" style="font-size: 16px; padding: 14px; height: auto;" id="pub-sim-name" placeholder="Nome" required value="${escapeHTML(simSelection.clientName)}" oninput="this.value = this.value.replace(/[0-9]/g, '')">
                     </div>
                     <div class="form-group" style="margin-bottom:18px;">
-                        <label style="color:#94a3b8; font-size:12px; font-weight: 500; margin-bottom: 6px; display: block;">SEU WHATSAPP:</label>
+                        <label style="color: var(--text-muted); font-size:12px; font-weight: 500; margin-bottom: 6px; display: block;">SEU WHATSAPP:</label>
                         <input type="text" class="pub-input" style="font-size: 16px; padding: 14px; height: auto;" id="pub-sim-phone" placeholder="Ex: (11) 98888-7777" maxlength="15" required value="${escapeHTML(simSelection.clientPhone)}" ${simSelection.needsBirth ? 'readonly' : ''}>
                     </div>
                     ${simSelection.needsBirth ? `
                     <div class="form-group" style="margin-bottom:18px;">
-                        <label style="color:#94a3b8; font-size:12px; font-weight: 500; margin-bottom: 6px; display: block;">SUA DATA DE NASCIMENTO:</label>
+                        <label style="color: var(--text-muted); font-size:12px; font-weight: 500; margin-bottom: 6px; display: block;">SUA DATA DE NASCIMENTO:</label>
                         <input type="date" class="pub-input" style="font-size: 16px; padding: 14px; height: auto;" id="pub-sim-birth" min="1920-01-01" max="${new Date().toISOString().split('T')[0]}" required value="${escapeHTML(simSelection.birth)}">
                         <small style="color:var(--text-muted); font-size:11px; display:block; margin-top:6px;">Para enviarmos mimos no seu aniversário! 🎁</small>
                     </div>
@@ -4747,7 +4805,7 @@ function renderPhoneScreen() {
                     ${data.professionals.filter(p => p.active).map(prof => {
             const avatar = prof.photoUrl
                 ? `<img src="${escapeHTML(prof.photoUrl)}" alt="${escapeHTML(prof.name)}" style="width:48px; height:48px; border-radius:50%; object-fit:cover; margin-bottom:6px; border:2px solid var(--primary);">`
-                : `<div class="pub-logo" style="width:48px; height:48px; font-size:16px; margin-bottom:6px; background: #64748b;"><i class="fa-solid fa-user"></i></div>`;
+                : `<div class="pub-logo" style="width:48px; height:48px; font-size:16px; margin-bottom:6px; background: var(--gray);"><i class="fa-solid fa-user"></i></div>`;
             return `
                         <div class="pub-select-card ${simSelection.profId === prof.id ? 'selected' : ''}" onclick="selectSimProf('${prof.id}')">
                             ${avatar}
@@ -4812,7 +4870,7 @@ function renderPhoneScreen() {
             </div>
             <div class="pub-section">
                 <div class="form-group" style="margin-bottom:12px;">
-                    <label style="color:#94a3b8; font-size:10px;">SELECIONE A DATA:</label>
+                    <label style="color: var(--text-muted); font-size:10px;">SELECIONE A DATA:</label>
                     <div style="display: flex; align-items: center; gap: 8px;">
                         <button class="btn btn-secondary btn-sm" onclick="changeSimDateOffset(-1)" style="padding: 0 12px;" ${publicSalonMode && testDate <= getLocalDateString(new Date()) ? 'disabled' : ''}><i class="fa-solid fa-chevron-left"></i></button>
                         <input type="date" id="pub-sim-date" class="pub-input" style="flex:1; margin:0;" value="${testDate}" ${publicSalonMode ? `min="${getLocalDateString(new Date())}"` : ''} onchange="changeSimDate(this.value)">
@@ -5240,25 +5298,27 @@ window.submitSimBooking = async function (event) {
                 // Show warning popup
                 const overlay = document.createElement('div');
                 overlay.id = 'pub-week-warning-overlay';
-                overlay.style.cssText = 'position:fixed; inset:0; background:rgba(0,0,0,0.7); z-index:9999; display:flex; align-items:center; justify-content:center; padding:20px;';
+                // Cores só do tema: este aviso aparece no link público, que
+                // herda o tema do salão — branco fixo sumia nos temas claros.
+                overlay.style.cssText = 'position:fixed; inset:0; background:var(--overlay-backdrop); z-index:9999; display:flex; align-items:center; justify-content:center; padding:20px;';
                 overlay.innerHTML = `
-                    <div style="background:var(--bg-secondary, #1e293b); border-radius:16px; padding:24px; max-width:380px; width:100%; box-shadow:0 20px 60px rgba(0,0,0,0.5); border:1px solid rgba(201,162,75,0.3);">
+                    <div style="background:var(--bg-secondary); border-radius:var(--radius-lg); padding:24px; max-width:380px; width:100%; box-shadow:var(--shadow-strong); border:1px solid var(--primary-edge);">
                         <div style="text-align:center; margin-bottom:16px;">
-                            <i class="fa-solid fa-calendar-check" style="font-size:36px; color:var(--warning, #f59e0b);"></i>
+                            <i class="fa-solid fa-calendar-check" style="font-size:36px; color:var(--warning);"></i>
                         </div>
-                        <h4 style="color:white; text-align:center; font-size:16px; margin-bottom:8px;">Você já tem agendamento nesta semana!</h4>
-                        <p style="color:#94a3b8; text-align:center; font-size:13px; margin-bottom:16px;">
+                        <h4 style="color:var(--text-primary); text-align:center; font-size:16px; margin-bottom:8px;">Você já tem agendamento nesta semana!</h4>
+                        <p style="color: var(--text-muted); text-align:center; font-size:13px; margin-bottom:16px;">
                             Identificamos que você já possui ${existingAppts.length === 1 ? 'um horário reservado' : existingAppts.length + ' horários reservados'} nesta mesma semana:
                         </p>
-                        <div style="background:rgba(0,0,0,0.2); border-radius:10px; padding:10px 14px; margin-bottom:18px; font-size:13px; color:#cbd5e1;">
+                        <div style="background:var(--surface-raised); border-radius:var(--radius-md); padding:10px 14px; margin-bottom:18px; font-size:13px; color:var(--text-main);">
                             ${apptListHtml}
                         </div>
-                        <p style="color:#94a3b8; text-align:center; font-size:12px; margin-bottom:18px;">
+                        <p style="color: var(--text-muted); text-align:center; font-size:12px; margin-bottom:18px;">
                             Deseja continuar mesmo assim?
                         </p>
                         <div style="display:flex; gap:10px;">
-                            <button id="pub-week-warn-back" style="flex:1; padding:12px; border-radius:10px; border:1px solid rgba(255,255,255,0.1); background:transparent; color:#94a3b8; font-weight:600; cursor:pointer; font-size:14px;">Voltar</button>
-                            <button id="pub-week-warn-continue" style="flex:1; padding:12px; border-radius:10px; border:none; background:linear-gradient(135deg, var(--primary, #C9A24B), var(--primary-dark, #8F6F2E)); color:white; font-weight:600; cursor:pointer; font-size:14px;">Sim, Agendar</button>
+                            <button id="pub-week-warn-back" style="flex:1; padding:12px; border-radius:var(--radius-md); border:1px solid var(--border-strong); background:transparent; color: var(--text-muted); font-weight:600; cursor:pointer; font-size:14px;">Voltar</button>
+                            <button id="pub-week-warn-continue" style="flex:1; padding:12px; border-radius:var(--radius-md); border:none; background:var(--primary-gradient); color:var(--text-accent-gold); font-weight:600; cursor:pointer; font-size:14px;">Sim, Agendar</button>
                         </div>
                     </div>
                 `;
@@ -5777,6 +5837,26 @@ function esconderCarregamentoInicial() {
     setTimeout(() => tela.remove(), 400);
 }
 
+// Cópia da tela de carregamento tirada antes de ela sair, para poder
+// mostrá-la de novo (no login). O app.js carrega no fim do <body>, então o
+// elemento já existe aqui.
+const MOLDE_DO_CARREGAMENTO = document.getElementById('boot-overlay')?.cloneNode(true);
+
+/* Põe a tela de carregamento de volta — no login, entre o "Entrar" e o painel
+   pronto. Sem ela o painel aparecia antes dos dados: por um instante no tema
+   padrão, com os números vazios do HTML, e só depois no tema e nos números
+   do salão. É o mesmo princípio da carga inicial: não mostrar nada que não
+   seja verdade. */
+function mostrarCarregamento(texto) {
+    if (document.getElementById('boot-overlay') || !MOLDE_DO_CARREGAMENTO) return;
+    const tela = MOLDE_DO_CARREGAMENTO.cloneNode(true);
+    const rotulo = tela.querySelector('.boot-texto');
+    if (rotulo && texto) rotulo.textContent = texto;
+    document.body.appendChild(tela);
+    // Mesmo prazo de segurança da carga inicial.
+    setTimeout(esconderCarregamentoInicial, 15000);
+}
+
 // O prazo de segurança começa a contar já no carregamento do arquivo: se o
 // boot travar numa chamada de rede, a tela sai mesmo assim e a pessoa vê o
 // que houver (login, ou o painel com o cache local).
@@ -5911,20 +5991,26 @@ window.addEventListener('DOMContentLoaded', async () => {
 
                 await DataService.login(email, password);
 
-                // Se sucesso
+                // Se sucesso: a tela de carregamento cobre tudo até o painel
+                // estar com o tema e os números do salão (mostrarCarregamento).
+                mostrarCarregamento('Carregando o salão...');
                 document.getElementById('auth-overlay').style.display = 'none';
                 document.getElementById('app-container').style.display = 'flex';
                 updateUserProfileUI();
                 updateDatabaseTabUI();
 
                 // Recarregar dados da nuvem
-                await loadData();
-                updateUserProfileUI(); // nome do salão vindo da nuvem
-                // O papel só é conhecido depois do login, então o recorte
-                // precisa ser refeito aqui — no boot ainda não havia sessão.
-                aplicarNivelDeAcesso();
-                renderDashboard();
-                renderMessages();
+                try {
+                    await loadData();
+                    updateUserProfileUI(); // nome do salão vindo da nuvem
+                    // O papel só é conhecido depois do login, então o recorte
+                    // precisa ser refeito aqui — no boot ainda não havia sessão.
+                    aplicarNivelDeAcesso();
+                    renderDashboard();
+                    renderMessages();
+                } finally {
+                    esconderCarregamentoInicial();
+                }
 
             } catch (err) {
                 errBox.style.display = 'flex';

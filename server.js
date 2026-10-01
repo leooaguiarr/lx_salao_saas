@@ -540,9 +540,15 @@ const server = http.createServer(async (req, res) => {
     // ------------------------------------------------------------
     const rawPath = decodeURIComponent(req.url.split('?')[0]);
 
-    // Rota da Landing Page oficial
-    if (rawPath === '/' || rawPath === '/home' || rawPath === '/landing') {
-        return serveStaticFile(res, path.join(PUBLIC_DIR, 'landing.html'));
+    // A landing segmentada ocupa um namespace próprio porque /<slug> continua
+    // reservado ao agendamento público de cada salão.
+    const landingRoutes = new Set([
+        '/', '/home', '/landing',
+        '/para/barbearias', '/para/saloes-de-beleza', '/para/nail-designers'
+    ]);
+    const landingPath = rawPath.length > 1 ? rawPath.replace(/\/+$/, '') : rawPath;
+    if (landingRoutes.has(landingPath)) {
+        return serveStaticFile(res, path.join(PUBLIC_DIR, 'landing-preview.html'));
     }
 
     const requestedFile = path.join(PUBLIC_DIR, rawPath);

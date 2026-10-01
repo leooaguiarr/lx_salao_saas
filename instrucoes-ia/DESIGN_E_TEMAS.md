@@ -3,10 +3,10 @@
 Leonardo não gostou das cores nem do layout do painel. Esta página guarda a
 direção aprovada e os valores exatos.
 
-**Estado em 26/09/2026:** implementados os seis pontos de layout (no Início e
-na Agenda), os nove temas e as três personalidades, e a migração (09). Falta
-o acento personalizável, `get_public_salon` com o tema, as outras abas na
-mesma linguagem e a landing — ver [01_PRODUTO_E_ESTADO.md](01_PRODUTO_E_ESTADO.md).
+**Estado em 30/09/2026:** implementados os seis pontos de layout, os nove
+temas e as três personalidades, o acento personalizável, o link público com o
+tema do salão e a landing segmentada por nicho — ver
+[01_PRODUTO_E_ESTADO.md](01_PRODUTO_E_ESTADO.md).
 
 Diferenças conscientes em relação ao texto abaixo:
 
@@ -141,5 +141,5 @@ Vale para todos os temas; consertar uma vez melhora as nove aparências.
    `api.js` — **as duas colunas existem no banco mas o painel nunca as envia**,
    então a cor e o nicho configurados na tela não persistem hoje.
 5. **`get_public_salon`** devolvendo o tema.
-6. **A landing refeita** na mesma linguagem. Combinar antes com o Gemini, que
-   trabalhou nela por último.
+6. **Concluído em 30/09:** landing refeita com entrada neutra escura e três
+   experiências comerciais nas rotas `/para/*`.

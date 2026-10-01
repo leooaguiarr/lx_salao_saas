@@ -30,7 +30,8 @@ docs/                  runbook, planos e proposta comercial (para humanos)
 instrucoes-ia/         esta pasta
 
 public/
-  landing.html          página de vendas (/) — CSS próprio: qutter-landing.css
+  landing-preview.html  landing oficial segmentada — CSS: landing-preview.css
+  landing.html          landing anterior, mantida como referência de rollback
   index.html            TODO o painel e o link público: um HTML só
   config.js             URL/chave anon do Supabase e a tabela de PLANS
   theme.js              ThemeManager: tema claro/escuro do salão
@@ -71,7 +72,8 @@ escopo é o mesmo, e o `app.js` já é grande demais.
 
 | Caminho | O que serve |
 | --- | --- |
-| `/`, `/home`, `/landing` | `landing.html` |
+| `/`, `/home`, `/landing` | `landing-preview.html` — entrada para escolher o nicho |
+| `/para/barbearias`, `/para/saloes-de-beleza`, `/para/nail-designers` | `landing-preview.html` já aberta na experiência do nicho |
 | `/api/health` | status e ambiente do Asaas |
 | `POST /api/auth/register-salon` | cria usuário, salão, vínculo de dono, profissional e serviço iniciais; começa o teste de 7 dias |
 | `POST /api/asaas/create-subscription` | cria cliente + assinatura no Asaas e devolve o QR Code Pix. Exige `Authorization: Bearer <token de login>`; o salão sai do token (via `salon_members`), nunca do corpo, e só dono/admin assina. **Não muda o plano**: grava o plano escolhido em `subscriptions`, e o webhook o aplica quando o pagamento é confirmado |

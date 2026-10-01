@@ -1,7 +1,7 @@
 # Produto e estado atual
 
 - Repositório: <https://github.com/leooaguiarr/lx_salao_saas> (público), branch `main`
-- Última atualização deste documento: 26/09/2026
+- Última atualização deste documento: 30/09/2026
 
 ## O que é
 
@@ -64,10 +64,10 @@ crediário são travados apenas na tela. Ver *Riscos*.
 
 **No ar e funcionando:**
 
-- Landing page (`public/landing.html`) com identidade clara em off-white,
-  verde profundo e caramelo; demonstrações visuais de agenda, clientes,
-  agendamento online e financeiro; planos e FAQ simplificados. Métricas e
-  depoimentos sem comprovação foram removidos. O cadastro do teste grátis
+- Landing segmentada (`public/landing-preview.html`) com entrada neutra escura
+  e três experiências comerciais: Barbearia, Salão de beleza e Nail & Beauty.
+  Cada nicho tem linguagem, cores, exemplos de agenda e rota própria em
+  `/para/*`; as chamadas ocupam telas completas. O cadastro do teste grátis
   continua em `POST /api/auth/register-salon`.
 - Painel completo: tudo o que está em [FUNCIONALIDADES.md](FUNCIONALIDADES.md),
   menos os módulos pausados (Mensagens e Kanban de Leads, ocultos no menu).
@@ -242,13 +242,15 @@ gravada em `primary_color`); link público herdando tema e acento (migração
 do cabeçalho; tela de carregamento neutra até o tema do salão estar aplicado
 (nada de piscar o tema padrão).
 
+**Também feito em 30/09:** landing refeita e segmentada por nicho. A entrada
+escura leva a `/para/barbearias`, `/para/saloes-de-beleza` ou
+`/para/nail-designers`; cada experiência usa personalidade e exemplos próprios,
+mantém o cadastro real de 7 dias e organiza as chamadas como telas completas.
+
 **Falta, na ordem:**
 
 1. Estrutura interna das telas (tabelas, filtros, modal de venda) ainda é a
    antiga, só com as cores novas. Refazer o que o Leonardo apontar.
-2. A landing refeita na mesma linguagem — **fica com outro agente de IA**,
-   decisão do Leonardo em 26/09/2026. Não mexer em `landing.html` nem em
-   `qutter-landing.css` sem ele pedir.
 
 ## O que vem a seguir
 

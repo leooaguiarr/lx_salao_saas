@@ -65,6 +65,9 @@ aqui (data, sintoma, causa, o que fazer).
 - **Abas no hash (`#vendas`), nunca no caminho** — o caminho é o slug do link
   público. Rota nova do painel entra em `ROTAS_INTERNAS` (e na cópia do
   `<head>` do `index.html`).
+- **Landing de nicho usa `/para/*`, nunca `/<nicho>`.** A raiz com um segmento
+  continua reservada ao slug público dos salões. Links internos da landing
+  devem rolar com `scrollIntoView`, sem trocar a rota da modalidade escolhida.
 - **Rótulo do link público não pode ter domínio fixo.** Ele é montado a partir
   de `location.host` (`updatePublicUrlLabels`).
 - **`minimum-scale=1` na viewport é intencional.** Durante o carregamento algo

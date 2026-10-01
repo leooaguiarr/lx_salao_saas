@@ -2133,6 +2133,169 @@ button, input, select, textarea {
     .inicio-linha-acoes:empty { display: none; }
 }
 
+/* PLANO SOLO (saas-plan.js → aplicarModoSolo). Quem atende sozinho não tem
+   comissão nem profissional a escolher: tudo o que é de equipe sai da tela.
+   `!important` porque parte desses blocos tem o display trocado pelo JS. */
+.plano-solo .so-equipe,
+.plano-solo .menu-item[data-target="comissoes"],
+.plano-solo .inicio-linha-prof {
+    display: none !important;
+}
+
+/* Sem a coluna do profissional, e com espaço para o botão "Receber". Só no
+   desktop: no celular a linha usa áreas nomeadas, e a área vazia do
+   profissional simplesmente fica em branco. */
+@media (min-width: 769px) {
+    /* Largura fixa nas ações: cada linha é uma grade própria, e com `auto`
+       a coluna da situação andava conforme a linha tinha ou não o botão. */
+    .plano-solo .inicio-linha {
+        grid-template-columns: 56px minmax(0, 1fr) 76px 92px 136px;
+    }
+    /* No Solo o "Receber" é o gesto principal da linha: não pode depender
+       de passar o mouse para aparecer. */
+    .plano-solo .inicio-linha-acoes { opacity: 1; }
+}
+
+.btn-receber {
+    padding: 6px 14px;
+    font-size: 13px;
+    white-space: nowrap;
+}
+
+/* Painel "Receber". No celular ele já sobe de baixo, como todo modal; os
+   botões de pagamento são grandes porque são tocados com pressa, às vezes
+   com a mão ainda ocupada. */
+.receber-cabecalho {
+    display: flex;
+    flex-direction: column;
+    min-width: 0;
+}
+
+.receber-servico {
+    font-size: 13px;
+    color: var(--text-muted);
+}
+
+.receber-rotulo {
+    display: block;
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--text-muted);
+    margin-bottom: 6px;
+}
+
+.receber-valor-caixa {
+    display: flex;
+    align-items: baseline;
+    gap: 8px;
+    padding: 10px 14px;
+    border: 1px solid var(--border-color);
+    border-radius: var(--radius-md);
+    background: var(--bg-primary);
+    margin-bottom: 16px;
+}
+
+.receber-valor-caixa span {
+    font-size: 18px;
+    color: var(--text-muted);
+}
+
+.receber-valor-caixa input {
+    flex: 1;
+    min-width: 0;
+    border: none;
+    background: transparent;
+    color: var(--text-main);
+    font-family: var(--fonte-titulo, inherit);
+    font-size: 34px;
+    font-weight: 600;
+    outline: none;
+}
+
+.receber-metodos {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+}
+
+.receber-metodo {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    min-height: 56px;
+    border: 1px solid var(--border-color);
+    border-radius: var(--radius-md);
+    background: var(--surface-raised);
+    color: var(--text-main);
+    font-family: inherit;
+    font-size: 16px;
+    font-weight: 700;
+    cursor: pointer;
+    transition: var(--transition);
+}
+
+.receber-metodo:hover:not(:disabled) {
+    border-color: var(--primary);
+    color: var(--primary);
+}
+
+.receber-metodo:disabled {
+    opacity: 0.6;
+    cursor: wait;
+}
+
+.receber-mais {
+    display: block;
+    width: 100%;
+    margin-top: 14px;
+    padding: 8px;
+    border: none;
+    background: none;
+    color: var(--text-muted);
+    font-family: inherit;
+    font-size: 13px;
+    text-decoration: underline;
+    cursor: pointer;
+}
+
+.receber-feito {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin: 0 0 18px;
+    color: var(--success);
+    font-weight: 700;
+}
+
+.receber-proximo {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    padding: 14px;
+    margin-bottom: 12px;
+    border: 1px solid var(--border-color);
+    border-radius: var(--radius-md);
+    background: var(--bg-primary);
+}
+
+.receber-proximo strong {
+    font-size: 18px;
+}
+
+.receber-comecar {
+    min-height: 52px;
+    font-size: 16px;
+    margin-bottom: 8px;
+}
+
+.receber-sem-proximo {
+    color: var(--text-muted);
+    margin: 0 0 12px;
+}
+
 /* Data Tables */
 .table-container {
     margin-top: 20px;

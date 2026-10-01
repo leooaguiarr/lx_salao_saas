@@ -73,6 +73,11 @@ aqui (data, sintoma, causa, o que fazer).
 - **`minimum-scale=1` na viewport é intencional.** Durante o carregamento algo
   passa um instante da largura da tela, e o Chrome do celular reduzia o zoom e
   não voltava: página 9px mais larga, "solta" para o lado. Não remova.
+- **Os scripts dividem o mesmo escopo global, e `window.nome` repetido some
+  sem erro.** O último arquivo carregado vence. Em 30/09/2026 o
+  `window.abrirRecebimento` do Receber (app.js) foi engolido pelo do Crediário
+  (crediario.js, carregado depois) — o botão abria nada. Antes de criar uma
+  função global, procure o nome em `public/*.js`.
 - **Ao mudar uma tela, confira o guia rápido** (`ajuda.js`). Já sobrou pergunta
   explicando painel que tinha sido removido.
 

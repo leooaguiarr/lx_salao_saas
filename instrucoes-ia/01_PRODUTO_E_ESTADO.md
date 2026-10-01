@@ -35,6 +35,19 @@ Os limites estão em `public/config.js` (`PLANS`) e são aplicados na tela por
 (gatilho `trg_check_professional_limit`, migração 03). Estoque, fidelidade e
 crediário são travados apenas na tela. Ver *Riscos*.
 
+**Plano Solo = "modo Solo"** (decisão do Leonardo, 30/09/2026): o plano
+`individual` é do profissional que trabalha sozinho, usa o sistema no celular
+entre um corte e outro e fica com todo o lucro. Decidido **pelo plano**, nunca
+pela quantidade de profissionais. `SaaSPlanManager.ehSolo()` põe a classe
+`plano-solo` no `<html>`, e o CSS esconde tudo o que tem `.so-equipe`: aba
+Comissões, escolha e filtros de profissional, comissão no cadastro, acesso de
+profissional. Comissão é sempre 0% (`server.js` no cadastro, migração 11 para
+os antigos, formulário força 0). No Início, quem está na cadeira ou ficou "a
+receber" ganha o botão **Receber**: valor preenchido, Pix/Dinheiro/Débito/
+Crédito em um toque, pelo mesmo checkout (`receberAtendimentoRapido`), e em
+seguida o próximo cliente com "Começar agora". Falta a etapa 3: um Início
+próprio do Solo no celular (quem está na cadeira, o próximo, recebido hoje).
+
 ## Infraestrutura (tudo autohospedado)
 
 | Serviço | Endereço | Observação |

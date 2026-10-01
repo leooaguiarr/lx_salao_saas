@@ -289,7 +289,10 @@ const server = http.createServer(async (req, res) => {
                         id: profId,
                         user_id: userId,
                         name: 'Profissional Principal',
-                        commission: 50.00,
+                        // No plano Solo o profissional é o próprio dono: 50%
+                        // de comissão fazia o Financeiro mostrar metade do
+                        // faturamento como "comissão a pagar" para ele mesmo.
+                        commission: (planId || 'individual') === 'individual' ? 0 : 50.00,
                         active: true
                     })
                 });

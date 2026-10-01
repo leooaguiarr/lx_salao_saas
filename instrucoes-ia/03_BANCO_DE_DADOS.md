@@ -26,6 +26,8 @@
 | `07_protege_cobranca.sql` | `process_asaas_webhook` só para a service_role; gatilho que impede o navegador de mudar `status`, `plan_id`, `trial_ends_at` e ids do Asaas |
 | `09_nove_temas.sql` | o CHECK de `business_info.theme` passa a aceitar os nove temas, além de `escuro`/`claro` (traduzidos pelo `theme.js` conforme o nicho). Aplicada em 26/09/2026 |
 | `08_plano_so_apos_pagamento.sql` | `process_asaas_webhook` aplica o plano de `subscriptions.plan_id` só na confirmação do pagamento, e acha o salão pela assinatura antes do cliente |
+| `10_link_publico_com_tema.sql` | `get_public_salon` passa a devolver `theme`, e o link público herda o tema do painel. Aplicada em 27/09/2026 |
+| `11_solo_sem_comissao.sql` | zera a comissão dos profissionais de salões no plano `individual` (Solo), que nasciam com 50% |
 
 **Colunas de cobrança de `business_info` são do servidor.** O gatilho
 `trg_protege_colunas_de_cobranca` descarta, sem erro, qualquer mudança nelas

@@ -93,17 +93,17 @@
     <!-- Font Awesome Icons -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <!-- CSS Customizado -->
-    <link rel="stylesheet" href="/index.css?v=83">
-    <link rel="stylesheet" href="/estoque.css?v=83">
-    <link rel="stylesheet" href="/ajuda.css?v=83">
-    <link rel="stylesheet" href="/auth.css?v=83">
+    <link rel="stylesheet" href="/index.css?v=84">
+    <link rel="stylesheet" href="/estoque.css?v=84">
+    <link rel="stylesheet" href="/ajuda.css?v=84">
+    <link rel="stylesheet" href="/auth.css?v=84">
     <!-- Evolução de Vendas. Depois dos anteriores de propósito: estes só
          acrescentam as telas novas e não redefinem nada do index.css. -->
-    <link rel="stylesheet" href="/vendas.css?v=83">
-    <link rel="stylesheet" href="/checkout.css?v=83">
-    <link rel="stylesheet" href="/comissoes.css?v=83">
-    <link rel="stylesheet" href="/crediario.css?v=83">
-    <link rel="stylesheet" href="/fidelidade.css?v=83">
+    <link rel="stylesheet" href="/vendas.css?v=84">
+    <link rel="stylesheet" href="/checkout.css?v=84">
+    <link rel="stylesheet" href="/comissoes.css?v=84">
+    <link rel="stylesheet" href="/crediario.css?v=84">
+    <link rel="stylesheet" href="/fidelidade.css?v=84">
 </head>
 <body class="dark-theme">
     <!--
@@ -591,7 +591,7 @@
                     </div>
 
                     <!-- Mobile Professional Switcher -->
-                    <div class="mobile-prof-switcher" id="mobile-prof-switcher">
+                    <div class="mobile-prof-switcher so-equipe" id="mobile-prof-switcher">
                         <!-- Populated dynamically via JS -->
                     </div>
 
@@ -758,7 +758,7 @@
                                     <option value="all">Todos os clientes</option>
                                 </select>
                             </div>
-                            <div class="sales-filter-field">
+                            <div class="sales-filter-field so-equipe">
                                 <label for="sales-filter-professional">Profissional</label>
                                 <select class="form-control" id="sales-filter-professional">
                                     <option value="all">Todos os profissionais</option>
@@ -1332,7 +1332,7 @@
                             </div>
                         </div>
 
-                        <div class="finance-filter-group">
+                        <div class="finance-filter-group so-equipe">
                             <span class="finance-filter-label"><i class="fa-solid fa-user-tie"></i> Filtrar por Profissional</span>
                             <div class="prof-filters" id="finance-prof-filters" style="display: flex; gap: 10px; overflow-x: auto; padding-bottom: 5px;">
                                 <!-- Buttons populated dynamically -->
@@ -1377,7 +1377,7 @@
 
                         <!-- PROFISSIONAL: Comissão Dia + Agendamentos + Comissão Mês.
                              O display é trocado pelo app.js (none/flex). -->
-                        <div id="cash-info-prof" class="financeiro-resumo-grade" style="display: none;">
+                        <div id="cash-info-prof" class="financeiro-resumo-grade so-equipe" style="display: none;">
                             <div class="indicador">
                                 <span class="indicador-rotulo">Comissão hoje</span>
                                 <div class="indicador-linha"><span class="indicador-numero" id="cash-prof-commission-day">R$ 0,00</span></div>
@@ -1861,7 +1861,7 @@
                         <h4 id="summary-client-name" style="margin: 0 0 8px 0; font-size: 18px; color: var(--text-main);"></h4>
                         <div style="display:flex; flex-direction:column; gap:4px;">
                             <div style="font-size: 13px; color: var(--text-muted); display:flex; align-items:center; gap:6px;"><i class="fa-solid fa-scissors"></i> <span id="summary-service-name"></span></div>
-                            <div style="font-size: 13px; color: var(--text-muted); display:flex; align-items:center; gap:6px;"><i class="fa-solid fa-user-tie"></i> <span id="summary-prof-name"></span></div>
+                            <div class="so-equipe" style="font-size: 13px; color: var(--text-muted); display:flex; align-items:center; gap:6px;"><i class="fa-solid fa-user-tie"></i> <span id="summary-prof-name"></span></div>
                         </div>
                     </div>
 
@@ -1884,7 +1884,7 @@
                                     <!-- Populated dynamically -->
                                 </select>
                             </div>
-                            <div class="form-group">
+                            <div class="form-group so-equipe">
                                 <label for="appt-prof-select">Profissional</label>
                                 <select id="appt-prof-select" class="form-control" required>
                                     <!-- Populated dynamically -->
@@ -2481,7 +2481,7 @@
                         <label for="encaixe-servico">Serviço</label>
                         <select id="encaixe-servico" class="form-control" required></select>
                     </div>
-                    <div class="form-group">
+                    <div class="form-group so-equipe">
                         <label for="encaixe-prof">Profissional</label>
                         <select id="encaixe-prof" class="form-control">
                             <option value="">Qualquer profissional (Mais rápido)</option>
@@ -2515,6 +2515,46 @@
                     </button>
                 </div>
             </form>
+        </div>
+    </div>
+
+    <!-- RECEBER EM UM TOQUE (plano Solo). Quem atende sozinho fecha a conta
+         com o próximo cliente já sentado: o valor vem preenchido e a forma de
+         pagamento é o próprio botão. Por baixo é o checkout de sempre
+         (receberAtendimentoRapido, em checkout.js). Desconto, produto e
+         pagamento dividido continuam no checkout completo, pelo link. -->
+    <div class="modal-backdrop" id="modal-receber">
+        <div class="modal-dialog receber-dialog">
+            <div class="modal-header">
+                <div class="receber-cabecalho">
+                    <span class="eyebrow">Receber</span>
+                    <h4 class="modal-title" id="receber-cliente">Cliente</h4>
+                    <span class="receber-servico" id="receber-servico"></span>
+                </div>
+                <button class="modal-close" data-close-modal="modal-receber" aria-label="Fechar">&times;</button>
+            </div>
+            <div class="modal-body">
+                <div id="receber-passo-pagar">
+                    <label for="receber-valor" class="receber-rotulo">Valor</label>
+                    <div class="receber-valor-caixa">
+                        <span>R$</span>
+                        <input type="number" id="receber-valor" inputmode="decimal" step="0.01" min="0">
+                    </div>
+                    <div class="receber-metodos">
+                        <button type="button" class="receber-metodo" data-metodo="pix"><i class="fa-brands fa-pix"></i> Pix</button>
+                        <button type="button" class="receber-metodo" data-metodo="cash"><i class="fa-solid fa-money-bill-wave"></i> Dinheiro</button>
+                        <button type="button" class="receber-metodo" data-metodo="debit_card"><i class="fa-solid fa-credit-card"></i> Débito</button>
+                        <button type="button" class="receber-metodo" data-metodo="credit_card"><i class="fa-regular fa-credit-card"></i> Crédito</button>
+                    </div>
+                    <button type="button" class="receber-mais" id="receber-mais">
+                        Desconto, produto ou pagamento dividido
+                    </button>
+                </div>
+                <div id="receber-passo-proximo" hidden>
+                    <p class="receber-feito"><i class="fa-solid fa-circle-check"></i> <span id="receber-feito-texto"></span></p>
+                    <div id="receber-proximo"></div>
+                </div>
+            </div>
         </div>
     </div>
 
@@ -2581,7 +2621,7 @@
                         <input type="file" id="prof-photo" class="form-control" accept="image/*">
                         <img id="prof-photo-preview" src="" alt="Prévia da foto" style="display:none; width:64px; height:64px; border-radius:50%; object-fit:cover; margin-top:8px; border:2px solid var(--primary);">
                     </div>
-                    <div class="form-group">
+                    <div class="form-group so-equipe">
                         <label for="prof-commission">Comissão sobre Serviço (%)</label>
                         <input type="number" id="prof-commission" class="form-control" placeholder="Ex: 50" min="0" max="100" required>
                     </div>
@@ -2597,7 +2637,7 @@
                          Fica no cadastro do profissional de propósito: o dono
                          não deve precisar procurar uma tela de usuários para
                          responder "esse barbeiro entra no sistema?". -->
-                    <div class="prof-acesso" id="prof-acesso-bloco">
+                    <div class="prof-acesso so-equipe" id="prof-acesso-bloco">
                         <div class="prof-acesso-titulo">
                             <i class="fa-solid fa-key"></i> Acesso ao sistema
                         </div>
@@ -2868,7 +2908,7 @@
                                     <label for="checkout-item-ref">O que está vendendo</label>
                                     <select id="checkout-item-ref" class="form-control"></select>
                                 </div>
-                                <div class="checkout-field checkout-field-prof">
+                                <div class="checkout-field checkout-field-prof so-equipe">
                                     <label for="checkout-item-prof">Profissional</label>
                                     <select id="checkout-item-prof" class="form-control"></select>
                                 </div>
@@ -3153,36 +3193,36 @@
     <!-- Estes três também levam versão: o servidor manda cache de um dia para
          arquivos estáticos, e sem o ?v= uma correção aqui só chegaria ao
          navegador de quem já usou o sistema no dia seguinte. -->
-    <script src="/config.js?v=83"></script>
-    <script src="/theme.js?v=83"></script>
-    <script src="/saas-plan.js?v=83"></script>
-    <script src="/api.js?v=83"></script>
+    <script src="/config.js?v=84"></script>
+    <script src="/theme.js?v=84"></script>
+    <script src="/saas-plan.js?v=84"></script>
+    <script src="/api.js?v=84"></script>
 
     <!-- JavaScript Principal -->
-    <script src="/app.js?v=83"></script>
+    <script src="/app.js?v=84"></script>
 
     <!-- Funcionalidades acrescentadas depois. A ordem importa: elas leem o
          estado global e as funções de cálculo que app.js define. -->
-    <script src="/estoque.js?v=83"></script>
-    <script src="/encaixe.js?v=83"></script>
-    <script src="/ajuda.js?v=83"></script>
+    <script src="/estoque.js?v=84"></script>
+    <script src="/encaixe.js?v=84"></script>
+    <script src="/ajuda.js?v=84"></script>
 
     <!-- Evolução de Vendas (banco: docs/14 a 28). A ordem entre eles TAMBÉM
          importa, e não é a mesma coisa que a ordem acima: `venda-calculo`
          precisa das constantes de `vendas-base`, `checkout` precisa do cálculo,
          e `recibo` é chamado no fim do checkout. Portados do projeto de origem
          (`lexion_salao`), onde nasceram como 22- a 28- e foram testados. -->
-    <script src="/vendas-base.js?v=83"></script>
-    <script src="/venda-calculo.js?v=83"></script>
-    <script src="/checkout.js?v=83"></script>
-    <script src="/comissoes.js?v=83"></script>
-    <script src="/crediario.js?v=83"></script>
-    <script src="/fidelidade.js?v=83"></script>
-    <script src="/recibo.js?v=83"></script>
+    <script src="/vendas-base.js?v=84"></script>
+    <script src="/venda-calculo.js?v=84"></script>
+    <script src="/checkout.js?v=84"></script>
+    <script src="/comissoes.js?v=84"></script>
+    <script src="/crediario.js?v=84"></script>
+    <script src="/fidelidade.js?v=84"></script>
+    <script src="/recibo.js?v=84"></script>
 
     <!-- Barra superior: lê o estado e os cálculos de todos os anteriores
          (clientes, estoque mínimo, crediário atrasado), por isso vem por último. -->
-    <script src="/topbar.js?v=83"></script>
-    <script src="/pwa.js?v=83"></script>
+    <script src="/topbar.js?v=84"></script>
+    <script src="/pwa.js?v=84"></script>
 </body>
 </html>

@@ -37,7 +37,7 @@ const STATE_KEYS = {
 const LOGO_PADRAO = '/assets/logo_lexion.png';
 
 // Versão exibida no rodapé do login.
-const VERSAO_DO_SISTEMA = '2.4.1';
+const VERSAO_DO_SISTEMA = '2.5.0';
 
 let currentSelectedDate = new Date();
 
@@ -1151,6 +1151,12 @@ function atendimentoEmAberto(status) {
    contexto — e, se não acontecer, a fila que o cliente acompanha mente.
    Por isso o card tem um botão só, que avança para o próximo passo. */
 function botaoDeVezDoCliente(appt) {
+    // No Solo, terminar o corte e cobrar são o mesmo gesto: o ✓ de "concluir"
+    // vira "Receber", que conclui e registra o pagamento juntos. Vale também
+    // para quem ficou "a receber" (concluído e não pago).
+    if (window.SaaSPlanManager?.ehSolo() && faltaReceber(appt)) {
+        return `<button class="btn btn-primary btn-sm btn-receber" onclick="abrirReceberAtendimento('${appt.id}')">Receber</button>`;
+    }
     if (appt.date !== getLocalDateString(new Date())) return '';
     if (!atendimentoEmAberto(appt.status)) return '';
 
@@ -1188,6 +1194,103 @@ window.avancarAtendimento = function (apptId, novoStatus) {
     const nome = cliente ? primeiroNomeApresentavel(cliente.name) : 'Atendimento';
     showToast(novoStatus === 'in_progress' ? `${nome} em atendimento.` : `${nome}: atendimento concluído.`, 'success');
 };
+
+/* --- Receber em um toque (plano Solo) ------------------------------------
+   Na cadeira ou já concluído, e ainda sem pagamento: é o que se cobra agora. */
+function faltaReceber(appt) {
+    const pago = appt.paymentStatus === 'paid' || appt.paymentStatus === 'free';
+    return !pago && (appt.status === 'in_progress' || appt.status === 'done');
+}
+
+let atendimentoEmRecebimento = '';
+
+window.abrirReceberAtendimento = function (apptId) {
+    const appt = data.appointments.find(a => a.id === apptId);
+    if (!appt) return;
+    atendimentoEmRecebimento = apptId;
+
+    const cliente = data.clients.find(c => c.id === appt.clientId);
+    const servico = data.services.find(s => s.id === appt.serviceId);
+    document.getElementById('receber-cliente').innerText = cliente ? cliente.name : 'Cliente';
+    document.getElementById('receber-servico').innerText = servico ? servico.name : '';
+    document.getElementById('receber-valor').value =
+        (typeof valorCombinadoDoAtendimento === 'function' ? valorCombinadoDoAtendimento(appt) : Number(servico?.price) || 0).toFixed(2);
+
+    document.getElementById('receber-passo-pagar').hidden = false;
+    document.getElementById('receber-passo-proximo').hidden = true;
+    document.querySelectorAll('#modal-receber .receber-metodo').forEach(b => { b.disabled = false; });
+    openModal('modal-receber');
+};
+
+// O próximo da fila de hoje: quem ainda não começou, pela ordem do horário.
+function proximoAtendimentoDeHoje(profId, depoisDe) {
+    const hoje = getLocalDateString(new Date());
+    return data.appointments
+        .filter(a => a.date === hoje && a.id !== depoisDe && a.profId === profId &&
+            atendimentoEmAberto(a.status) && a.status !== 'in_progress')
+        .sort((a, b) => timeToMinutes(a.time) - timeToMinutes(b.time))[0] || null;
+}
+
+async function receberCom(metodo, botao) {
+    const appt = data.appointments.find(a => a.id === atendimentoEmRecebimento);
+    if (!appt) return;
+    const valor = parseFloat(document.getElementById('receber-valor').value);
+    if (!(valor > 0)) {
+        showToast('Informe o valor recebido.', 'warning');
+        return;
+    }
+
+    const botoes = document.querySelectorAll('#modal-receber .receber-metodo');
+    const rotulo = botao.innerHTML;
+    botoes.forEach(b => { b.disabled = true; });
+    botao.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Registrando...';
+
+    const gravou = await window.receberAtendimentoRapido(appt.id, metodo, valor);
+    botao.innerHTML = rotulo;
+    botoes.forEach(b => { b.disabled = false; });
+    if (!gravou) return;
+
+    // Pago, a próxima pergunta é "quem é o próximo?": a resposta fica na
+    // mesma tela, com o botão de começar, para não ter de procurar na lista.
+    document.getElementById('receber-feito-texto').innerText =
+        `${formatCurrency(valor)} recebido · ${salePaymentMethodLabel(metodo)}`;
+    const proximo = proximoAtendimentoDeHoje(appt.profId, appt.id);
+    const alvo = document.getElementById('receber-proximo');
+    if (proximo) {
+        const cliente = data.clients.find(c => c.id === proximo.clientId);
+        const servico = data.services.find(s => s.id === proximo.serviceId);
+        alvo.innerHTML = `
+            <div class="receber-proximo">
+                <span class="eyebrow">Próximo · ${escapeHTML(proximo.time)}</span>
+                <strong>${escapeHTML(cliente ? cliente.name : 'Cliente')}</strong>
+                <span class="receber-servico">${escapeHTML(servico ? servico.name : '')}</span>
+            </div>
+            <button type="button" class="btn btn-primary btn-full receber-comecar"
+                    onclick="closeModal('modal-receber'); avancarAtendimento('${proximo.id}', 'in_progress');">
+                <i class="fa-solid fa-play"></i> Começar agora
+            </button>
+            <button type="button" class="btn btn-secondary btn-full" data-close-receber>Depois</button>`;
+    } else {
+        alvo.innerHTML = `
+            <p class="receber-sem-proximo">Ninguém mais na agenda de hoje.</p>
+            <button type="button" class="btn btn-secondary btn-full" data-close-receber>Fechar</button>`;
+    }
+    alvo.querySelector('[data-close-receber]')?.addEventListener('click', () => closeModal('modal-receber'));
+    document.getElementById('receber-passo-pagar').hidden = true;
+    document.getElementById('receber-passo-proximo').hidden = false;
+    // O checkout por baixo fecha o próprio modal e devolve a rolagem da
+    // página; este continua aberto, então trava de novo.
+    document.body.style.overflow = 'hidden';
+}
+
+document.querySelectorAll('#modal-receber .receber-metodo').forEach(botao => {
+    botao.addEventListener('click', () => receberCom(botao.dataset.metodo, botao));
+});
+
+document.getElementById('receber-mais')?.addEventListener('click', () => {
+    closeModal('modal-receber');
+    window.abrirCheckoutDoAtendimento(atendimentoEmRecebimento);
+});
 
 function translateLeadStage(st) {
     const match = {
@@ -1584,9 +1687,13 @@ function populateApptFormSelects() {
 
     // Populate Professionals
     profSelect.innerHTML = '<option value="">-- Selecione o Profissional --</option>';
-    data.professionals.filter(p => p.active).forEach(prof => {
+    const ativos = data.professionals.filter(p => p.active);
+    ativos.forEach(prof => {
         profSelect.innerHTML += `<option value="${prof.id}">${escapeHTML(prof.name)}</option>`;
     });
+    // Um profissional só não é escolha. No Solo o campo nem aparece, e sem
+    // isto o agendamento seria recusado por "falta o profissional".
+    if (ativos.length === 1) profSelect.value = ativos[0].id;
 }
 
 /* O cliente (ou o serviço, ou o profissional) do atendimento pode ter sido
@@ -3736,10 +3843,10 @@ function renderProfissionaisGrid() {
                 <button class="btn btn-icon btn-sm" onclick="openEditProfessional('${prof.id}')" title="Editar"><i class="fa-solid fa-pen"></i></button>
             </div>
             <div class="item-config-meta">
-                <span class="item-price-tag">${prof.commission || 0}<i class="fa-solid fa-percent" style="margin-left: 2px;"></i> Comissão</span>
+                <span class="item-price-tag so-equipe">${prof.commission || 0}<i class="fa-solid fa-percent" style="margin-left: 2px;"></i> Comissão</span>
                 <span class="item-status-tag ${prof.active ? 'active' : 'inactive'}">${prof.active ? 'Ativo' : 'Inativo'}</span>
             </div>
-            ${typeof seloDeAcesso === 'function' ? seloDeAcesso(prof) : ''}
+            <div class="so-equipe">${typeof seloDeAcesso === 'function' ? seloDeAcesso(prof) : ''}</div>
             <button class="btn btn-secondary btn-sm btn-full" style="margin-top:10px;" onclick="abrirIndisponibilidade('${prof.id}')">
                 <i class="fa-regular fa-calendar-xmark"></i> Indisponibilidade${bloqueiosFuturos(prof.id).length ? ` (${bloqueiosFuturos(prof.id).length})` : ''}
             </button>
@@ -4201,7 +4308,11 @@ document.getElementById('form-professional').addEventListener('submit', (e) => {
     const id = document.getElementById('prof-id').value;
     const name = document.getElementById('prof-name').value;
     const phone = document.getElementById('prof-phone').value;
-    const commission = parseFloat(document.getElementById('prof-commission').value) || 0;
+    // No Solo o profissional é o dono: comissão sobre o próprio corte só
+    // tiraria do "lucro" um dinheiro que não sai de lugar nenhum.
+    const commission = window.SaaSPlanManager?.ehSolo()
+        ? 0
+        : (parseFloat(document.getElementById('prof-commission').value) || 0);
     const active = document.getElementById('prof-active').checked;
     const photoFile = document.getElementById('prof-photo')?.files[0];
 

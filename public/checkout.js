@@ -83,7 +83,16 @@ function checkoutDisponivel() {
 // --- ABERTURA ---------------------------------------------------------------
 
 function abrirCheckout(opcoes) {
+    prepararCheckout(opcoes);
+    openModal('modal-checkout');
+}
+
+/* Monta o estado e a tela do checkout sem abrir o modal. O "Receber" rápido
+   do Solo (receberAtendimentoRapido) passa por aqui para usar o MESMO motor —
+   mesma RPC, mesma chave contra cobrança dupla — sem mostrar a tela inteira. */
+function prepararCheckout(opcoes) {
     const config = opcoes || {};
+    checkoutState.rapido = !!config.rapido;
 
     checkoutState.appointmentId = config.appointmentId || '';
     checkoutState.origem = checkoutState.appointmentId ? 'appointment' : 'counter';
@@ -130,7 +139,6 @@ function abrirCheckout(opcoes) {
 
     renderCheckoutSelects();
     renderCheckout();
-    openModal('modal-checkout');
 }
 
 /* O aviso de que esta tela é para quem NÃO está agendado.
@@ -198,6 +206,10 @@ window.abrirCheckoutDoAtendimento = function (apptId) {
         return;
     }
 
+    abrirCheckout(checkoutDoAtendimento(appt));
+};
+
+function checkoutDoAtendimento(appt) {
     const servico = (data.services || []).find(s => s.id === appt.serviceId);
     const itens = [];
     if (servico || appt.serviceId) {
@@ -206,22 +218,53 @@ window.abrirCheckoutDoAtendimento = function (apptId) {
             refId: appt.serviceId || '',
             nome: servico ? servico.name : 'Serviço',
             quantidade: 1,
-            // O valor combinado no atendimento manda sobre o preço de tabela:
-            // é ele que o cliente ouviu.
-            precoUnitario: appt.price !== undefined && appt.price !== null
-                ? Number(appt.price)
-                : (servico ? Number(servico.price) || 0 : 0),
+            precoUnitario: valorCombinadoDoAtendimento(appt),
             profissionalId: appt.profId || ''
         });
     }
 
-    abrirCheckout({
+    return {
         appointmentId: appt.id,
         clientId: appt.clientId || '',
         professionalId: appt.profId || '',
         competenceDate: appt.date || getLocalDateString(new Date()),
         itens: itens
-    });
+    };
+}
+
+// O valor combinado no atendimento manda sobre o preço de tabela: é ele que o
+// cliente ouviu.
+function valorCombinadoDoAtendimento(appt) {
+    if (appt.price !== undefined && appt.price !== null && appt.price !== '') return Number(appt.price);
+    const servico = (data.services || []).find(s => s.id === appt.serviceId);
+    return servico ? Number(servico.price) || 0 : 0;
+}
+
+/* "Receber" em um toque, para quem atende sozinho (plano Solo): o valor já
+   vem preenchido e a forma de pagamento é o próprio botão. Por baixo é o
+   checkout de sempre, com um pagamento só, cobrindo o total — a RPC conclui
+   o atendimento, marca como pago e atualiza a última visita do cliente.
+   Devolve true quando a venda foi gravada. */
+window.receberAtendimentoRapido = async function (apptId, metodo, valor) {
+    const appt = (data.appointments || []).find(a => a.id === apptId);
+    if (!appt) return false;
+    if (!checkoutDisponivel()) {
+        closeModal('modal-receber');
+        window.abrirCheckoutDoAtendimento(apptId);
+        return false;
+    }
+
+    const config = checkoutDoAtendimento(appt);
+    const total = Math.round((Number(valor) || 0) * 100) / 100;
+    // Valor mudado na hora (arredondou, deu desconto): vale o que foi cobrado.
+    if (config.itens[0]) config.itens[0].precoUnitario = total;
+    config.rapido = true;
+    prepararCheckout(config);
+
+    checkoutState.pagamentos = total > 0
+        ? [{ uid: novoIdDeLinha(), metodo: metodo, valor: total, valorEntregue: null }]
+        : [];
+    return window.finalizarCheckout();
 };
 
 // --- SELECTS ----------------------------------------------------------------
@@ -270,6 +313,9 @@ function renderCheckoutSelects() {
         selectItemProf.value = profissionais.some(p => p.id === anterior)
             ? anterior
             : (profissionais.some(p => p.id === checkoutState.professionalId) ? checkoutState.professionalId : '');
+        // Com um profissional só não há o que escolher — e no Solo o campo nem
+        // aparece, então ficar em branco travaria a venda de balcão.
+        if (!selectItemProf.value && profissionais.length === 1) selectItemProf.value = profissionais[0].id;
     }
 
     renderCheckoutCatalogo();
@@ -738,14 +784,15 @@ function guardarRetornoDaVenda(retorno) {
 }
 
 window.finalizarCheckout = async function () {
-    if (checkoutState.enviando) return;
+    if (checkoutState.enviando) return false;
 
     const calculo = renderCheckout();
     const erros = validarVenda(calculo, checkoutState);
     if (erros.length) {
         showToast(erros[0], 'warning');
-        return;
+        return false;
     }
+    let gravou = false;
 
     checkoutState.clientId = document.getElementById('checkout-client')?.value || '';
     // `professionalId` não vem mais de um campo: ou chegou do agendamento, ou a
@@ -770,7 +817,7 @@ window.finalizarCheckout = async function () {
                     ? 'A estrutura de Vendas ainda não foi aplicada no Supabase (migração mestre 00_MASTER_ALL_IN_ONE.sql).'
                     : (retorno && retorno.motivo) || 'Não foi possível concluir a venda.';
                 showToast(motivo, 'danger');
-                return;
+                return false;
             }
         } else {
             // Modo local/demonstração: mesma conta, mesmas recusas, sem nuvem.
@@ -778,6 +825,7 @@ window.finalizarCheckout = async function () {
         }
 
         guardarRetornoDaVenda(retorno);
+        gravou = true;
 
         const numero = retorno.venda
             ? String(retorno.venda.sale_number || retorno.venda.saleNumber || '').padStart(6, '0')
@@ -828,16 +876,20 @@ window.finalizarCheckout = async function () {
         if (typeof renderPageData === 'function') renderPageData(abaAtiva);
 
         // A oferta do recibo vem por último, com a venda já gravada e a tela já
-        // atualizada: se ela falhasse, a venda continuaria feita.
-        if (retorno.venda) oferecerReciboDaVenda(retorno.venda, clienteDaVenda, numero);
+        // atualizada: se ela falhasse, a venda continuaria feita. No "Receber"
+        // rápido ela não aparece: ali o próximo cliente já está esperando, e o
+        // recibo continua saindo por Atendimentos → Detalhes.
+        if (retorno.venda && !checkoutState.rapido) oferecerReciboDaVenda(retorno.venda, clienteDaVenda, numero);
     } catch (erro) {
         console.error('Falha ao concluir a venda:', erro);
         showToast(erro.message || 'Não foi possível concluir a venda.', 'danger');
     } finally {
         checkoutState.enviando = false;
+        checkoutState.rapido = false;
         if (botao) botao.innerHTML = '<i class="fa-solid fa-circle-check"></i> Finalizar venda';
         renderCheckout();
     }
+    return gravou;
 };
 
 // --- RECIBO LOGO APOS A VENDA -----------------------------------------------

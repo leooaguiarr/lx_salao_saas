@@ -1,7 +1,8 @@
 /**
  * SaaS Plan Gatekeeper & Feature Locks
  * Controla os limites de plano:
- * - Plano Individual: 1 profissional, agendamento, clientes, vendas básicas (sem estoque e fidelidade)
+ * - Plano Individual: 1 profissional, agendamento, clientes, vendas básicas (sem estoque e fidelidade).
+ *   É o "modo Solo": sem comissão e sem escolha de profissional (ver ehSolo).
  * - Plano Equipe: até 4 profissionais, estoque liberado
  * - Plano Ilimitado: profissionais ilimitados, fidelidade e crediário liberados
  */
@@ -19,7 +20,30 @@ const SaaSPlanManager = {
         this.trialEndsAt = businessInfo.trial_ends_at || businessInfo.trialEndsAt || null;
 
         this.applyPlanRestrictions();
+        this.aplicarModoSolo();
         this.renderSubscriptionBanner();
+    },
+
+    /* MODO SOLO. O plano Individual é do profissional que trabalha sozinho:
+       todo o lucro é dele, não há comissão a calcular nem profissional a
+       escolher. Decidido pelo PLANO, e não pela quantidade de profissionais
+       (decisão do Leonardo, 30/09/2026): um dono com um funcionário só, que
+       não atende, continua precisando da comissão.
+
+       A classe no <html> esconde o que é de equipe (regras `.plano-solo` no
+       index.css, elementos marcados com `.so-equipe`). Quem passa para o
+       plano Equipe ganha tudo de volta no próximo carregamento. */
+    ehSolo() {
+        return this.currentPlanId === 'individual';
+    },
+
+    aplicarModoSolo() {
+        const solo = this.ehSolo();
+        document.documentElement.classList.toggle('plano-solo', solo);
+        // O campo de comissão some no Solo, mas é `required`: escondido e vazio,
+        // ele travaria o "Salvar" do profissional sem erro visível.
+        const comissao = document.getElementById('prof-commission');
+        if (comissao) comissao.required = !solo;
     },
 
     getPlan() {

@@ -343,8 +343,9 @@ const SaaSPlanManager = {
         }
 
         const nameInput = document.getElementById('checkout-name');
-        if (nameInput && !nameInput.value && window.data && window.data.businessInfo) {
-            nameInput.value = window.data.businessInfo.name || '';
+        // `typeof data`: o app.js declara com `let`, que não vira window.data.
+        if (nameInput && !nameInput.value && typeof data !== 'undefined' && data.businessInfo) {
+            nameInput.value = data.businessInfo.name || '';
         }
 
         document.getElementById('checkout-form-step').style.display = 'block';
@@ -396,7 +397,11 @@ const SaaSPlanManager = {
             // O servidor descobre o salão pelo token do login. Mandar o id do
             // salão no corpo deixava qualquer um assinar (e trocar o plano)
             // em nome de outro salão.
-            const token = window.DataService ? await DataService.getAccessToken() : null;
+            // `typeof`, e não `window.DataService`: o api.js declara com
+            // `const`, que NÃO vira propriedade do window. O teste antigo dava
+            // sempre falso e o checkout respondia "sessão expirou" para
+            // qualquer um — a assinatura nunca tinha funcionado (05/10/2026).
+            const token = typeof DataService !== 'undefined' ? await DataService.getAccessToken() : null;
             if (!token) {
                 throw new Error('Sua sessão expirou. Saia e entre de novo para assinar.');
             }

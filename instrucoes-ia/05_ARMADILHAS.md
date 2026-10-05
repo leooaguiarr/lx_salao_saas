@@ -92,6 +92,13 @@ aqui (data, sintoma, causa, o que fazer).
   `window.abrirRecebimento` do Receber (app.js) foi engolido pelo do Crediário
   (crediario.js, carregado depois) — o botão abria nada. Antes de criar uma
   função global, procure o nome em `public/*.js`.
+- **`const`/`let` no topo do arquivo NÃO vira `window.X`** (05/10/2026).
+  `DataService` (api.js) e `data` (app.js) são globais, mas `window.DataService`
+  e `window.data` são `undefined`. O checkout de assinatura testava
+  `window.DataService` e respondia "sessão expirou" para todo mundo desde
+  21/09 — ninguém tinha assinado de verdade para ver. Use `typeof X !==
+  'undefined'`, ou exponha com `window.X = X` como fazem `SaaSPlanManager` e
+  `ThemeManager`. (`function` no topo vira `window.X`; `const`/`let` não.)
 - **Ao mudar uma tela, confira o guia rápido** (`ajuda.js`). Já sobrou pergunta
   explicando painel que tinha sido removido.
 - **Testar o link público por script esconde problema de toque** (05/10/2026).

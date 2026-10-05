@@ -260,6 +260,11 @@ escura leva a `/para/barbearias`, `/para/saloes-de-beleza` ou
 `/para/nail-designers`; cada experiência usa personalidade e exemplos próprios,
 mantém o cadastro real de 7 dias e organiza as chamadas como telas completas.
 
+**Também feito em 05/10:** a entrada da landing ficou mais leve: as cenas de
+atendimento com pessoas deram lugar a naturezas-mortas dos três nichos, os
+cards ficaram cerca de 15% mais baixos no desktop e ganharam foco dourado
+discreto, sem mudar as rotas nem o comportamento da escolha.
+
 **Falta, na ordem:**
 
 1. Estrutura interna das telas (tabelas, filtros, modal de venda) ainda é a

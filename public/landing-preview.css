@@ -113,16 +113,17 @@ body:not([data-theme]) .preview-footer { display: none; }
 .gateway-copy > p { max-width: 630px; margin: 16px auto 0; color: var(--muted); font-size: 16px; line-height: 1.55; }
 .selection-label { display: block; margin-top: 18px; color: var(--text); font-size: 12px; font-weight: 800; letter-spacing: .12em; text-transform: uppercase; }
 
-.segment-picker { width: 100%; min-height: 0; display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; max-width: var(--max); margin: 0 auto; }
-.segment-card { position: relative; isolation: isolate; height: 100%; min-height: 220px; overflow: hidden; border: 0; border-radius: 20px; background: #241f1a; color: #fff; cursor: pointer; text-align: left; box-shadow: 0 18px 45px rgba(30, 26, 21, .14); }
+.segment-picker { width: 100%; height: min(100%, 272px); min-height: 0; align-self: center; display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; max-width: var(--max); margin: 0 auto; }
+.segment-card { position: relative; isolation: isolate; height: 100%; min-height: 220px; overflow: hidden; border: 1px solid rgba(255,255,255,.08); border-radius: 20px; background: #241f1a; color: #fff; cursor: pointer; text-align: left; box-shadow: 0 18px 45px rgba(30, 26, 21, .14); transition: border-color .3s ease, box-shadow .3s ease, filter .3s ease; }
 .segment-photo, .segment-overlay { position: absolute; inset: 0; }
 .segment-photo { z-index: -2; background-position: center; background-size: cover; transition: transform .65s cubic-bezier(.2,.7,.2,1), filter .4s ease; }
 .segment-overlay { z-index: -1; background: linear-gradient(180deg, rgba(12,10,9,.03) 28%, rgba(12,10,9,.88) 100%); transition: background .3s ease; }
-.segment-card-barbearia .segment-photo { background-image: url('assets/niche_barbearia.jpg'); }
-.segment-card-salao .segment-photo { background-image: url('assets/niche_salao_feminino.jpg'); }
-.segment-card-nail .segment-photo { background-image: url('assets/niche_nail_designer_preview.jpg'); }
+.segment-card-barbearia .segment-photo { background-image: url('assets/gateway_barbearia_objetos.jpg'); background-position: center 34%; }
+.segment-card-salao .segment-photo { background-image: url('assets/gateway_salao_vazio.jpg'); background-position: center 45%; }
+.segment-card-nail .segment-photo { background-image: url('assets/gateway_nail_objetos.jpg'); background-position: center 42%; }
 .segment-card:hover .segment-photo { transform: scale(1.045); }
 .segment-card:hover .segment-overlay { background: linear-gradient(180deg, rgba(12,10,9,.02) 16%, rgba(12,10,9,.94) 100%); }
+.segment-card:hover, .segment-card:focus-visible { border-color: rgba(200,134,47,.78); box-shadow: 0 22px 50px rgba(10,8,6,.28), 0 0 0 1px rgba(200,134,47,.12); filter: brightness(1.04); }
 .segment-content { position: absolute; inset: auto 0 0; display: grid; padding: 28px; }
 .segment-number { position: absolute; right: 26px; bottom: 25px; color: rgba(255,255,255,.45); font-size: 11px; font-weight: 800; letter-spacing: .14em; }
 .segment-content strong { font-size: clamp(24px, 2.3vw, 34px); line-height: 1.1; letter-spacing: -.04em; }
@@ -304,7 +305,7 @@ body[data-theme="barbearia"] .niche-hero h1, body[data-theme="barbearia"] .syste
     .gateway h1 { font-size: clamp(34px, 9.5vw, 46px); }
     .gateway-copy > p { margin-top: 12px; font-size: 13px; line-height: 1.45; }
     .selection-label { margin-top: 12px; font-size: 10px; }
-    .segment-picker { display: flex; max-width: none; margin-inline: -16px; padding-inline: 16px; gap: 12px; overflow-x: auto; overscroll-behavior-x: contain; scroll-snap-type: x mandatory; scrollbar-width: none; }
+    .segment-picker { height: 100%; max-height: none; align-self: stretch; display: flex; max-width: none; margin-inline: -16px; padding-inline: 16px; gap: 12px; overflow-x: auto; overscroll-behavior-x: contain; scroll-snap-type: x mandatory; scrollbar-width: none; }
     .segment-picker::-webkit-scrollbar { display: none; }
     .segment-card { flex: 0 0 min(78vw, 360px); min-height: 0; scroll-snap-align: center; }
     .segment-card .segment-photo { background-position: center 38%; }

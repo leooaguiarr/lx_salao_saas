@@ -37,7 +37,7 @@ const STATE_KEYS = {
 const LOGO_PADRAO = '/assets/logo_lexion.png';
 
 // Versão exibida no rodapé do login.
-const VERSAO_DO_SISTEMA = '2.7.0';
+const VERSAO_DO_SISTEMA = '2.7.1';
 
 let currentSelectedDate = new Date();
 
@@ -4959,6 +4959,10 @@ function renderPhoneScreen() {
 
     // Step 3: Date & Time selection
     else if (simulationStep === 3) {
+        // Já aqui: a grade usa a duração do serviço escolhido, e sem serviço
+        // cai em 30 min — um serviço de 45 apareceria livre na última meia
+        // hora e o banco recusaria no Confirmar.
+        marcarServicoUnico();
         // compute availability grid
         // default working hours are 9:00 to 19:00, 30 min increments.
         // filter out slots where professional has existing booking
@@ -5040,6 +5044,7 @@ function renderPhoneScreen() {
 
     // Step 4: Select Service & Confirm
     else if (simulationStep === 4) {
+        marcarServicoUnico();
         phoneScreen.innerHTML = `
             <div class="pub-header">
                 ${logoHtml}
@@ -5058,7 +5063,9 @@ function renderPhoneScreen() {
                         </div>
                     `).join('')}
                 </div>
-                <button class="pub-btn-submit btn-full" onclick="submitSimBooking(event)" ${!simSelection.serviceId ? 'disabled' : ''} style="margin-top: 15px;">Confirmar Agendamento <i class="fa-solid fa-check"></i></button>
+                <button class="pub-btn-submit btn-full" onclick="submitSimBooking(event)" ${!simSelection.serviceId ? 'disabled' : ''} style="margin-top: 15px;">${simSelection.serviceId
+                    ? 'Confirmar Agendamento <i class="fa-solid fa-check"></i>'
+                    : 'Toque no serviço acima para confirmar'}</button>
                 <button class="btn btn-secondary btn-sm btn-full" onclick="changeSimStep(3)" style="margin-top: 8px;"><i class="fa-solid fa-chevron-left"></i> Voltar</button>
             </div>
         `;
@@ -5116,6 +5123,17 @@ function renderPhoneScreen() {
 
     // Depois do innerHTML de cada passo, senão a atribuição apagaria o rodapé.
     phoneScreen.insertAdjacentHTML('beforeend', rodapeLexion());
+}
+
+// Link público: com um serviço só, ele já vem marcado. Antes o "Confirmar"
+// ficava desativado até o cliente tocar no ÚNICO card da lista, sem nada que
+// dissesse isso: o cliente apertava o botão, nada acontecia, e o agendamento
+// parecia travado (relatado em 05/10/2026).
+function marcarServicoUnico() {
+    const ativos = data.services.filter(s => s.active);
+    if (!simSelection.serviceId && ativos.length === 1) {
+        simSelection.serviceId = ativos[0].id;
+    }
 }
 
 // Phone interaction routing functions (must be global to match string HTML events)

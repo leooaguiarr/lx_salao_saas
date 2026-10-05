@@ -80,6 +80,11 @@ aqui (data, sintoma, causa, o que fazer).
   função global, procure o nome em `public/*.js`.
 - **Ao mudar uma tela, confira o guia rápido** (`ajuda.js`). Já sobrou pergunta
   explicando painel que tinha sido removido.
+- **Testar o link público por script esconde problema de toque** (05/10/2026).
+  Preencher `simSelection` e chamar `submitSimBooking` funcionou, mas o
+  cliente real ficava "travado": o Confirmar só ativa depois de tocar num card
+  de serviço, e com um serviço só ninguém toca. Teste o caminho pelos cliques,
+  como o cliente faz, e confira se todo botão desativado diz por quê.
 
 ## Ferramentas e ambiente
 

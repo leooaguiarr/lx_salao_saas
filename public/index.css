@@ -2045,6 +2045,15 @@ button, input, select, textarea {
 
 .situacao-agora .inicio-linha-hora { color: var(--primary-hover); }
 
+/* "Amanhã" / "07/10" acima da hora, na lista dos próximos dias. */
+.inicio-linha-dia {
+    display: block;
+    font-size: 10px;
+    font-weight: 600;
+    letter-spacing: 0.02em;
+    line-height: 1.2;
+}
+
 .inicio-linha-quem {
     min-width: 0;
     font-size: 14px;

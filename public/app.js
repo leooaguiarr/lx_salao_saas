@@ -37,7 +37,7 @@ const STATE_KEYS = {
 const LOGO_PADRAO = '/assets/logo_lexion.png';
 
 // Versão exibida no rodapé do login.
-const VERSAO_DO_SISTEMA = '2.7.1';
+const VERSAO_DO_SISTEMA = '2.7.2';
 
 let currentSelectedDate = new Date();
 
@@ -892,7 +892,10 @@ function renderDashboard() {
                 const amanha = new Date(now);
                 amanha.setDate(amanha.getDate() + 1);
                 const [, mm, dd] = appt.date.split('-');
-                quando = appt.date === getLocalDateString(amanha) ? `Amanhã ${appt.time}` : `${dd}/${mm} ${appt.time}`;
+                // Dia numa linha pequena acima da hora: "Amanhã 09:00" numa
+                // linha só não cabe na coluna de 56px e invadia o nome do cliente.
+                const dia = appt.date === getLocalDateString(amanha) ? 'Amanhã' : `${dd}/${mm}`;
+                quando = `<span class="inicio-linha-dia">${dia}</span>${appt.time}`;
             }
 
             const linha = document.createElement('div');

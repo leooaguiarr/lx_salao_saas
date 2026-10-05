@@ -13,11 +13,38 @@
     <meta name="twitter:card" content="summary_large_image">
     <base href="/">
     <title>Lexion Salões | Gestão para negócios da beleza</title>
+    <!-- Google Ads + Consent Mode. A escolha salva do visitante é aplicada
+         antes da configuração da tag para evitar cookies publicitários sem
+         autorização. Sem escolha, a medição permanece em modo negado. -->
+    <script>
+        window.dataLayer = window.dataLayer || [];
+        function gtag(){ dataLayer.push(arguments); }
+        gtag('consent', 'default', {
+            ad_storage: 'denied',
+            analytics_storage: 'denied',
+            ad_user_data: 'denied',
+            ad_personalization: 'denied',
+            wait_for_update: 500
+        });
+        try {
+            if (localStorage.getItem('lexion_cookie_consent') === 'granted') {
+                gtag('consent', 'update', {
+                    ad_storage: 'granted',
+                    analytics_storage: 'granted',
+                    ad_user_data: 'granted',
+                    ad_personalization: 'granted'
+                });
+            }
+        } catch (erro) { /* armazenamento indisponível: mantém negado */ }
+        gtag('js', new Date());
+        gtag('config', 'AW-18490550479');
+    </script>
+    <script async src="https://www.googletagmanager.com/gtag/js?id=AW-18490550479"></script>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Karla:wght@400;500;600;700&family=Manrope:wght@400;500;600;700;800&family=Outfit:wght@400;500;600;700&display=swap" rel="stylesheet">
     <link rel="icon" href="assets/favicon_lexion.png" type="image/png">
-    <link rel="stylesheet" href="landing-preview.css?v=6">
+    <link rel="stylesheet" href="landing-preview.css?v=7">
 </head>
 <body>
     <a class="skip-link" href="#conteudo">Ir para o conteúdo</a>
@@ -219,6 +246,7 @@
                 <button type="button" data-open-trial="equipe_4">Testar grátis</button>
                 <button type="button" data-open-legal="privacy">Privacidade e LGPD</button>
                 <button type="button" data-open-legal="terms">Termos de uso</button>
+                <button type="button" data-cookie-preferences>Preferências de cookies</button>
             </nav>
 
             <div class="footer-column footer-contact">
@@ -248,6 +276,18 @@
             <a class="footer-credit" href="https://lexionconsultoria.com.br" target="_blank" rel="noopener noreferrer">Desenvolvido por Lexion Consultoria</a>
         </div>
     </footer>
+
+    <aside class="cookie-banner" id="cookie-banner" aria-labelledby="cookie-title" hidden>
+        <div class="cookie-copy">
+            <strong id="cookie-title">Sua privacidade importa</strong>
+            <p>Usamos cookies de publicidade para medir o desempenho das campanhas e melhorar a experiência. Você pode aceitar ou recusar.</p>
+            <button type="button" data-open-legal="privacy">Ver Política de Privacidade</button>
+        </div>
+        <div class="cookie-actions">
+            <button class="cookie-reject" type="button" data-cookie-choice="denied">Recusar</button>
+            <button class="cookie-accept" type="button" data-cookie-choice="granted">Aceitar</button>
+        </div>
+    </aside>
 
     <div class="modal-overlay" id="modal-trial" role="dialog" aria-modal="true" aria-labelledby="trial-title" aria-hidden="true">
         <div class="modal-card">
@@ -309,6 +349,7 @@
                 <section><h3>Quais dados utilizamos</h3><p>Dados de cadastro, contato, estabelecimento e informações operacionais inseridas no uso da plataforma. Dados de pagamento são processados pelos provedores responsáveis pela cobrança.</p></section>
                 <section><h3>Para que utilizamos</h3><p>Para criar e proteger sua conta, prestar o serviço contratado, oferecer suporte, processar cobranças e melhorar a segurança e a experiência da plataforma.</p></section>
                 <section><h3>Proteção e compartilhamento</h3><p>Aplicamos autenticação e separação de dados por estabelecimento. Não vendemos dados pessoais. O compartilhamento ocorre somente com fornecedores necessários à operação, como infraestrutura, autenticação e pagamentos.</p></section>
+                <section><h3>Cookies e medição de publicidade</h3><p>Com sua autorização, utilizamos a Google tag para medir visitas e resultados das campanhas do Google Ads. Você pode recusar ou alterar sua escolha a qualquer momento em “Preferências de cookies” no rodapé.</p></section>
                 <section><h3>Responsabilidade sobre clientes</h3><p>Cada estabelecimento é responsável pelos dados de seus próprios clientes e deve utilizá-los de acordo com a LGPD e com as finalidades informadas a eles.</p></section>
                 <section><h3>Seus direitos</h3><p>Você pode solicitar informações, correção ou exclusão de dados aplicáveis pelo e-mail <a href="mailto:contato@lexionconsultoria.com.br">contato@lexionconsultoria.com.br</a>.</p></section>
             </div>
@@ -361,8 +402,29 @@
         const segmentPage = document.getElementById('segment-page');
         const modalTrial = document.getElementById('modal-trial');
         const modalLegal = document.getElementById('modal-legal');
+        const cookieBanner = document.getElementById('cookie-banner');
         const TIPO_POR_SEGMENTO = { barbearia: 'barbearia', salao: 'salao', nail: 'estetica' };
         let segmentoAtivo = null;
+
+        function atualizarConsentimentoCookies(escolha, salvar = true) {
+            const permitido = escolha === 'granted';
+            gtag('consent', 'update', {
+                ad_storage: permitido ? 'granted' : 'denied',
+                analytics_storage: permitido ? 'granted' : 'denied',
+                ad_user_data: permitido ? 'granted' : 'denied',
+                ad_personalization: permitido ? 'granted' : 'denied'
+            });
+            if (salvar) {
+                try { localStorage.setItem('lexion_cookie_consent', permitido ? 'granted' : 'denied'); }
+                catch (erro) { /* escolha vale nesta visita mesmo sem armazenamento */ }
+            }
+            cookieBanner.hidden = true;
+        }
+
+        function abrirPreferenciasCookies() {
+            cookieBanner.hidden = false;
+            cookieBanner.querySelector('[data-cookie-choice="granted"]').focus();
+        }
 
         function textoComQuebra(elemento, texto) {
             elemento.replaceChildren();
@@ -527,6 +589,8 @@
         document.querySelectorAll('[data-close-trial]').forEach(botao => botao.addEventListener('click', fecharModalTrial));
         document.querySelectorAll('[data-open-legal]').forEach(botao => botao.addEventListener('click', () => abrirModalLegal(botao.dataset.openLegal)));
         document.querySelectorAll('[data-close-legal]').forEach(botao => botao.addEventListener('click', fecharModalLegal));
+        document.querySelectorAll('[data-cookie-choice]').forEach(botao => botao.addEventListener('click', () => atualizarConsentimentoCookies(botao.dataset.cookieChoice)));
+        document.querySelectorAll('[data-cookie-preferences]').forEach(botao => botao.addEventListener('click', abrirPreferenciasCookies));
         modalTrial.addEventListener('click', event => { if (event.target === modalTrial) fecharModalTrial(); });
         modalLegal.addEventListener('click', event => { if (event.target === modalLegal) fecharModalLegal(); });
         document.addEventListener('keydown', event => {
@@ -538,6 +602,11 @@
         window.addEventListener('popstate', () => { const chave = segmentoDaUrl(); chave ? abrirSegmento(chave, false) : mostrarEntrada(false); });
         const segmentoInicial = segmentoDaUrl();
         if (segmentoInicial) abrirSegmento(segmentoInicial, false);
+        try {
+            if (!localStorage.getItem('lexion_cookie_consent')) cookieBanner.hidden = false;
+        } catch (erro) {
+            cookieBanner.hidden = false;
+        }
     </script>
 </body>
 </html>

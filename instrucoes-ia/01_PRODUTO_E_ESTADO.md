@@ -277,6 +277,11 @@ simplificadas para `/segmentos/barbearia`, `/segmentos/salao` e
 `/segmentos/estetica`. As antigas rotas `/para/*` respondem com redirecionamento
 permanente, preservando links que já tenham sido divulgados.
 
+**Também feito em 05/10 (versão 2.6.2):** a landing recebeu a Google tag do
+Google Ads (`AW-18490550479`) com Consent Mode. Cookies de medição e publicidade
+ficam negados por padrão até a escolha do visitante; o rodapé permite reabrir
+as preferências, e a Política de Privacidade informa a finalidade da medição.
+
 **Falta, na ordem:**
 
 1. Estrutura interna das telas (tabelas, filtros, modal de venda) ainda é a

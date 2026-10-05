@@ -155,7 +155,7 @@ Profissional". Conta de teste do Solo: `leooaguiarr+solo@gmail.com`, salão
    `finalizar_venda` recusava toda venda com item (ver 05_ARMADILHAS, "schema
    de vendas"). Depois de aplicar: receber um atendimento de teste pelo
    "Receber" e pela aba Atendimentos, e conferir Financeiro e Comissões.
-   **Comissões e estoque — confirmado em 05/10/2026, migração 14 escrita.**
+   **Comissões e estoque — migração 14 aplicada e conferida pela API em 05/10/2026.**
    `pagar_comissoes` e `registrar_movimento_estoque` não existiam no banco
    (chamadas pela API com a conta Teste Solo: PGRST202). A 14 cria as duas
    nas colunas do SaaS e acrescenta a `stock_movements` as colunas que a tela

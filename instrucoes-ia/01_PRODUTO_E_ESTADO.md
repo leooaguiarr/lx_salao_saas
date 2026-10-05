@@ -120,7 +120,13 @@ próprio do Solo no celular (quem está na cadeira, o próximo, recebido hoje).
    o token de login e o plano só muda na confirmação. **Falta rodar a
    migração `08_plano_so_apos_pagamento.sql`** no Studio — sem ela, o
    pagamento confirmado ativa o salão mas não troca o plano.
-2. **A chave anon lê e grava tabelas direto.** As políticas
+2. **A chave anon lê e grava tabelas direto — FECHADO em 05/10/2026.** A
+   migração `12_fecha_acesso_anonimo.sql` foi aplicada: apagou as seis
+   políticas abaixo e fixou o `search_path` do gatilho de limite de
+   profissionais; o Security Advisor do Supabase zerou os avisos. Conferido
+   por fora com a chave anon: SELECT nas cinco tabelas volta `[]`, INSERT em
+   `appointments` volta 401, e `get_public_salon` segue respondendo. O
+   `api.js` (2.6.4) não lê mais `business_info` direto. Texto original: as políticas
    "Agendamento: ..." da migração 01 dão à chave pública (que está no
    `config.js`) leitura de **todos** os `business_info`, `appointments` e
    `professional_blocks` de todos os salões, e INSERT livre em
@@ -298,7 +304,6 @@ Da lista do dono do projeto, em ordem sugerida:
 
 1. Testar a cobrança na sandbox de ponta a ponta: checkout Pix → "confirmar
    recebimento" no painel da sandbox → webhook com 200 → salão ativo.
-2. Fechar o risco 2 (políticas anon), com teste do link público.
 3. Conferir o risco 3 no SQL Editor e, se faltar, escrever a migração.
 4. Validar um pagamento real de assinatura ponta a ponta.
 5. **Painel Super Admin** da Lexion: todos os salões, faturamento, churn.

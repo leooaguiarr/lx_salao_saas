@@ -987,7 +987,7 @@ const DataService = {
     // -------------------------
     // LINK PÚBLICO DE AGENDAMENTO (sem login)
     // As duas funções chamam RPCs no Supabase criadas por
-    // docs/public_booking_setup.sql
+    // supabase/migrations/06_rpcs_publicas.sql
     // -------------------------
 
     // Retorna { businessInfo, services, professionals, bookedSlots }
@@ -996,19 +996,9 @@ const DataService = {
         if (!supabaseClient) return null;
         const { data, error } = await supabaseClient.rpc('get_public_salon', { p_slug: slug });
         if (error) throw error;
-        
-        // Fallback for older SQL schemas that don't return avatarUrl in the RPC:
-        if (data && data.businessInfo && !data.businessInfo.avatarUrl) {
-            try {
-                const { data: bizData } = await supabaseClient.from('business_info').select('avatarUrl').eq('slug', slug).single();
-                if (bizData && bizData.avatarUrl) {
-                    data.businessInfo.avatarUrl = bizData.avatarUrl;
-                }
-            } catch (e) {
-                console.warn('Não foi possível buscar a avatarUrl separadamente', e);
-            }
-        }
-        
+        // O logo vem dentro do get_public_salon (migração 06). Não há mais
+        // leitura direta de business_info aqui: a chave anon perdeu acesso às
+        // tabelas na migração 12, e essa leitura só voltaria erro.
         return data;
     },
 

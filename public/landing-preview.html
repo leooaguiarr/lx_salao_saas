@@ -536,6 +536,26 @@
             document.body.classList.remove('modal-open');
         }
 
+        function registrarConversaoCadastro(email) {
+            let redirecionou = false;
+            const redirecionar = () => {
+                if (redirecionou) return;
+                redirecionou = true;
+                window.location.href = `/app?registered=1&email=${encodeURIComponent(email)}`;
+            };
+
+            // O callback reduz a chance de o redirecionamento interromper o
+            // envio. O fallback mantém o cadastro fluido se a rede, a tag ou
+            // um bloqueador impedir o retorno do Google.
+            setTimeout(redirecionar, 1400);
+            gtag('event', 'conversion', {
+                send_to: 'AW-18490550479/AuMfCPGJrI4dEM_R_fBE',
+                value: 1.0,
+                currency: 'BRL',
+                event_callback: redirecionar
+            });
+        }
+
         async function iniciarCadastroTrial(event) {
             event.preventDefault();
             const tipo = document.getElementById('trial-business-type').value;
@@ -561,7 +581,7 @@
 
                 localStorage.setItem('lexion_auto_login', JSON.stringify({ email, password: senha, registered: true, salonName: nome }));
                 botao.textContent = 'Tudo pronto! Redirecionando...';
-                setTimeout(() => { window.location.href = `/app?registered=1&email=${encodeURIComponent(email)}`; }, 800);
+                registrarConversaoCadastro(email);
             } catch (falha) {
                 erro.style.display = 'flex';
                 erro.querySelector('span').textContent = falha.message || 'Falha ao processar cadastro.';

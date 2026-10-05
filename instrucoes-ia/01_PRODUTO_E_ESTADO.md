@@ -282,6 +282,11 @@ Google Ads (`AW-18490550479`) com Consent Mode. Cookies de medição e publicida
 ficam negados por padrão até a escolha do visitante; o rodapé permite reabrir
 as preferências, e a Política de Privacidade informa a finalidade da medição.
 
+**Também feito em 05/10 (versão 2.6.3):** a conversão do Google Ads é
+disparada apenas depois que `/api/auth/register-salon` confirma a criação da
+conta. O redirecionamento aguarda o callback da tag, com fallback temporizado,
+e nenhum identificador interno ou dado pessoal é enviado no evento.
+
 **Falta, na ordem:**
 
 1. Estrutura interna das telas (tabelas, filtros, modal de venda) ainda é a

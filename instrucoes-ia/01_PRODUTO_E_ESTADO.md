@@ -80,7 +80,7 @@ próprio do Solo no celular (quem está na cadeira, o próximo, recebido hoje).
 - Landing segmentada (`public/landing-preview.html`) com entrada neutra escura
   e três experiências comerciais: Barbearia, Salão de beleza e Nail & Beauty.
   Cada nicho tem linguagem, cores, exemplos de agenda e rota própria em
-  `/para/*`; as chamadas ocupam telas completas. O cadastro do teste grátis
+  `/segmentos/*`; as chamadas ocupam telas completas. O cadastro do teste grátis
   continua em `POST /api/auth/register-salon`.
 - Painel completo: tudo o que está em [FUNCIONALIDADES.md](FUNCIONALIDADES.md),
   menos os módulos pausados (Mensagens e Kanban de Leads, ocultos no menu).
@@ -256,8 +256,8 @@ do cabeçalho; tela de carregamento neutra até o tema do salão estar aplicado
 (nada de piscar o tema padrão).
 
 **Também feito em 30/09:** landing refeita e segmentada por nicho. A entrada
-escura leva a `/para/barbearias`, `/para/saloes-de-beleza` ou
-`/para/nail-designers`; cada experiência usa personalidade e exemplos próprios,
+escura leva a `/segmentos/barbearia`, `/segmentos/salao` ou
+`/segmentos/estetica`; cada experiência usa personalidade e exemplos próprios,
 mantém o cadastro real de 7 dias e organiza as chamadas como telas completas.
 
 **Também feito em 05/10:** a entrada da landing ficou mais leve: as cenas de
@@ -271,6 +271,11 @@ técnico. A landing também ganhou cabeçalho mais compacto, artigo feminino da
 marca em toda a narrativa e rodapé institucional completo, com contato,
 navegação, redes sociais, acesso, política de privacidade, termos e crédito da
 consultoria. Na entrada neutra aparece apenas a faixa de copyright e crédito.
+
+**Também feito em 05/10 (versão 2.6.1):** as rotas comerciais foram
+simplificadas para `/segmentos/barbearia`, `/segmentos/salao` e
+`/segmentos/estetica`. As antigas rotas `/para/*` respondem com redirecionamento
+permanente, preservando links que já tenham sido divulgados.
 
 **Falta, na ordem:**
 

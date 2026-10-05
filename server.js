@@ -545,11 +545,22 @@ const server = http.createServer(async (req, res) => {
 
     // A landing segmentada ocupa um namespace próprio porque /<slug> continua
     // reservado ao agendamento público de cada salão.
+    const landingPath = rawPath.length > 1 ? rawPath.replace(/\/+$/, '') : rawPath;
+    const legacyLandingRoutes = new Map([
+        ['/para/barbearias', '/segmentos/barbearia'],
+        ['/para/saloes-de-beleza', '/segmentos/salao'],
+        ['/para/nail-designers', '/segmentos/estetica']
+    ]);
+    if (legacyLandingRoutes.has(landingPath)) {
+        const query = req.url.includes('?') ? req.url.slice(req.url.indexOf('?')) : '';
+        res.writeHead(301, { Location: legacyLandingRoutes.get(landingPath) + query });
+        return res.end();
+    }
+
     const landingRoutes = new Set([
         '/', '/home', '/landing',
-        '/para/barbearias', '/para/saloes-de-beleza', '/para/nail-designers'
+        '/segmentos/barbearia', '/segmentos/salao', '/segmentos/estetica'
     ]);
-    const landingPath = rawPath.length > 1 ? rawPath.replace(/\/+$/, '') : rawPath;
     if (landingRoutes.has(landingPath)) {
         return serveStaticFile(res, path.join(PUBLIC_DIR, 'landing-preview.html'));
     }

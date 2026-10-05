@@ -326,7 +326,7 @@
     <script>
         const SEGMENTOS = {
             barbearia: {
-                route: 'barbearias', theme: 'barbearia', image: 'assets/niche_barbearia.jpg', imageAlt: 'Barbeiro atendendo um cliente em uma barbearia',
+                route: 'barbearia', theme: 'barbearia', image: 'assets/niche_barbearia.jpg', imageAlt: 'Barbeiro atendendo um cliente em uma barbearia',
                 eyebrow: 'Lexion para barbearias', title: 'Mais cortes na agenda.\nMenos pontas soltas.', lead: 'Organize cadeiras, barbeiros, retornos e caixa em um só lugar — sem tirar os olhos de quem está na sua frente.',
                 metric: '14 de 18', metricLabel: 'horários ocupados', nextClient: 'Rafael Mendes', nextService: 'Corte + barba', nextTime: '14:30',
                 problemKicker: 'Feito para a rotina da barbearia', problemTitle: 'Da primeira cadeira à casa cheia.', problemText: 'A Lexion coloca ordem na operação para você atender mais, acompanhar a equipe e transformar bons clientes em clientes frequentes.',
@@ -336,7 +336,7 @@
                 schedule: [['09:00','Carlos Andrade','Corte degradê','Felipe','R$ 55'],['10:30','Matheus Lima','Corte + barba','Carlos','R$ 90'],['13:00','João Vitor','Barba completa','Felipe','R$ 45'],['14:30','Rafael Mendes','Corte + barba','Carlos','R$ 90']]
             },
             salao: {
-                route: 'saloes-de-beleza', theme: 'salao', image: 'assets/niche_salao_feminino.jpg', imageAlt: 'Profissional atendendo uma cliente em um salão de beleza',
+                route: 'salao', theme: 'salao', image: 'assets/niche_salao_feminino.jpg', imageAlt: 'Profissional atendendo uma cliente em um salão de beleza',
                 eyebrow: 'Lexion para salões e estúdios', title: 'Seu salão cheio.\nSua gestão leve.', lead: 'Coordene profissionais, serviços, produtos e clientes com a mesma atenção que você dedica a cada resultado.',
                 metric: '11 de 15', metricLabel: 'horários ocupados', nextClient: 'Camila Rocha', nextService: 'Mechas + finalização', nextTime: '13:00',
                 problemKicker: 'Tudo conversa', problemTitle: 'Uma experiência impecável também nos bastidores.', problemText: 'Do agendamento ao recebimento, sua equipe encontra o que precisa e sua cliente sente que cada detalhe foi lembrado.',
@@ -346,7 +346,7 @@
                 schedule: [['09:00','Fernanda Alves','Coloração','Bianca','R$ 280'],['10:30','Mariana Costa','Corte feminino','Luiza','R$ 120'],['13:00','Camila Rocha','Mechas + finalização','Bianca','R$ 420'],['15:30','Isabela Martins','Escova','Luiza','R$ 80']]
             },
             nail: {
-                route: 'nail-designers', theme: 'nail', image: 'assets/niche_nail_designer_preview.jpg', imageAlt: 'Nail designer atendendo uma cliente em seu estúdio',
+                route: 'estetica', theme: 'nail', image: 'assets/niche_nail_designer_preview.jpg', imageAlt: 'Nail designer atendendo uma cliente em seu estúdio',
                 eyebrow: 'Lexion para Nail & Beauty', title: 'Sua arte encanta.\nSua agenda acompanha.', lead: 'Ganhe tempo para criar, atender e crescer com uma rotina organizada para manicure, nail art, maquiagem e beleza.',
                 metric: '8 de 10', metricLabel: 'horários ocupados', nextClient: 'Larissa Souza', nextService: 'Blindagem + nail art', nextTime: '15:00',
                 problemKicker: 'Do seu jeito de atender', problemTitle: 'Mais autonomia. Menos tempo no WhatsApp.', problemText: 'A Lexion organiza horários, recorrência, materiais e pagamentos para você cuidar da experiência sem carregar o negócio inteiro na memória.',
@@ -415,7 +415,7 @@
 
             if (atualizarUrl) {
                 const emArquivoDePrevia = location.pathname.endsWith('/landing-preview.html');
-                history.pushState({ segmento: chave }, '', emArquivoDePrevia ? `#/para/${segmento.route}` : `/para/${segmento.route}`);
+                history.pushState({ segmento: chave }, '', emArquivoDePrevia ? `#/segmentos/${segmento.route}` : `/segmentos/${segmento.route}`);
             }
             window.scrollTo({ top: 0, behavior: 'instant' });
         }
@@ -435,8 +435,8 @@
         }
 
         function segmentoDaUrl() {
-            const rotaNoCaminho = location.pathname.match(/^\/para\/([^/]+)\/?$/)?.[1];
-            const rota = rotaNoCaminho || location.hash.replace(/^#\/para\//, '');
+            const rotaNoCaminho = location.pathname.match(/^\/segmentos\/([^/]+)\/?$/)?.[1];
+            const rota = rotaNoCaminho || location.hash.replace(/^#\/segmentos\//, '');
             return Object.keys(SEGMENTOS).find(chave => SEGMENTOS[chave].route === rota);
         }
 
@@ -514,7 +514,7 @@
             const destino = document.querySelector(link.getAttribute('href'));
             if (!destino || segmentPage.hidden) return;
 
-            // A modalidade vive no caminho /para/.... A navegação interna só
+            // A modalidade vive no caminho /segmentos/.... A navegação interna só
             // rola a página para não abandonar a experiência escolhida.
             event.preventDefault();
             destino.scrollIntoView({ behavior: 'smooth', block: 'start' });

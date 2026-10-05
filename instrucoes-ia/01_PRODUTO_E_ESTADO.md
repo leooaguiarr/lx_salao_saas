@@ -265,6 +265,13 @@ atendimento com pessoas deram lugar a naturezas-mortas dos três nichos, os
 cards ficaram cerca de 15% mais baixos no desktop e ganharam foco dourado
 discreto, sem mudar as rotas nem o comportamento da escolha.
 
+**Também feito em 05/10 (versão 2.6.0):** quem conclui o cadastro pela landing
+recebe um onboarding de boas-vindas orientado a valor antes do passo a passo
+técnico. A landing também ganhou cabeçalho mais compacto, artigo feminino da
+marca em toda a narrativa e rodapé institucional completo, com contato,
+navegação, redes sociais, acesso, política de privacidade, termos e crédito da
+consultoria. Na entrada neutra aparece apenas a faixa de copyright e crédito.
+
 **Falta, na ordem:**
 
 1. Estrutura interna das telas (tabelas, filtros, modal de venda) ainda é a

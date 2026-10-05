@@ -22,34 +22,34 @@
    link. Por isso são passos numerados, e não mais um bloco de perguntas. */
 const PRIMEIROS_PASSOS = [
     {
-        titulo: 'Cadastre o estabelecimento',
+        titulo: 'Dê identidade ao seu espaço',
         onde: 'Configurações → Dados do Estabelecimento',
-        texto: 'Nome, endereço, telefone e a logo. Aqui também fica o <strong>horário de funcionamento</strong> de cada dia da semana — é ele que decide quais horários o cliente enxerga no link.'
+        texto: 'Comece com nome, endereço, telefone e logo para que cada contato tenha a sua marca. Defina também o <strong>horário de funcionamento</strong>: é ele que transforma sua rotina em horários disponíveis para o cliente.'
     },
     {
-        titulo: 'Cadastre os serviços',
+        titulo: 'Transforme seu talento em uma agenda vendável',
         onde: 'Configurações → Serviços Oferecidos',
-        texto: 'Preço e <strong>duração em minutos</strong>. A duração é o que monta a grade: um corte de 40 minutos ocupa 40 minutos da agenda, e o horário seguinte só aparece depois disso.'
+        texto: 'Cadastre preço e <strong>duração em minutos</strong>. Assim, a Lexion monta uma agenda realista, protege seu tempo e oferece ao cliente somente o que você consegue cumprir.'
     },
     {
-        titulo: 'Cadastre a equipe',
+        titulo: 'Coloque sua equipe para crescer junto',
         onde: 'Configurações → Profissionais',
-        texto: 'Foto e percentual de comissão. Quem estiver marcado como inativo some do link de agendamento e da agenda, sem perder o histórico.'
+        texto: 'Apresente cada profissional com foto e organize as comissões desde o início. Quem estiver inativo sai da agenda pública sem perder o histórico construído.'
     },
     {
-        titulo: 'Cadastre o que você vende',
+        titulo: 'Aumente o valor de cada visita',
         onde: 'Estoque → Produto',
-        texto: 'Bebida da geladeira, pomada, shampoo. Informe a quantidade que tem hoje e a partir de quanto quer ser avisado para repor.'
+        texto: 'Cadastre produtos que complementam o atendimento — bebida, pomada, shampoo ou cuidados para casa. A Lexion acompanha o saldo e avisa antes que uma oportunidade de venda acabe na prateleira.'
     },
     {
-        titulo: 'Abra o caixa no começo do dia',
+        titulo: 'Comece o dia com clareza',
         onde: 'Financeiro → Abrir Caixa',
-        texto: 'Informe o troco inicial. Recebimento em dinheiro com o caixa fechado entra como <strong>pendente</strong>, para o saldo em gaveta não mentir.'
+        texto: 'Informe o troco inicial e deixe cada entrada no lugar certo. Recebimento em dinheiro com o caixa fechado fica <strong>pendente</strong>, para você confiar no saldo que vê.'
     },
     {
-        titulo: 'Divulgue seu link',
+        titulo: 'Deixe sua agenda trabalhar por você',
         onde: 'Menu → Link de Agendamento',
-        texto: 'Copie e cole na bio do Instagram e no WhatsApp. O cliente agenda sozinho, sem criar conta, e o horário cai na sua agenda na hora.'
+        texto: 'Compartilhe seu link na bio do Instagram e no WhatsApp. O cliente escolhe o melhor horário sem criar conta, e você recebe tudo organizado na agenda — mesmo enquanto está atendendo.'
     }
 ];
 
@@ -272,17 +272,37 @@ function renderAjuda(filtro) {
     duvidas.innerHTML = htmlDasDuvidas(grupos, busca);
 }
 
-window.abrirAjuda = function () {
+function abrirGuia(modoOnboarding) {
     const busca = document.getElementById('ajuda-busca');
     if (busca) busca.value = '';
+    const modal = document.getElementById('modal-ajuda');
+    modal?.classList.toggle('modo-onboarding', modoOnboarding);
+    const titulo = document.getElementById('ajuda-modal-titulo');
+    if (titulo) titulo.textContent = modoOnboarding ? 'Bem-vindo à Lexion' : 'Guia rápido';
     renderAjuda('');
     openModal('modal-ajuda');
     // Fecha a gaveta do celular: o guia abriu por cima dela e, ao sair, a
     // pessoa voltaria para o menu aberto em vez da tela em que estava.
     document.getElementById('sidebar')?.classList.remove('show');
+}
+
+window.abrirAjuda = function () {
+    abrirGuia(false);
+};
+
+// Quem acabou de vir da landing ainda não procura uma função: procura a
+// certeza de que fez uma boa escolha. A abertura especial entrega primeiro o
+// resultado prometido e depois mostra a configuração necessária para chegar lá.
+window.abrirOnboarding = function () {
+    abrirGuia(true);
 };
 
 document.getElementById('btn-abrir-ajuda')?.addEventListener('click', abrirAjuda);
+document.getElementById('btn-onboarding-comecar')?.addEventListener('click', function () {
+    closeModal('modal-ajuda');
+    document.querySelector('.menu-item[data-target="configuracoes"]')?.click();
+    requestAnimationFrame(() => document.querySelector('[data-config-tab="empresa"]')?.click());
+});
 document.getElementById('ajuda-busca')?.addEventListener('input', function () {
     renderAjuda(this.value);
 });

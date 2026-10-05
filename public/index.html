@@ -93,17 +93,17 @@
     <!-- Font Awesome Icons -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <!-- CSS Customizado -->
-    <link rel="stylesheet" href="/index.css?v=85">
-    <link rel="stylesheet" href="/estoque.css?v=85">
-    <link rel="stylesheet" href="/ajuda.css?v=85">
-    <link rel="stylesheet" href="/auth.css?v=85">
+    <link rel="stylesheet" href="/index.css?v=86">
+    <link rel="stylesheet" href="/estoque.css?v=86">
+    <link rel="stylesheet" href="/ajuda.css?v=86">
+    <link rel="stylesheet" href="/auth.css?v=86">
     <!-- Evolução de Vendas. Depois dos anteriores de propósito: estes só
          acrescentam as telas novas e não redefinem nada do index.css. -->
-    <link rel="stylesheet" href="/vendas.css?v=85">
-    <link rel="stylesheet" href="/checkout.css?v=85">
-    <link rel="stylesheet" href="/comissoes.css?v=85">
-    <link rel="stylesheet" href="/crediario.css?v=85">
-    <link rel="stylesheet" href="/fidelidade.css?v=85">
+    <link rel="stylesheet" href="/vendas.css?v=86">
+    <link rel="stylesheet" href="/checkout.css?v=86">
+    <link rel="stylesheet" href="/comissoes.css?v=86">
+    <link rel="stylesheet" href="/crediario.css?v=86">
+    <link rel="stylesheet" href="/fidelidade.css?v=86">
 </head>
 <body class="dark-theme">
     <!--
@@ -2268,10 +2268,22 @@
     <div class="modal-backdrop" id="modal-ajuda">
         <div class="modal-dialog glass-effect modal-ajuda-dialog">
             <div class="modal-header">
-                <h4 class="modal-title"><i class="fa-regular fa-circle-question"></i> Guia rápido</h4>
+                <h4 class="modal-title"><i class="fa-regular fa-circle-question"></i> <span id="ajuda-modal-titulo">Guia rápido</span></h4>
                 <button class="modal-close" data-close-modal="modal-ajuda">&times;</button>
             </div>
             <div class="modal-body">
+                <section class="ajuda-boas-vindas" aria-labelledby="ajuda-boas-vindas-titulo">
+                    <span class="ajuda-boas-vindas-kicker">Sua nova rotina começa aqui</span>
+                    <h5 id="ajuda-boas-vindas-titulo">Você cuida da experiência.<br><em>A Lexion organiza o resto.</em></h5>
+                    <p>Em poucos minutos, seu espaço estará pronto para receber agendamentos, acompanhar clientes e crescer com mais tranquilidade.</p>
+                    <div class="ajuda-resultados" aria-label="Resultados que você vai alcançar">
+                        <span><i class="fa-regular fa-calendar-check"></i> Agenda aberta 24h</span>
+                        <span><i class="fa-solid fa-rotate"></i> Clientes que voltam</span>
+                        <span><i class="fa-solid fa-chart-line"></i> Negócio sob controle</span>
+                    </div>
+                    <button type="button" class="btn btn-primary" id="btn-onboarding-comecar">Preparar meu espaço</button>
+                </section>
+
                 <div class="ajuda-busca-caixa">
                     <i class="fa-solid fa-magnifying-glass"></i>
                     <input type="search" id="ajuda-busca" class="form-control"
@@ -2280,10 +2292,10 @@
                 </div>
 
                 <section id="ajuda-secao-passos">
-                    <h5 class="ajuda-secao-titulo">Primeiros passos</h5>
+                    <h5 class="ajuda-secao-titulo">Seu caminho para o primeiro agendamento</h5>
                     <p class="ajuda-secao-descricao" id="ajuda-passos-descricao">
-                        A ordem importa: serviço sem duração não monta a grade, e grade
-                        sem horário de funcionamento não abre o link.
+                        Cada etapa libera uma parte da experiência. Ao final, sua agenda
+                        estará pronta para trabalhar por você.
                     </p>
                     <div id="ajuda-passos"></div>
                 </section>
@@ -3193,36 +3205,36 @@
     <!-- Estes três também levam versão: o servidor manda cache de um dia para
          arquivos estáticos, e sem o ?v= uma correção aqui só chegaria ao
          navegador de quem já usou o sistema no dia seguinte. -->
-    <script src="/config.js?v=85"></script>
-    <script src="/theme.js?v=85"></script>
-    <script src="/saas-plan.js?v=85"></script>
-    <script src="/api.js?v=85"></script>
+    <script src="/config.js?v=86"></script>
+    <script src="/theme.js?v=86"></script>
+    <script src="/saas-plan.js?v=86"></script>
+    <script src="/api.js?v=86"></script>
 
     <!-- JavaScript Principal -->
-    <script src="/app.js?v=85"></script>
+    <script src="/app.js?v=86"></script>
 
     <!-- Funcionalidades acrescentadas depois. A ordem importa: elas leem o
          estado global e as funções de cálculo que app.js define. -->
-    <script src="/estoque.js?v=85"></script>
-    <script src="/encaixe.js?v=85"></script>
-    <script src="/ajuda.js?v=85"></script>
+    <script src="/estoque.js?v=86"></script>
+    <script src="/encaixe.js?v=86"></script>
+    <script src="/ajuda.js?v=86"></script>
 
     <!-- Evolução de Vendas (banco: docs/14 a 28). A ordem entre eles TAMBÉM
          importa, e não é a mesma coisa que a ordem acima: `venda-calculo`
          precisa das constantes de `vendas-base`, `checkout` precisa do cálculo,
          e `recibo` é chamado no fim do checkout. Portados do projeto de origem
          (`lexion_salao`), onde nasceram como 22- a 28- e foram testados. -->
-    <script src="/vendas-base.js?v=85"></script>
-    <script src="/venda-calculo.js?v=85"></script>
-    <script src="/checkout.js?v=85"></script>
-    <script src="/comissoes.js?v=85"></script>
-    <script src="/crediario.js?v=85"></script>
-    <script src="/fidelidade.js?v=85"></script>
-    <script src="/recibo.js?v=85"></script>
+    <script src="/vendas-base.js?v=86"></script>
+    <script src="/venda-calculo.js?v=86"></script>
+    <script src="/checkout.js?v=86"></script>
+    <script src="/comissoes.js?v=86"></script>
+    <script src="/crediario.js?v=86"></script>
+    <script src="/fidelidade.js?v=86"></script>
+    <script src="/recibo.js?v=86"></script>
 
     <!-- Barra superior: lê o estado e os cálculos de todos os anteriores
          (clientes, estoque mínimo, crediário atrasado), por isso vem por último. -->
-    <script src="/topbar.js?v=85"></script>
-    <script src="/pwa.js?v=85"></script>
+    <script src="/topbar.js?v=86"></script>
+    <script src="/pwa.js?v=86"></script>
 </body>
 </html>

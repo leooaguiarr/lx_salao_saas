@@ -37,7 +37,7 @@ const STATE_KEYS = {
 const LOGO_PADRAO = '/assets/logo_lexion.png';
 
 // Versão exibida no rodapé do login.
-const VERSAO_DO_SISTEMA = '2.5.0';
+const VERSAO_DO_SISTEMA = '2.6.0';
 
 let currentSelectedDate = new Date();
 
@@ -5975,6 +5975,9 @@ setTimeout(esconderCarregamentoInicial, 15000);
 
 // --- INITIALIZER ON LOAD ---
 window.addEventListener('DOMContentLoaded', async () => {
+    const urlParams = new URLSearchParams(window.location.search);
+    const cadastroRecemCriado = urlParams.get('registered') === '1';
+
     try {
         // 1. Inicializa Conexão Supabase (credenciais fixas no api.js)
         await DataService.init();
@@ -6009,7 +6012,6 @@ window.addEventListener('DOMContentLoaded', async () => {
     }
 
     // Se ainda não estiver logado, preenche o email se veio por URL
-    const urlParams = new URLSearchParams(window.location.search);
     const emailParam = urlParams.get('email');
     if (emailParam && document.getElementById('auth-email')) {
         document.getElementById('auth-email').value = emailParam;
@@ -6084,6 +6086,17 @@ window.addEventListener('DOMContentLoaded', async () => {
 
     // O painel está montado e com os números reais na tela: pode aparecer.
     esconderCarregamentoInicial();
+
+    // O anúncio e a landing fizeram uma promessa antes do cadastro. Na primeira
+    // entrada, o painel continua essa história antes de virar manual de uso.
+    // A URL é limpa para o onboarding não reaparecer quando a pessoa atualizar.
+    if (cadastroRecemCriado && DataService.isAuthenticated() && typeof abrirOnboarding === 'function') {
+        urlParams.delete('registered');
+        urlParams.delete('email');
+        const consulta = urlParams.toString();
+        history.replaceState(history.state, '', `${location.pathname}${consulta ? `?${consulta}` : ''}${location.hash}`);
+        setTimeout(abrirOnboarding, 450);
+    }
 
     // Login Form Submit (dentro do DOMContentLoaded para garantir que o form exista)
     const formLogin = document.getElementById('form-login');

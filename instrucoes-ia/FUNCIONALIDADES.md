@@ -564,9 +564,15 @@ O sistema prepara mensagens e abre a conversa no WhatsApp, reduzindo o trabalho 
 
 O sistema possui um guia de ajuda integrado, aberto pelo botão de interrogação no rodapé da barra lateral.
 
+Na primeira entrada após o cadastro pela landing, o guia abre automaticamente
+como uma experiência de boas-vindas: primeiro reforça os resultados que o
+negócio pode alcançar e depois conduz a configuração. A URL é limpa para que
+essa apresentação não reapareça em todo login.
+
 ### Conteúdo do guia
 
-- Sequência de primeiros passos para configurar e começar a usar o sistema.
+- Sequência orientada a resultados para preparar a marca, liberar a agenda
+  online, estimular o retorno de clientes e organizar o negócio.
 - Dúvidas frequentes sobre agenda e atendimento.
 - Dúvidas sobre dinheiro e caixa.
 - Orientações sobre produtos e estoque.

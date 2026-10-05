@@ -79,6 +79,12 @@ Profissional". Conta de teste do Solo: `leooaguiarr+solo@gmail.com`, salão
   DELETED, REFUNDED, CREDIT_CARD_CAPTURE_REFUSED, REPROVED_BY_RISK_ANALYSIS,
   CHARGEBACK_REQUESTED — **sem** AUTHORIZED, que a função trata como pago),
   migração 08 a confirmar e um pagamento real de ponta a ponta com estorno.
+  **Feito em 05/10:** chave de produção, webhook e token no ar; Coolify com
+  healthcheck em `/api/health`. Checkout real no cartão gerou a assinatura na
+  conta principal, e `PAYMENT_CREATED`/`PAYMENT_DELETED` chegaram com
+  `processed = true` em `asaas_webhooks`. O Leonardo **não pagou** (removeu a
+  cobrança): a ativação por pagamento confirmado **não foi vista em produção**
+  — conferir no primeiro cliente real (`business_info.status = active`).
   Checkout com **cartão recorrente** (fatura do Asaas, cartão nunca passa pelo
   servidor) e Pix, versão 2.8.0. Estorno e chargeback só ficam registrados:
   não bloqueiam o salão sozinhos.

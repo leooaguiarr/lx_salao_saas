@@ -83,9 +83,7 @@ async function createSubscription({
     customerId,
     value,
     billingType = 'UNDEFINED', // 'PIX', 'CREDIT_CARD', 'BOLETO', 'UNDEFINED'
-    planName = 'Plano SaaS',
-    creditCard = null,
-    creditCardHolderInfo = null
+    planName = 'Plano SaaS'
 }) {
     // Calcula próxima data de vencimento (hoje)
     const today = new Date();
@@ -100,11 +98,10 @@ async function createSubscription({
         description: `Assinatura mensal: ${planName} - Lexion Salão SaaS`
     };
 
-    // Se for cartão de crédito transparente
-    if (billingType === 'CREDIT_CARD' && creditCard) {
-        payload.creditCard = creditCard;
-        payload.creditCardHolderInfo = creditCardHolderInfo;
-    }
+    // Cartão: o número NUNCA vem para cá. Sem os dados do cartão, o Asaas cria
+    // a cobrança com uma fatura (invoiceUrl) onde o próprio cliente digita o
+    // cartão; o Asaas guarda e cobra sozinho nos meses seguintes. Assim a
+    // Lexion fica fora do escopo de PCI.
 
     const subscription = await asaasRequest('/subscriptions', 'POST', payload);
     return subscription;
@@ -128,6 +125,14 @@ async function getPixQrCode(paymentId) {
     return await asaasRequest(`/payments/${paymentId}/pixQrCode`);
 }
 
+/**
+ * Cancela uma assinatura no Asaas. O Asaas remove junto as cobranças ainda
+ * não pagas dela, e nenhuma cobrança nova é gerada.
+ */
+async function cancelSubscription(subscriptionId) {
+    return await asaasRequest(`/subscriptions/${encodeURIComponent(subscriptionId)}`, 'DELETE');
+}
+
 module.exports = {
     ASAAS_ENV,
     ASAAS_API_URL,
@@ -135,5 +140,6 @@ module.exports = {
     createOrFindCustomer,
     createSubscription,
     getSubscriptionFirstPayment,
-    getPixQrCode
+    getPixQrCode,
+    cancelSubscription
 };

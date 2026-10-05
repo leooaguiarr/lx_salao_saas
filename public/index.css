@@ -927,6 +927,57 @@ button, input, select, textarea {
     font-size: 9px;
 }
 
+/* Escolha da forma de pagamento da assinatura (saas-plan.js). O rádio fica
+   escondido: o cartão inteiro é o alvo do toque, e a borda mostra o escolhido. */
+.checkout-formas {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+}
+
+.checkout-forma {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    padding: 12px;
+    background: var(--bg-primary);
+    border: 1px solid var(--border-strong);
+    border-radius: 10px;
+    cursor: pointer;
+}
+
+.checkout-forma input {
+    position: absolute;
+    opacity: 0;
+    pointer-events: none;
+}
+
+.checkout-forma:has(input:checked) {
+    border-color: var(--primary);
+    background: var(--primary-soft);
+}
+
+.checkout-forma:has(input:focus-visible) {
+    outline: 2px solid var(--primary);
+    outline-offset: 2px;
+}
+
+.checkout-forma-nome {
+    font-weight: 600;
+    font-size: 0.88rem;
+    color: var(--text-main);
+}
+
+.checkout-forma-nome i {
+    color: var(--primary);
+    margin-right: 4px;
+}
+
+.checkout-forma-desc {
+    font-size: 0.76rem;
+    color: var(--text-muted);
+}
+
 /* Nos botões (sub-abas de Configurações, atalhos) o margin-left:auto do menu
    empurraria o selo para longe do texto. */
 .btn .plan-lock-badge,

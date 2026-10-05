@@ -258,13 +258,23 @@ const SaaSPlanManager = {
                                 </div>
                             </div>
 
-                            <div style="margin-bottom: 20px; background: var(--primary-soft); border: 1px solid var(--primary-edge); border-radius: 10px; padding: 12px;">
-                                <div style="display: flex; align-items: center; gap: 8px; font-weight: 600; font-size: 0.88rem; color: var(--primary); margin-bottom: 4px;">
-                                    <i class="fa-brands fa-pix"></i> Pagamento Recorrente via Pix
+                            <!-- Forma de pagamento. O cartão é digitado na fatura
+                                 do próprio Asaas, nunca aqui (ver server.js). -->
+                            <div style="margin-bottom: 20px;">
+                                <span style="display: block; font-size: 0.82rem; font-weight: 600; margin-bottom: 6px; color: var(--text-muted);">Forma de pagamento</span>
+                                <div class="checkout-formas">
+                                    <label class="checkout-forma">
+                                        <input type="radio" name="checkout-forma" value="CREDIT_CARD" checked onchange="SaaSPlanManager.atualizarFormaDePagamento()">
+                                        <span class="checkout-forma-nome"><i class="fa-regular fa-credit-card"></i> Cartão de crédito</span>
+                                        <span class="checkout-forma-desc">Cobrado sozinho todo mês</span>
+                                    </label>
+                                    <label class="checkout-forma">
+                                        <input type="radio" name="checkout-forma" value="PIX" onchange="SaaSPlanManager.atualizarFormaDePagamento()">
+                                        <span class="checkout-forma-nome"><i class="fa-brands fa-pix"></i> Pix</span>
+                                        <span class="checkout-forma-desc">Um QR Code a cada mês</span>
+                                    </label>
                                 </div>
-                                <div style="font-size: 0.8rem; color: var(--text-muted); line-height: 1.4;">
-                                    Será gerado um QR Code Pix instantâneo. A confirmação do Asaas ativa sua assinatura automaticamente sem intervenção manual.
-                                </div>
+                                <p id="checkout-forma-ajuda" style="font-size: 0.8rem; color: var(--text-muted); line-height: 1.4; margin: 8px 0 0;"></p>
                             </div>
 
                             <div id="checkout-error" style="display: none; background: var(--danger-light); border: 1px solid var(--danger); color: var(--danger); padding: 10px 14px; border-radius: 8px; font-size: 0.85rem; margin-bottom: 14px;">
@@ -272,9 +282,28 @@ const SaaSPlanManager = {
                             </div>
 
                             <button type="submit" id="btn-submit-checkout" style="width: 100%; padding: 12px; background: var(--primary-gradient); color: var(--text-accent-gold); font-weight: 700; border: none; border-radius: 8px; font-size: 0.95rem; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 8px;">
-                                <i class="fa-solid fa-lock"></i> Gerar Assinatura & Pix Asaas
+                                <i class="fa-solid fa-lock"></i> <span id="btn-submit-checkout-texto">Continuar para o pagamento</span>
                             </button>
                         </form>
+                    </div>
+
+                    <!-- Cartão: o cliente termina na fatura do Asaas. É um link,
+                         e não um window.open, porque a abertura vem depois de
+                         uma chamada ao servidor e o navegador bloquearia o pop-up. -->
+                    <div id="checkout-card-step" style="display: none; text-align: center;">
+                        <div style="width: 50px; height: 50px; border-radius: 50%; background: var(--primary-light); color: var(--primary); display: flex; align-items: center; justify-content: center; font-size: 1.4rem; margin: 0 auto 12px;">
+                            <i class="fa-regular fa-credit-card"></i>
+                        </div>
+                        <h4 style="font-size: 1.2rem; font-weight: 700; margin-bottom: 4px;">Falta só o cartão</h4>
+                        <p style="font-size: 0.85rem; color: var(--text-muted); margin-bottom: 18px; line-height: 1.5;">
+                            Cadastre o cartão na página segura do Asaas. A cobrança passa a ser automática todo mês, e sua assinatura é ativada assim que o pagamento for aprovado.
+                        </p>
+                        <a id="checkout-card-link" href="#" target="_blank" rel="noopener" style="display: flex; align-items: center; justify-content: center; gap: 8px; width: 100%; padding: 12px; background: var(--primary-gradient); color: var(--text-accent-gold); font-weight: 700; border-radius: 8px; font-size: 0.95rem; text-decoration: none; margin-bottom: 10px;">
+                            <i class="fa-solid fa-lock"></i> Abrir página de pagamento
+                        </a>
+                        <button type="button" onclick="const m = document.getElementById('modal-asaas-checkout'); if (m) { m.classList.remove('show'); m.classList.remove('active'); }" style="background: var(--surface-strong); border: 1px solid var(--border-strong); color: var(--text-main); padding: 10px 20px; border-radius: 8px; cursor: pointer; font-size: 0.9rem; font-weight: 600;">
+                            Fechar e continuar usando
+                        </button>
                     </div>
 
                     <div id="checkout-pix-step" style="display: none; text-align: center;">
@@ -320,10 +349,32 @@ const SaaSPlanManager = {
 
         document.getElementById('checkout-form-step').style.display = 'block';
         document.getElementById('checkout-pix-step').style.display = 'none';
+        document.getElementById('checkout-card-step').style.display = 'none';
         document.getElementById('checkout-error').style.display = 'none';
+        this.atualizarFormaDePagamento();
 
         modal.classList.add('show');
         modal.classList.add('active');
+    },
+
+    formaDePagamentoEscolhida() {
+        const marcada = document.querySelector('input[name="checkout-forma"]:checked');
+        return marcada && marcada.value === 'PIX' ? 'PIX' : 'CREDIT_CARD';
+    },
+
+    // Texto de apoio e do botão acompanham a forma escolhida: o cliente
+    // precisa saber, antes de clicar, se vai ver um QR Code ou uma página
+    // para digitar o cartão.
+    atualizarFormaDePagamento() {
+        const pix = this.formaDePagamentoEscolhida() === 'PIX';
+        const ajuda = document.getElementById('checkout-forma-ajuda');
+        if (ajuda) {
+            ajuda.textContent = pix
+                ? 'Geramos o QR Code agora. Nos meses seguintes, o Asaas manda a cobrança Pix por e-mail e SMS.'
+                : 'Você digita o cartão na página segura do Asaas. Os dados do cartão não passam pela Lexion.';
+        }
+        const texto = document.getElementById('btn-submit-checkout-texto');
+        if (texto) texto.textContent = pix ? 'Gerar Pix da assinatura' : 'Continuar para o pagamento';
     },
 
     async processCheckout(e) {
@@ -332,12 +383,14 @@ const SaaSPlanManager = {
         const name = document.getElementById('checkout-name').value;
         const cpf = document.getElementById('checkout-cpf').value;
         const phone = document.getElementById('checkout-phone').value;
+        const forma = this.formaDePagamentoEscolhida();
         const btn = document.getElementById('btn-submit-checkout');
         const errBox = document.getElementById('checkout-error');
+        const textoOriginal = btn.innerHTML;
 
         try {
             btn.disabled = true;
-            btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Gerando Cobrança Asaas...';
+            btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Preparando sua assinatura...';
             errBox.style.display = 'none';
 
             // O servidor descobre o salão pelo token do login. Mandar o id do
@@ -359,13 +412,26 @@ const SaaSPlanManager = {
                     name: name,
                     cpfCnpj: cpf.replace(/\D/g, ''),
                     phone: phone.replace(/\D/g, ''),
-                    billingType: 'PIX'
+                    billingType: forma
                 })
             });
 
             const result = await response.json();
             if (!response.ok || !result.ok) {
                 throw new Error(result.error || 'Erro ao gerar assinatura no Asaas.');
+            }
+
+            // Cartão: segue para a fatura do Asaas, onde o cartão é digitado.
+            if (forma === 'CREDIT_CARD') {
+                if (!result.invoiceUrl) {
+                    throw new Error('O Asaas não devolveu a página de pagamento. Tente de novo em instantes.');
+                }
+                document.getElementById('checkout-card-link').href = result.invoiceUrl;
+                document.getElementById('checkout-form-step').style.display = 'none';
+                document.getElementById('checkout-card-step').style.display = 'block';
+                btn.disabled = false;
+                btn.innerHTML = textoOriginal;
+                return;
             }
 
             // Exibe passo do Pix
@@ -388,7 +454,7 @@ const SaaSPlanManager = {
             errBox.style.display = 'block';
             errBox.querySelector('span').textContent = err.message || 'Falha ao processar assinatura.';
             btn.disabled = false;
-            btn.innerHTML = '<i class="fa-solid fa-lock"></i> Gerar Assinatura & Pix Asaas';
+            btn.innerHTML = textoOriginal;
         }
     },
 

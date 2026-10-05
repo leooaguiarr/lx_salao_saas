@@ -102,6 +102,43 @@ async function salaoDoUsuario(userId) {
     return salao.length ? { salonId: userId, papel: 'owner' } : null;
 }
 
+// Cancela no Asaas as assinaturas do salão nos status pedidos, menos a que
+// deve ficar. Existe porque CADA checkout cria uma assinatura nova: sem isto,
+// gerar o Pix duas vezes, ou trocar de plano, deixava duas assinaturas
+// cobrando todo mês. Só marca CANCELLED no banco o que o Asaas confirmou ter
+// cancelado — uma falha de rede não pode esconder uma assinatura viva.
+async function cancelarOutrasAssinaturas(salonId, status, manterAsaasId) {
+    const cabecalhos = { 'apikey': SUPABASE_KEY, 'Authorization': `Bearer ${SUPABASE_KEY}` };
+    const filtroStatus = status.map(s => `"${s}"`).join(',');
+    const busca = await fetch(
+        `${SUPABASE_URL}/rest/v1/subscriptions?salon_id=eq.${encodeURIComponent(salonId)}` +
+        `&status=in.(${filtroStatus})&select=asaas_subscription_id`,
+        { headers: cabecalhos });
+    if (!busca.ok) throw new Error(`subscriptions HTTP ${busca.status}`);
+
+    const alvos = (await busca.json())
+        .map(linha => linha.asaas_subscription_id)
+        .filter(id => id && id !== manterAsaasId);
+
+    for (const asaasId of alvos) {
+        try {
+            await asaasService.cancelSubscription(asaasId);
+        } catch (err) {
+            // Já removida no painel do Asaas: o objetivo foi atingido.
+            if (!/não encontrad|not found|removid/i.test(err.message || '')) {
+                console.error(`[Assinatura] Não consegui cancelar ${asaasId} no Asaas:`, err.message);
+                continue;
+            }
+        }
+        await fetch(`${SUPABASE_URL}/rest/v1/subscriptions?asaas_subscription_id=eq.${encodeURIComponent(asaasId)}`, {
+            method: 'PATCH',
+            headers: { ...cabecalhos, 'Content-Type': 'application/json', 'Prefer': 'return=minimal' },
+            body: JSON.stringify({ status: 'CANCELLED', canceled_at: new Date().toISOString(), updated_at: new Date().toISOString() })
+        });
+        console.log(`[Assinatura] ${asaasId} cancelada (salão ${salonId}).`);
+    }
+}
+
 // Helper para ler corpo JSON de requisições POST
 function parseJsonBody(req) {
     return new Promise((resolve, reject) => {
@@ -354,7 +391,12 @@ const server = http.createServer(async (req, res) => {
                 const email = usuario.email;
 
                 const data = await parseJsonBody(req);
-                const { planId, name, cpfCnpj, phone, billingType, creditCard, creditCardHolderInfo } = data;
+                const { planId, name, cpfCnpj, phone } = data;
+                // Só Pix ou cartão. O cartão é digitado na fatura do PRÓPRIO
+                // Asaas (invoiceUrl), nunca aqui: dado de cartão passando pelo
+                // servidor da Lexion traria a obrigação de PCI e o risco de
+                // vazamento. Por isso campos de cartão no corpo são ignorados.
+                const billingType = data.billingType === 'CREDIT_CARD' ? 'CREDIT_CARD' : 'PIX';
 
                 if (!planId || !name || !email) {
                     res.writeHead(400);
@@ -379,21 +421,33 @@ const server = http.createServer(async (req, res) => {
                 // 1. Cria ou busca cliente no Asaas
                 const customer = await asaasService.createOrFindCustomer({ name, email, cpfCnpj, phone });
 
-                // 2. Cria a assinatura mensal no Asaas
+                // 2. Assinatura anterior que nunca foi paga (TRIAL) sai antes
+                //    de criar a nova: gerar o checkout de novo, trocar de plano
+                //    ou de Pix para cartão não pode deixar duas cobranças
+                //    abertas. A ACTIVE fica até a nova ser paga (webhook).
+                try {
+                    await cancelarOutrasAssinaturas(salonId, ['TRIAL'], null);
+                } catch (limpezaErr) {
+                    console.error('[Checkout] Falha ao cancelar assinaturas pendentes:', limpezaErr.message);
+                    res.writeHead(500);
+                    res.end(JSON.stringify({ ok: false, error: 'Não foi possível preparar a assinatura. Tente de novo em instantes.' }));
+                    return;
+                }
+
+                // 3. Cria a assinatura mensal no Asaas
                 const subscription = await asaasService.createSubscription({
                     customerId: customer.id,
                     value: selectedPlan.price,
-                    billingType: billingType || 'PIX',
-                    planName: selectedPlan.name,
-                    creditCard,
-                    creditCardHolderInfo
+                    billingType,
+                    planName: selectedPlan.name
                 });
 
-                // 3. Busca a 1ª cobrança para obter dados de pagamento (Pix/Boleto)
+                // 4. Busca a 1ª cobrança: no Pix, para o QR Code; no cartão,
+                //    para a fatura (invoiceUrl) onde o cliente digita o cartão.
                 const firstPayment = await asaasService.getSubscriptionFirstPayment(subscription.id);
                 let pixData = null;
 
-                if (firstPayment && (billingType === 'PIX' || firstPayment.billingType === 'PIX')) {
+                if (firstPayment && billingType === 'PIX') {
                     try {
                         pixData = await asaasService.getPixQrCode(firstPayment.id);
                     } catch (pixErr) {
@@ -401,7 +455,7 @@ const server = http.createServer(async (req, res) => {
                     }
                 }
 
-                // 4. Salva no Supabase (business_info e subscriptions)
+                // 5. Salva no Supabase (business_info e subscriptions)
                 //
                 // O plan_id do salão NÃO muda aqui: gerar a cobrança não é
                 // pagar. O plano escolhido fica em subscriptions.plan_id, e a
@@ -462,8 +516,10 @@ const server = http.createServer(async (req, res) => {
                     ok: true,
                     customerId: customer.id,
                     subscriptionId: subscription.id,
+                    billingType,
                     payment: firstPayment,
-                    pix: pixData
+                    pix: pixData,
+                    invoiceUrl: firstPayment ? firstPayment.invoiceUrl : null
                 }));
             } catch (err) {
                 console.error('Erro em create-subscription:', err);
@@ -520,6 +576,19 @@ const server = http.createServer(async (req, res) => {
                         res.writeHead(500);
                         res.end(JSON.stringify({ received: false, error: 'Falha ao registrar o evento' }));
                         return;
+                    }
+
+                    // Pagou a assinatura nova: as outras do salão (o plano
+                    // antigo numa troca, um checkout esquecido) param de cobrar.
+                    // Falha aqui NÃO vira 500: o pagamento já foi registrado, e
+                    // o Asaas reenviaria o evento à toa. Fica no log.
+                    const pagou = ['PAYMENT_CONFIRMED', 'PAYMENT_RECEIVED'].includes(webhookData.event);
+                    if (pagou && webhookData.payment.subscription && rpcResult && rpcResult.ok && rpcResult.salon_id) {
+                        try {
+                            await cancelarOutrasAssinaturas(rpcResult.salon_id, ['TRIAL', 'ACTIVE', 'OVERDUE'], webhookData.payment.subscription);
+                        } catch (limpezaErr) {
+                            console.error('[Asaas Webhook] Pagamento registrado, mas falhou o cancelamento das outras assinaturas:', limpezaErr.message);
+                        }
                     }
                 }
 

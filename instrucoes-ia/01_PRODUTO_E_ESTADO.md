@@ -71,12 +71,17 @@ Profissional". Conta de teste do Solo: `leooaguiarr+solo@gmail.com`, salão
 - **Conferir a configuração sem abrir o Coolify**: `GET /api/health` diz
   `webhookProtegido` (token configurado?) e `chaveSupabase` (tem que ser
   `service_role`). Nunca mostra o valor de segredo nenhum.
-- **Asaas em SANDBOX, de propósito** (decidido em 21/09/2026). O sistema
-  ainda está em fase de testes da API de cobrança: `ASAAS_ENV=sandbox` e chave
-  `$aact_hmlg_` no Coolify, webhook com token cadastrado na conta sandbox.
-  Nenhuma cobrança é real. Confira o ambiente em vigor pelo campo `asaasEnv`
-  do `/api/health`. **A volta para produção faz parte do *Checklist de
-  lançamento*, mais abaixo neste arquivo.**
+- **Asaas indo para PRODUÇÃO (05/10/2026), decisão do Leonardo: cobrar de
+  verdade.** O `/api/health` já dizia `asaasEnv: production`. Chave e webhook
+  da sandbox foram removidos na conta sandbox. Em andamento: chave
+  `$aact_prod_` e `ASAAS_WEBHOOK_TOKEN` no Coolify, webhook na conta principal
+  (v3, envio **sequencial**, eventos CREATED, CONFIRMED, RECEIVED, OVERDUE,
+  DELETED, REFUNDED, CREDIT_CARD_CAPTURE_REFUSED, REPROVED_BY_RISK_ANALYSIS,
+  CHARGEBACK_REQUESTED — **sem** AUTHORIZED, que a função trata como pago),
+  migração 08 a confirmar e um pagamento real de ponta a ponta com estorno.
+  Checkout com **cartão recorrente** (fatura do Asaas, cartão nunca passa pelo
+  servidor) e Pix, versão 2.8.0. Estorno e chargeback só ficam registrados:
+  não bloqueiam o salão sozinhos.
 
 ## Estado atual (24/09/2026)
 

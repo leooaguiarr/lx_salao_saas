@@ -927,6 +927,13 @@ button, input, select, textarea {
     font-size: 9px;
 }
 
+/* Nos botões (sub-abas de Configurações, atalhos) o margin-left:auto do menu
+   empurraria o selo para longe do texto. */
+.btn .plan-lock-badge,
+.inicio-link .plan-lock-badge {
+    margin-left: 6px;
+}
+
 .sidebar-footer {
     padding: 12px 16px;
     border-top: 1px solid var(--border-color);

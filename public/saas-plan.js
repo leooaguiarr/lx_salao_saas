@@ -66,41 +66,44 @@ const SaaSPlanManager = {
      * Aplica visualmente as travas na barra lateral / abas do sistema
      */
     applyPlanRestrictions() {
-        const plan = this.getPlan();
+        // Trava TODOS os caminhos para a tela, não só o item do menu: a
+        // sub-aba Fidelidade de Configurações e o atalho de estoque do Início
+        // levavam à tela bloqueada sem passar pelo cadeado.
+        const travas = [
+            { aba: 'estoque', recurso: 'inventory', nome: 'Estoque', plano: 'equipe_4' },
+            { aba: 'fidelidade', recurso: 'loyalty', nome: 'Clube de Benefícios', plano: 'ilimitado' },
+            { aba: 'crediario', recurso: 'credit', nome: 'Crediário', plano: 'ilimitado' }
+        ];
 
-        // Trava da aba Estoque
-        const tabEstoque = document.querySelector('[data-target="estoque"], [data-tab="estoque"]');
-        if (tabEstoque) {
-            if (!this.canAccess('inventory')) {
-                this.decorateLockedTab(tabEstoque, 'Estoque', 'equipe_4');
-            } else {
-                this.removeLockFromTab(tabEstoque);
-            }
-        }
+        travas.forEach(({ aba, recurso, nome, plano }) => {
+            const seletor = `[data-target="${aba}"], [data-tab="${aba}"], [data-config-tab="${aba}"]`;
+            document.querySelectorAll(seletor).forEach(el => {
+                if (!this.canAccess(recurso)) {
+                    this.decorateLockedTab(el, nome, plano);
+                } else {
+                    this.removeLockFromTab(el);
+                }
+            });
+        });
+    },
 
-        // Trava da aba Fidelidade
-        const tabFidelidade = document.querySelector('[data-target="fidelidade"], [data-tab="fidelidade"]');
-        if (tabFidelidade) {
-            if (!this.canAccess('loyalty')) {
-                this.decorateLockedTab(tabFidelidade, 'Clube de Benefícios', 'ilimitado');
-            } else {
-                this.removeLockFromTab(tabFidelidade);
-            }
-        }
-
-        // Trava da aba Crediário
-        const tabCrediario = document.querySelector('[data-target="crediario"], [data-tab="crediario"]');
-        if (tabCrediario) {
-            if (!this.canAccess('credit')) {
-                this.decorateLockedTab(tabCrediario, 'Crediário', 'ilimitado');
-            } else {
-                this.removeLockFromTab(tabCrediario);
-            }
-        }
+    /* Botão "Adicionar Profissional" com cadeado quando o plano já está no
+       limite. Antes o limite só aparecia DEPOIS de preencher o formulário
+       inteiro e clicar em Salvar. Chamado a cada renderProfissionaisGrid(),
+       porque ativar ou desativar um profissional muda a contagem. */
+    atualizarBotaoAdicionarProfissional(profissionais) {
+        const botao = document.getElementById('btn-add-professional');
+        if (!botao) return;
+        const ativos = (profissionais || []).filter(p => p.active !== false).length;
+        const noLimite = ativos >= this.getMaxProfessionals();
+        botao.classList.toggle('btn-no-limite-do-plano', noLimite);
+        const icone = botao.querySelector('i');
+        if (icone) icone.className = noLimite ? 'fa-solid fa-lock' : 'fa-solid fa-plus';
+        botao.title = noLimite ? 'Disponível em um plano maior' : '';
     },
 
     decorateLockedTab(tabElement, featureName, requiredPlan) {
-        if (tabElement.dataset.isLocked) return;
+        if (tabElement.dataset.isLocked === 'true') return;
 
         tabElement.dataset.isLocked = 'true';
         let badge = tabElement.querySelector('.plan-lock-badge');
@@ -113,7 +116,10 @@ const SaaSPlanManager = {
             tabElement.appendChild(badge);
         }
 
-        // Intercepta clique para mostrar modal de upgrade
+        // Intercepta clique para mostrar modal de upgrade. Um listener só por
+        // elemento: travar, destravar e travar de novo não duplica o modal.
+        if (tabElement.dataset.lockListener) return;
+        tabElement.dataset.lockListener = 'true';
         tabElement.addEventListener('click', (e) => {
             if (tabElement.dataset.isLocked === 'true') {
                 e.stopImmediatePropagation();
@@ -136,6 +142,15 @@ const SaaSPlanManager = {
         const max = this.getMaxProfessionals();
         if (currentCount >= max) {
             const nextPlan = max === 1 ? 'equipe_4' : 'ilimitado';
+            if (this.ehSolo()) {
+                // No Solo não é "limite atingido": é outro jeito de trabalhar.
+                this.showUpgradeModal(
+                    'sua equipe',
+                    nextPlan,
+                    'O plano Solo é feito para quem atende sozinho. Para cadastrar outros profissionais, com agenda e comissão de cada um, passe para o Plano Equipe.'
+                );
+                return false;
+            }
             this.showUpgradeModal(
                 `Cadastro de Profissionais (Limite atingido: ${max})`,
                 nextPlan,

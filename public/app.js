@@ -37,7 +37,7 @@ const STATE_KEYS = {
 const LOGO_PADRAO = '/assets/logo_lexion.png';
 
 // Versão exibida no rodapé do login.
-const VERSAO_DO_SISTEMA = '2.6.4';
+const VERSAO_DO_SISTEMA = '2.6.5';
 
 let currentSelectedDate = new Date();
 
@@ -156,6 +156,10 @@ async function loadData(escopo = 'completo') {
         }
         if (window.SaaSPlanManager) {
             window.SaaSPlanManager.init(data.businessInfo);
+            // A grade de profissionais pode ter sido desenhada antes de o plano
+            // ser conhecido (o padrão é Solo, 1 profissional): sem isto, um salão
+            // Equipe veria o cadeado até a próxima renderização.
+            window.SaaSPlanManager.atualizarBotaoAdicionarProfissional(data.professionals);
         }
     }
 
@@ -3853,6 +3857,8 @@ function renderProfissionaisGrid() {
         `;
         profsGrid.appendChild(card);
     });
+
+    window.SaaSPlanManager?.atualizarBotaoAdicionarProfissional(data.professionals);
 }
 
 /* ----------------------------------------------------------------
@@ -4222,6 +4228,13 @@ document.getElementById('btn-delete-service').addEventListener('click', () => {
 
 // Professionals CRUD
 document.getElementById('btn-add-professional').addEventListener('click', () => {
+    // Limite do plano ANTES de abrir o formulário: barrar só no Salvar fazia a
+    // pessoa preencher tudo à toa. A checagem do Salvar continua lá, e o
+    // gatilho trg_check_professional_limit é quem garante no banco.
+    if (window.SaaSPlanManager) {
+        const ativos = (data.professionals || []).filter(p => p.active !== false).length;
+        if (!window.SaaSPlanManager.checkCanAddProfessional(ativos)) return;
+    }
     document.getElementById('prof-id').value = '';
     document.getElementById('form-professional').reset();
     const photoPreview = document.getElementById('prof-photo-preview');

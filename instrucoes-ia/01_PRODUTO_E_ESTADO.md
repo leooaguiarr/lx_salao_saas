@@ -47,6 +47,11 @@ receber" ganha o botão **Receber**: valor preenchido, Pix/Dinheiro/Débito/
 Crédito em um toque, pelo mesmo checkout (`receberAtendimentoRapido`), e em
 seguida o próximo cliente com "Começar agora". Falta a etapa 3: um Início
 próprio do Solo no celular (quem está na cadeira, o próximo, recebido hoje).
+No Solo o menu mostra Início, Agenda, Atendimentos, Clientes, Financeiro e
+Configurações; Estoque, Fidelidade e Crediário **ficam visíveis com cadeado**
+(vitrine do upgrade, decisão de 05/10/2026), assim como "Adicionar
+Profissional". Conta de teste do Solo: `leooaguiarr+solo@gmail.com`, salão
+"Teste Solo" (`teste-solo-cr2y`), criada pela API em 05/10 — sai na limpeza.
 
 ## Infraestrutura (tudo autohospedado)
 
@@ -304,10 +309,10 @@ Da lista do dono do projeto, em ordem sugerida:
 
 1. Testar a cobrança na sandbox de ponta a ponta: checkout Pix → "confirmar
    recebimento" no painel da sandbox → webhook com 200 → salão ativo.
-3. Conferir o risco 3 no SQL Editor e, se faltar, escrever a migração.
-4. Validar um pagamento real de assinatura ponta a ponta.
-5. **Painel Super Admin** da Lexion: todos os salões, faturamento, churn.
-6. **WhatsApp automático** (Evolution API ou Z-API): lembrete 2h antes,
+2. Conferir o risco 3 no SQL Editor e, se faltar, escrever a migração.
+3. Validar um pagamento real de assinatura ponta a ponta.
+4. **Painel Super Admin** da Lexion: todos os salões, faturamento, churn.
+5. **WhatsApp automático** (Evolution API ou Z-API): lembrete 2h antes,
    pós-venda e aniversário.
-7. **Upload de imagens no Supabase Storage** no lugar do base64.
-8. Trazer os testes da Alabama para `instrucoes-ia/ferramentas/` ou `tests/`.
+6. **Upload de imagens no Supabase Storage** no lugar do base64.
+7. Trazer os testes da Alabama para `instrucoes-ia/ferramentas/` ou `tests/`.

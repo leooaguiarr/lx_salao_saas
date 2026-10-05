@@ -155,15 +155,14 @@ Profissional". Conta de teste do Solo: `leooaguiarr+solo@gmail.com`, salão
    `finalizar_venda` recusava toda venda com item (ver 05_ARMADILHAS, "schema
    de vendas"). Depois de aplicar: receber um atendimento de teste pelo
    "Receber" e pela aba Atendimentos, e conferir Financeiro e Comissões.
-   **Duas RPCs que o front chama não estão no schema do SaaS** (suspeita,
-   levantada em 21/09/2026). `pagar_comissoes` (baixa de comissões) e
-   `registrar_movimento_estoque` (toda entrada/saída de estoque) existem só nos
-   scripts antigos (`docs/legacy_sql/21_comissoes.sql` e
-   `add_movimentacao_estoque.sql`); o `00_MASTER` e as migrações 01–06 não as
-   criam. É o mesmo buraco que derrubou o link público e foi fechado pela 06.
-   **Não dá para confirmar pela chave anon** — conferir no SQL Editor:
-   `select proname from pg_proc where proname in ('pagar_comissoes','registrar_movimento_estoque');`
-   Se vier vazio, falta uma migração nova portando as duas para o schema atual.
+   **Comissões e estoque — confirmado em 05/10/2026, migração 14 escrita.**
+   `pagar_comissoes` e `registrar_movimento_estoque` não existiam no banco
+   (chamadas pela API com a conta Teste Solo: PGRST202). A 14 cria as duas
+   nas colunas do SaaS e acrescenta a `stock_movements` as colunas que a tela
+   lê; o `api.js` expõe `qty` e `base_amount`. Ainda sem conferência
+   ponta a ponta: `receber_crediario` e `resgatar_fidelidade` (migração 04)
+   existem, mas podem ter o mesmo descompasso de nomes que a `finalizar_venda`
+   tinha.
 4. **Limites de plano de estoque, fidelidade e crediário só no front-end.** Um
    usuário técnico contorna a trava do `saas-plan.js` pelo console. O limite de
    profissionais já é garantido por gatilho no banco.

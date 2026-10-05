@@ -37,7 +37,7 @@ const STATE_KEYS = {
 const LOGO_PADRAO = '/assets/logo_lexion.png';
 
 // Versão exibida no rodapé do login.
-const VERSAO_DO_SISTEMA = '2.8.1';
+const VERSAO_DO_SISTEMA = '2.8.2';
 
 let currentSelectedDate = new Date();
 

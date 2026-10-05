@@ -656,7 +656,10 @@ const DataService = {
             try {
                 const smResult = await supabaseClient.from('stock_movements').select('*');
                 if (!smResult.error) {
-                    stockMovements = smResult.data || [];
+                    // A quantidade mora em `quantity` no SaaS; a tela (vinda da
+                    // Alabama) lê `qty`. Ver migração 14.
+                    stockMovements = (smResult.data || []).map(mov =>
+                        Object.assign({ qty: mov.quantity }, mov));
                 } else {
                     console.warn("Tabela stock_movements não encontrada no Supabase, usando localStorage:", smResult.error.message);
                     stockMovements = JSON.parse(localStorage.getItem(keys.STOCK_MOVEMENTS)) || [];
@@ -685,6 +688,12 @@ const DataService = {
                         // devolve os dois nomes (migração 13); aqui a leitura
                         // direta ganha os mesmos apelidos.
                         if (tableName === 'sale_items') rows = rows.map(apelidosDoItemDeVenda);
+                        // Mesma história nas comissões: a coluna é
+                        // commission_base, a aba Comissões lê base_amount (e
+                        // mostrava a "Base" sempre zerada).
+                        if (tableName === 'sale_commissions') {
+                            rows = rows.map(c => Object.assign({ base_amount: c.commission_base }, c));
+                        }
                         localStorage.setItem(storageKey, JSON.stringify(rows));
                         return { rows: rows, ready: true };
                     }

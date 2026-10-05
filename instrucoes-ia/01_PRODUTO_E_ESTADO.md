@@ -140,7 +140,7 @@ Profissional". Conta de teste do Solo: `leooaguiarr+solo@gmail.com`, salão
    (migração 06), então essas políticas provavelmente sobraram — mas
    removê-las mexe no agendamento público e precisa de teste ponta a ponta
    antes.
-3. **Vendas — migração 13 escrita em 05/10/2026, falta aplicar.** Até ela, a
+3. **Vendas — migração 13 aplicada em 05/10/2026.** Até ela, a
    `finalizar_venda` recusava toda venda com item (ver 05_ARMADILHAS, "schema
    de vendas"). Depois de aplicar: receber um atendimento de teste pelo
    "Receber" e pela aba Atendimentos, e conferir Financeiro e Comissões.

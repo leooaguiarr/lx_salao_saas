@@ -535,10 +535,12 @@ BEGIN
             sale_id, sale_payment_id, cash_register_id, source
         ) VALUES (
             'tr-' || v_sufixo || '-' || v_seq, v_salao, 'income', v_valor,
-            -- Mesmo formato de new Date().toISOString(): o saldo em gaveta
-            -- compara "registradoEm" com "dateOpened" como texto.
+            -- "registradoEm" é TIMESTAMPTZ no SaaS (na Alabama era texto). O
+            -- to_char da versão antiga aqui derrubou a venda com "column
+            -- registradoEm is of type timestamp with time zone but expression
+            -- is of type text" (05/10/2026): vai o instante, sem formatar.
             to_char(v_competencia, 'YYYY-MM-DD'),
-            to_char(v_agora AT TIME ZONE 'UTC', 'YYYY-MM-DD"T"HH24:MI:SS.MS"Z"'),
+            v_agora,
             v_resumo, v_categoria,
             v_metodo,
             CASE WHEN v_metodo = 'cash' AND v_caixa IS NULL THEN 'pending' ELSE 'completed' END,

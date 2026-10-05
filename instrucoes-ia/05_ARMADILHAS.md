@@ -31,6 +31,10 @@ aqui (data, sintoma, causa, o que fazer).
   mexer em qualquer RPC de venda, crediário, comissão ou estoque, compare o
   payload do front com o que a função lê — `pagar_comissoes` e
   `registrar_movimento_estoque` (risco 3) são suspeitas do mesmo problema.
+  **Os tipos também mudaram:** `transactions."registradoEm"` é `TIMESTAMPTZ`
+  no SaaS (texto na Alabama). Copiar o `to_char(...)` da Alabama para ela
+  derrubou a venda na primeira versão da 13. Confira o tipo no `00_MASTER`
+  antes de portar um INSERT.
 - **O ciclo leve devolve `undefined` de propósito** para `business_info`,
   `professionals` e `products`. Trocar por `[]`/`{}` zera a agenda sem erro.
 - **O `saveData` limpa todo texto que grava** (`sanitizeForStorage`): tira `<`

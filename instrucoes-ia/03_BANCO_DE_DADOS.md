@@ -29,6 +29,7 @@
 | `10_link_publico_com_tema.sql` | `get_public_salon` passa a devolver `theme`, e o link público herda o tema do painel. Aplicada em 27/09/2026 |
 | `11_solo_sem_comissao.sql` | zera a comissão dos profissionais de salões no plano `individual` (Solo), que nasciam com 50%. Aplicada em 05/10/2026 |
 | `12_fecha_acesso_anonimo.sql` | apaga as seis políticas "Agendamento: ..." que davam à chave anon leitura de todos os salões e INSERT livre em `appointments`; fixa o `search_path` do gatilho de limite de profissionais. Aplicada em 05/10/2026 |
+| `13_finalizar_venda_compativel.sql` | `finalizar_venda` volta a ler o payload que a tela manda (`serviceId`/`productId`/`itemName`) e grava nas colunas do SaaS; comissão com taxa em porcentagem (`/100`); validações da Alabama de volta; `stock_movements.sale_id`; `venda_em_json` devolve transações, movimentos, produtos e os apelidos de item da Alabama. Escrita em 05/10/2026 |
 
 **Colunas de cobrança de `business_info` são do servidor.** O gatilho
 `trg_protege_colunas_de_cobranca` descarta, sem erro, qualquer mudança nelas

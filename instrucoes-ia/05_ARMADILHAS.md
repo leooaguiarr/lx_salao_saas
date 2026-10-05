@@ -21,6 +21,16 @@ aqui (data, sintoma, causa, o que fazer).
   público ficaram fora do `00_MASTER` e o link caiu (corrigido pela 06). Suspeita
   aberta do mesmo tipo: ver risco 2 em
   [01_PRODUTO_E_ESTADO.md](01_PRODUTO_E_ESTADO.md).
+- **O schema de vendas do SaaS não usa os nomes que a tela usa** (05/10/2026).
+  A tela veio da Alabama (`serviceId`, `itemName`, `item_name`, `net_amount`,
+  `gross_amount`); as tabelas e RPCs do SaaS (migrações 02 e 04) nasceram com
+  `reference_id`, `name`, `net_total`, `gross_total`. A `finalizar_venda` da 04
+  lia os nomes do SaaS e **nenhuma venda gravava** até a migração 13. A ponte
+  hoje: a 13 aceita o payload da tela e devolve os apelidos; o `api.js`
+  (`apelidosDoItemDeVenda`) põe os apelidos na leitura de `sale_items`. Ao
+  mexer em qualquer RPC de venda, crediário, comissão ou estoque, compare o
+  payload do front com o que a função lê — `pagar_comissoes` e
+  `registrar_movimento_estoque` (risco 3) são suspeitas do mesmo problema.
 - **O ciclo leve devolve `undefined` de propósito** para `business_info`,
   `professionals` e `products`. Trocar por `[]`/`{}` zera a agenda sem erro.
 - **O `saveData` limpa todo texto que grava** (`sanitizeForStorage`): tira `<`

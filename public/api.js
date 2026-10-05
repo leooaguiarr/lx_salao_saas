@@ -68,6 +68,21 @@ function normalizaServico(servico) {
     }
 }
 
+// Item de venda do SaaS com os nomes que a tela lê. A tabela sale_items do
+// SaaS nasceu com nomes próprios (name, gross_total, net_total, reference_id)
+// e as telas de venda vieram da Alabama lendo outros. Mesmos apelidos que a
+// venda_em_json da migração 13 acrescenta.
+function apelidosDoItemDeVenda(item) {
+    const ref = item.reference_id || null;
+    return Object.assign({
+        item_name: item.name,
+        gross_amount: item.gross_total,
+        net_amount: item.net_total,
+        service_id: item.item_type === 'service' ? ref : null,
+        product_id: item.item_type === 'product' ? ref : null
+    }, item);
+}
+
 // Inicializa o cliente Supabase (chamado uma vez ao carregar a página)
 function initSupabase() {
     if (typeof window.supabase !== 'undefined' && SUPABASE_URL !== 'https://SEU-PROJETO.supabase.co') {
@@ -663,7 +678,13 @@ const DataService = {
                 try {
                     const result = await supabaseClient.from(tableName).select('*');
                     if (!result.error) {
-                        const rows = result.data || [];
+                        let rows = result.data || [];
+                        // A tabela do SaaS usa name/gross_total/net_total/
+                        // reference_id; a tela (vindo da Alabama) lê item_name/
+                        // gross_amount/net_amount/service_id/product_id. A RPC já
+                        // devolve os dois nomes (migração 13); aqui a leitura
+                        // direta ganha os mesmos apelidos.
+                        if (tableName === 'sale_items') rows = rows.map(apelidosDoItemDeVenda);
                         localStorage.setItem(storageKey, JSON.stringify(rows));
                         return { rows: rows, ready: true };
                     }

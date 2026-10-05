@@ -140,7 +140,11 @@ Profissional". Conta de teste do Solo: `leooaguiarr+solo@gmail.com`, salão
    (migração 06), então essas políticas provavelmente sobraram — mas
    removê-las mexe no agendamento público e precisa de teste ponta a ponta
    antes.
-3. **Duas RPCs que o front chama não estão no schema do SaaS** (suspeita,
+3. **Vendas — migração 13 escrita em 05/10/2026, falta aplicar.** Até ela, a
+   `finalizar_venda` recusava toda venda com item (ver 05_ARMADILHAS, "schema
+   de vendas"). Depois de aplicar: receber um atendimento de teste pelo
+   "Receber" e pela aba Atendimentos, e conferir Financeiro e Comissões.
+   **Duas RPCs que o front chama não estão no schema do SaaS** (suspeita,
    levantada em 21/09/2026). `pagar_comissoes` (baixa de comissões) e
    `registrar_movimento_estoque` (toda entrada/saída de estoque) existem só nos
    scripts antigos (`docs/legacy_sql/21_comissoes.sql` e

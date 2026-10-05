@@ -37,7 +37,7 @@ const STATE_KEYS = {
 const LOGO_PADRAO = '/assets/logo_lexion.png';
 
 // Versão exibida no rodapé do login.
-const VERSAO_DO_SISTEMA = '2.6.5';
+const VERSAO_DO_SISTEMA = '2.7.0';
 
 let currentSelectedDate = new Date();
 
@@ -4789,6 +4789,20 @@ function getBookingWhatsAppMessage() {
     // exigia a tela de Configurações já renderizada para funcionar.
     return aplicarTagsWhatsApp(data.businessInfo.whatsappBookingMessage || defaultMsg);
 }
+
+// Botão "Enviar link" do cabeçalho. Responde a quem PEDIU o link, por isso
+// não usa o modelo de Configurações: aquele é de divulgação ("agende seu
+// horário para hoje, não deixe pra última hora") e soaria estranho como
+// resposta. Sem número no wa.me, o WhatsApp abre a escolha do contato.
+window.enviarLinkDeAgendamento = function () {
+    const slug = data.businessInfo && data.businessInfo.slug;
+    if (!slug) {
+        showToast('Defina o endereço do seu link em Configurações → Dados do Estabelecimento.', 'error');
+        return;
+    }
+    const msg = `Olá! Para agendar seu horário, é só escolher o dia e a hora por aqui:\n${getPublicBookingUrl(slug)}`;
+    window.open(`https://wa.me/?text=${encodeURIComponent(msg)}`, '_blank');
+};
 
 // Popula o textarea de composição com a mensagem já montada
 function populateBookingDraft() {

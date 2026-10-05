@@ -179,6 +179,10 @@ O cliente pode consultar sua posição usando o mesmo link público da barbearia
 
 Cada estabelecimento possui um endereço público próprio, que pode ser divulgado pelo WhatsApp, Instagram, site ou outros canais.
 
+### Enviar o link em um toque
+
+O botão **Enviar link**, no topo do painel em todas as abas e em todos os planos, abre o WhatsApp com uma mensagem curta e o link, para o profissional escolher o contato. Serve para responder a quem pede "me manda o link?". No celular, aparece como um ícone redondo ao lado do sino. A mensagem de divulgação personalizável continua em Configurações → Link de Agendamento.
+
 ### Experiência do cliente
 
 - Acesso sem login e sem instalação de aplicativo.

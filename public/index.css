@@ -1068,6 +1068,46 @@ button, input, select, textarea {
 }
 
 /* --- Sino de avisos ------------------------------------------------------ */
+/* "Enviar link" do cabeçalho. Encosta no par de ações (o gap de 20px do
+   .header-right o afastaria como se fosse outro assunto). */
+.btn-enviar-link {
+    margin-right: -10px;
+}
+
+.btn-enviar-link .fa-whatsapp {
+    font-size: 16px;
+}
+
+/* Tablet: com o texto, o sino passava da borda em 820px e o título da página
+   virava "In...". Só o ícone, e menos ar entre os botões. O seletor leva o
+   .header-right para vencer o raio de canto que a personalidade do tema põe
+   em todo .btn. */
+@media (max-width: 1024px) {
+    .header-right {
+        gap: 12px;
+    }
+    .header-right .btn-enviar-link {
+        width: 40px;
+        height: 40px;
+        padding: 0;
+        margin-right: 0;
+        justify-content: center;
+        border-radius: var(--radius-full);
+    }
+    .header-right .btn-enviar-link span {
+        display: none;
+    }
+}
+
+/* Faixa estreita com o menu lateral aberto: o par de ações perde um pouco
+   de folga para o título da página não virar reticências. */
+@media (min-width: 769px) and (max-width: 900px) {
+    .header-right .quick-actions .btn {
+        padding: 8px 12px;
+        font-size: 13px;
+    }
+}
+
 .header-sino {
     position: relative;
     width: 40px;
@@ -4173,6 +4213,18 @@ button, input, select, textarea {
     }
     .header-right .quick-actions {
         display: none; /* Hide header btn on small mobile to fit title, bottom bar handles it or inside tabs */
+    }
+    /* No celular o "Enviar link" vira um círculo do tamanho do sino: o
+       cabeçalho só tem espaço para o título e dois ícones. */
+    .header-right .btn-enviar-link {
+        width: 40px;
+        height: 40px;
+        padding: 0;
+        justify-content: center;
+        border-radius: var(--radius-full);
+    }
+    .header-right .btn-enviar-link span {
+        display: none;
     }
     .section-actions-bar {
         flex-direction: column;

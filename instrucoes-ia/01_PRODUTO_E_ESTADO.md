@@ -1,7 +1,7 @@
 # Produto e estado atual
 
 - Repositório: <https://github.com/leooaguiarr/lx_salao_saas> (público), branch `main`
-- Última atualização deste documento: 30/09/2026
+- Última atualização deste documento: 05/10/2026
 
 ## O que é
 
@@ -50,7 +50,7 @@ próprio do Solo no celular (quem está na cadeira, o próximo, recebido hoje).
 No Solo o menu mostra Início, Agenda, Atendimentos, Clientes, Financeiro e
 Configurações; Estoque, Fidelidade e Crediário **ficam visíveis com cadeado**
 (vitrine do upgrade, decisão de 05/10/2026), assim como "Adicionar
-Profissional". Conta de teste do Solo: `leooaguiarr+solo@gmail.com`, salão
+Profissional". Conta de teste do Solo: e-mail do Leonardo com o alias `+solo`, salão
 "Teste Solo" (`teste-solo-cr2y`), criada pela API em 05/10 — sai na limpeza.
 
 ## Infraestrutura (tudo autohospedado)
@@ -172,35 +172,39 @@ Profissional". Conta de teste do Solo: `leooaguiarr+solo@gmail.com`, salão
 6. **Fotos em base64 no banco** (logo, profissionais, produtos). Pesam em cada
    carga. O bucket do Storage já existe no Coolify, mas não está ligado.
 
-## Onde paramos (21/09/2026) — retomar por aqui
+## Onde paramos (05/10/2026) — retomar por aqui
 
-O código da cobrança está pronto e no ar (webhook com token, checkout com
-login, plano só na confirmação). Falta **testar na sandbox**, nesta ordem:
+No ar: versão **2.8.2** (`?v=98`). Migrações 11 a 14 aplicadas. O dia foi
+de consertos que só apareceram usando o sistema de verdade (detalhe de cada
+um no 06_HISTORICO): vendas não gravavam (13), comissões e estoque sem as
+RPCs (14), chave anon com acesso às tabelas (12), checkout de assinatura
+com falso "sessão expirou", link público "travando" no Confirmar.
 
-1. **Rodar a migração `08_plano_so_apos_pagamento.sql`** no SQL Editor (3
-   linhas `ok = true`). Ainda não foi rodada.
-2. **Trocar o Asaas para sandbox no Coolify** (aplicação `lx_salao_saas`,
-   variáveis Production): `ASAAS_ENV=sandbox`, `ASAAS_API_KEY` da sandbox
-   (`$aact_hmlg_...`), **Redeploy**. Em 21/09 o `/api/health` ainda dizia
-   `asaasEnv: production` — **testar assim gera cobrança real**. Conferir
-   `asaasEnv: sandbox` antes do passo 3.
-3. O teste: entrar no painel como **dono** de um salão de teste →
-   Ctrl+Shift+R → clicar no **selo do plano, no rodapé do menu lateral**
-   ("Ver planos e assinar") → escolher um plano diferente do atual → gerar
-   o Pix (a sandbox exige CPF válido; se o QR não aparecer, cadastrar uma
-   chave Pix aleatória na conta sandbox). **Até aqui o plano não pode ter
-   mudado.**
-4. No painel da sandbox, abrir a cobrança e **confirmar o recebimento**.
-5. Conferir: evento com **200** no log de webhooks da sandbox (401 = token
-   diferente do Coolify; 500 = banco recusou); plano novo no selo; e
-   `select name, status, plan_id from public.business_info;` com
-   `status = active` e o plano escolhido. Se o salão não ativar, anotar o
-   **nome do evento** que o Asaas mandou: a função só ativa com
-   `PAYMENT_CONFIRMED`, `PAYMENT_RECEIVED` ou `PAYMENT_AUTHORIZED`.
+**Asaas em produção, cobrando de verdade.** Chave `$aact_prod_` e token no
+Coolify (Literal, sem Buildtime), webhook sequencial na conta principal,
+healthcheck do Coolify em `/api/health` porta 8000. Checkout com cartão
+recorrente (fatura do Asaas) ou Pix. Testado sem pagar: assinatura criada
+no Asaas e `PAYMENT_CREATED`/`PAYMENT_DELETED` gravados com
+`processed = true`.
 
-Pendências menores do mesmo assunto: apagar o log falso do teste de
-21/09 (`delete from public.asaas_webhooks where payment_id = 'pay_falso';`)
-e, depois do teste, o risco 2 (políticas da chave anon).
+**Pendências do Leonardo** (perguntar no início da sessão):
+
+1. **Remover a assinatura de teste** dele no Asaas (*Clientes → Leonardo
+   Aguiar → Assinaturas*). Ele removeu só a cobrança; a assinatura gera outra
+   no mês seguinte.
+2. **Migração 08** — não há confirmação de que rodou. Sem ela, quem paga é
+   ativado mas não muda de plano. Rodar (é idempotente) e ver 3× `true`.
+3. **Testar pela tela** (conta de desenvolvedor, Ilimitado): entrada de
+   estoque (saldo e histórico) e baixa de comissão com a coluna "Base".
+4. **Primeiro cliente real que pagar**: conferir
+   `select name, status, plan_id from public.business_info where ...` com
+   `status = active`. A ativação por pagamento nunca foi vista em produção.
+
+**Contas de teste:** Teste Solo (e-mail do Leonardo com o alias `+solo`, slug
+`teste-solo-cr2y`, plano individual) — tem agendamentos e duas vendas de
+teste; a senha está com o Leonardo. Conta de desenvolvedor no Ilimitado
+(`contato@lexionconsultoria.com.br`). Ambas saem (ou ficam) na limpeza do
+checklist de lançamento.
 
 ## Checklist de lançamento
 
@@ -321,10 +325,12 @@ e nenhum identificador interno ou dado pessoal é enviado no evento.
 
 Da lista do dono do projeto, em ordem sugerida:
 
-1. Testar a cobrança na sandbox de ponta a ponta: checkout Pix → "confirmar
-   recebimento" no painel da sandbox → webhook com 200 → salão ativo.
-2. Conferir o risco 3 no SQL Editor e, se faltar, escrever a migração.
-3. Validar um pagamento real de assinatura ponta a ponta.
+1. Conferir `receber_crediario` e `resgatar_fidelidade` (migração 04) contra
+   o payload que a tela manda — mesmo descompasso possível da
+   `finalizar_venda` (ver 05_ARMADILHAS, "schema de vendas").
+2. Estorno (`PAYMENT_REFUNDED`) e chargeback desativarem o salão sozinhos;
+   hoje só ficam no log `asaas_webhooks`.
+3. Limpeza do banco (checklist de lançamento, item 1).
 4. **Painel Super Admin** da Lexion: todos os salões, faturamento, churn.
 5. **WhatsApp automático** (Evolution API ou Z-API): lembrete 2h antes,
    pós-venda e aniversário.
